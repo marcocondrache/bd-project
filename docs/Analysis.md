@@ -5,6 +5,7 @@
 - Products
 - Carts
 - Orders
+- Shipments
 - Reviews
 - Sessions
 
@@ -17,15 +18,16 @@
 
 - One User has N Orders
 - One Order has One (finalized) Cart
+- One Shipment has One Order
 
 - One User has one Profile
 
 
-## authorizations
+## Authorizations
 The users cannot search and buy for their own products
 
 
-## authentication
+## Authentication
 The user isn't required to log in ("anonymous" session) to use a cart
 - If logged in, then the cart belongs to the user
 - If not belong to an anonymous session
