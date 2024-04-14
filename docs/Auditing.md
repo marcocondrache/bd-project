@@ -3,11 +3,10 @@ We decided to handle the auditing of database entities changes via triggers and 
 
 The entities that have auditing enabled are:
 - `products`
+- `product_reservations` 
 - `carts`
 - `orders`
 - `shipments`
-
-It could be helpful to introduce the auditing also for `product_reservations` in order to analyze the changes that users make to their reservations, for example the quantity of products reserved.
 
 ## Implementation
 To summarize, the auditing is implemented in the following way:
