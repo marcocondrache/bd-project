@@ -35,5 +35,4 @@ AFTER UPDATE OF current_status ON carts
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE FUNCTION update_cart_history();
-
 ```
