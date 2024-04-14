@@ -8,13 +8,13 @@ class Base(Flask):
     def configure_modules(self):
         modules = self.config.get('BLUEPRINTS', [])
 
-        for module in modules:
+        for blueprint in modules:
             try:
-                import_module('app.modules.%s' % module)
-                self.register_blueprint(module)
+                module = import_module('app.modules.%s' % blueprint)
+                self.register_blueprint(getattr(module, blueprint))
             except Exception as e:
                 print(e)
-                self.logger.error('Error registering module %s' % module)
+                self.logger.error('Error registering %s' % blueprint)
 
     def configure_error_handlers(self):
         @self.errorhandler(500)

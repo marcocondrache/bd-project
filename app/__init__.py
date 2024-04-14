@@ -1,8 +1,9 @@
+from importlib import import_module
 from factory.app import Base
 
 def read_config(path):
     if isinstance(path, str):
-        module = __import__('config', fromlist=[path])
+        module = import_module('config')
         return getattr(module, path)
     return path
 
