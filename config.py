@@ -1,8 +1,11 @@
 import os
 
-class Config(object):
+from extentions import db
+class Prod(object):
     ENV = os.getenv("FLASK_ENV", "production")
     DEBUG = os.getenv('FLASK_DEBUG', '0') == '1'
+
+    TESTING = False
 
     DB_USER = os.getenv('DB_USER', '')
     DB_PASS = os.getenv('DB_PASS', '')
@@ -17,6 +20,7 @@ class Config(object):
     }
 
     BLUEPRINTS = ["auth"]
+    EXTENSIONS = [db]
 
-class Dev(Config):
-    pass
+class Dev(Prod):
+    DEBUG = True

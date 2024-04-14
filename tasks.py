@@ -6,5 +6,4 @@ def setup(c):
 
 @task
 def dev(c):
-    c.prefix("FLASK_CONFIG_DEFAULT=Dev")
     c.run("python wsgi.py")
