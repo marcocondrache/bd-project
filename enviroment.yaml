@@ -1,0 +1,8 @@
+name: kepler-shop
+channels:
+  - defaults
+dependencies:
+  - invoke
+
+  - pip
+  - python=3.10
