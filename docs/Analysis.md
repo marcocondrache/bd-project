@@ -18,7 +18,7 @@
 
 - One User has N Orders
 - One Order has One (finalized) Cart
-- One Shipment has One Order
+- One Shipment has One (completed) Order
 
 - One User has one Profile
 
@@ -177,6 +177,8 @@ the buyer and the products can be shown.
 > 
 > If the product is damaged,
 > or the user is not satisfied, the order can be refunded.
+> 
+> _We will not implement the final three states of the shipment._
 
 # Reviews
 The product has reviews, which are pairs (ratings, review) with one required.
