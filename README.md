@@ -4,6 +4,6 @@ To create and activate a new enviroment use the following commands:
 
 ```sh
 $ cd bd-project
-$ conda env new --file enviroment.yaml && conda activate kepler-shop
+$ conda env create -f environment.yaml && conda activate kepler-shop
 $ invoke setup dev
 ```
