@@ -6,4 +6,4 @@ def setup(c):
 
 @task
 def dev(c):
-    c.run("flask --app app run")
+    c.run("python wsgi.py")
