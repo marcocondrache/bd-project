@@ -1,6 +1,6 @@
 import os
 
-from extentions import db
+from extentions import db, auth
 
 
 class Prod(object):
@@ -21,8 +21,8 @@ class Prod(object):
         'name': DB_NAME
     }
 
-    BLUEPRINTS = ["auth"]
-    EXTENSIONS = [db]
+    BLUEPRINTS = ["main", "auth"]
+    EXTENSIONS = [db, auth]
 
 
 class Dev(Prod):
