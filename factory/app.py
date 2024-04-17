@@ -27,7 +27,7 @@ class Base(Flask):
             return render_template("http/404.html"), 404
 
     def configure_extensions(self):
-        extensions = self.config.get('EXTENTIONS', [])
+        extensions = self.config.get('EXTENSIONS', [])
 
         for extension in extensions:
             init = getattr(extension, 'init_app', False)

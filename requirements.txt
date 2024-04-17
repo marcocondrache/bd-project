@@ -1,4 +1,7 @@
 Flask
 Flask-SQLAlchemy
+Flask-Login
 SQLAlchemy
 invoke
+python-dotenv
+psycopg2
