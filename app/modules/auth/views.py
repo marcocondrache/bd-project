@@ -1,4 +1,4 @@
-from . import auth
+from app.modules.auth import auth
 
 
 @auth.route("/login")
