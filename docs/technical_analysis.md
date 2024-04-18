@@ -25,14 +25,20 @@ The user can do the following actions:
 # User
 The user can do the following actions:
 - ## Update profile
-  - From the profile page
+  - Input: (given name, family name, password, IBAN, show sold-out products, card number, destination address)
+  - Output: User
+  - From: the profile page
+  - Flow:
     - If the user is a seller, the IBAN and show sold-out products options are shown.
     - If the user is a buyer, the card number and destination address options are shown.
   - The user can update the given name, family name, password and the other options according to the role.
   - _The user entity is updated._
   - _The buyer or seller entity is updated._
 - ## Delete profile
-  - From the profile page
+  - Input: (guid)
+  - Output: None
+  - From: the profile page
+  - Flow:
   - The user must confirm the deletion.
   - _The user entity is deleted._
   - _The buyer or seller entity is deleted._
@@ -43,10 +49,33 @@ The user can do the following actions:
 # Product
 The seller can do the following actions:
 - ## Create product
-  - From the product creation page
+  - Input: (name*, price*, quantity*, categories*, description, brand, is second-hand)
+  - Output: Product
+  - From: the product creation page
+  - Flow:
   - The user must provide a name, price, quantity, categories.
     - Optionally, the user can provide a description, brand, "is second-hand" option.
-    - The currency is defaulted to EURO.
+    - The currency is defaulted to the EURO.
   - _A new product entity is created._
   - If the categories do not exist, _new category entities are created._
   - _New product-category associations are created._
+- ## Update product
+  - Input: (price, quantity, categories, description)
+  - Output: Product
+  - From: the product page
+  - Flow:
+  - The user can update the price, quantity, categories, description.
+  - _The product entity is updated._
+  - _The product sequence is incremented._ (for the product reservation)
+  - If the categories do not exist, _new category entities are created._
+  - _New product-category associations are created._
+  - _The history is triggered._
+- ## Delete product
+  - Input: (guid)
+  - Output: None
+  - From: the product page
+  - Flow:
+  - The user must confirm the deletion.
+  - _Deleted_at is set to the current timestamp._
+  - _The product sequence is incremented._
+  - _The history is triggered._
