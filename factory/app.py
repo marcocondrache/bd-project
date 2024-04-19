@@ -28,10 +28,15 @@ class Base(Flask):
 
     def configure_extensions(self):
         extensions = self.config.get('EXTENSIONS', [])
+        print(extensions)
 
         for extension in extensions:
             init = getattr(extension, 'init_app', False)
             init(self)
+        
+        migrate = self.config.get('MIGRATE', False)
+        if migrate:
+            migrate.init_app(self, extensions[0])
 
     def setup(self):
         self.configure_modules()
