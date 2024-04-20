@@ -9,3 +9,7 @@ def setup(c):
 @task
 def dev(c):
     c.run("python wsgi.py")
+
+@task
+def migrate(c):
+    c.run("flask db upgrade")
