@@ -22,10 +22,7 @@ class Prod(object):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
     BLUEPRINTS = ["main", "auth", "home"]
-    EXTENSIONS = [db, login_manager]
-
-    # loading separately because of init app arguments
-    MIGRATE = migrate
+    EXTENSIONS = [db, login_manager, migrate]
 
 
 class Dev(Prod):

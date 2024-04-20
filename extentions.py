@@ -14,3 +14,6 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 
 migrate = Migrate()
+
+def migrate_kwargs():
+    return {"db": db}
