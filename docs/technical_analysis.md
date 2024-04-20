@@ -57,6 +57,7 @@ The seller can do the following actions:
     - Optionally, the user can provide a description, brand, "is second-hand" option.
     - The currency is defaulted to the EURO.
   - _A new product entity is created._
+  - _The keywords in the product text fields are saved._
   - If the categories do not exist, _new category entities are created._
   - _New product-category associations are created._
 - ## Update product
