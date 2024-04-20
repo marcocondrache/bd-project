@@ -3,6 +3,7 @@ from app.modules.main import main
 from flask_login import current_user
 
 
+
 @main.route('/')
 def index():
     if current_user.is_authenticated:
