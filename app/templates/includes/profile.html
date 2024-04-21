@@ -86,6 +86,7 @@
 					Save
 				</button>
 				<button x-show="!profileEditMode"
+				 x-on:click="window.location.href = 'auth/logout'"
 				 class="flex rounded-lg bg-red-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
 					Logout
 				</button>
