@@ -1,5 +1,6 @@
 from importlib import import_module
 from flask import Flask, render_template
+from werkzeug.utils import import_string
 
 
 class Base(Flask):
@@ -31,7 +32,12 @@ class Base(Flask):
 
         for extension in extensions:
             init = getattr(extension, 'init_app', False)
-            init(self)
+            # load additional kwargs
+            try:
+                init_kwargs = import_string('%s_init_kwargs' % extension)()
+            except ImportError:
+                init_kwargs = dict()
+            init(self, **init_kwargs)
 
     def setup(self):
         self.configure_modules()
