@@ -79,8 +79,22 @@
 			profileOpen: false,
 			asideOpen: true,
 			linkShown: false,
+			profileEditMode: false,
 		}));
 	});
+
+	async function saveProfile(card_number, destination_address) {
+		return await fetch('/buyers', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				card_number,
+				destination_address,
+			})
+		});
+	}
 </script>
 </body>
 </html>
