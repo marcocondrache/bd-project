@@ -74,22 +74,44 @@
 </main>
 
 <script>
+	async function editUser() {
+		console.log("edit user", JSON.stringify(this.profile))
+
+		const response = await fetch('/users', {
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(this.profile)
+		});
+
+		if (response.ok) {
+			this.originalProfile = this.profile;
+			this.profileEditMode = false;
+		} else {
+			alert("Failed to update user"); // TODO find the will to do
+		}
+	}
+
 	document.addEventListener("alpine:init", () => {
 		Alpine.data("layout", () => ({
 			profileOpen: false,
 			asideOpen: true,
 			linkShown: false,
 			profileEditMode: false,
-		}));
-	});
+			editUser,
+			profile: {
+				destination_address: "{{ current_user.buyers[0].destination_address }}",
+				card_number: "{{ current_user.buyers[0].card_number }}",
 
-	async function editUser(body) {
-		return await fetch('/users/{{ current_user.guid }}', {
-			method: 'PUT',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(body)
-		});
-	}
+				{% if current_user.sellers %} iban: "{{ current_user.sellers[0].iban }}", {% endif %}
+			},
+			originalProfile: {
+				destination_address: "{{ current_user.buyers[0].destination_address }}",
+				card_number: "{{ current_user.buyers[0].card_number }}",
+
+				{% if current_user.sellers %} iban: "{{ current_user.sellers[0].iban }}", {% endif %}
+			}
+	}));
+	});
 </script>
 </body>
 </html>

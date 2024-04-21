@@ -11,12 +11,7 @@
 			<img class="w-32 h-32 rounded-full mx-auto" src="https://source.boringavatars.com/"
 			     alt={{ current_user.given_name }}>
 		</div>
-		<div class="p-2" x-data="{
-			destinationAddress: '{{ current_user.buyers[0].destination_address }}',
-			cardNumber: '{{ current_user.buyers[0].card_number }}',
-			iban: '{{ current_user.sellers[0].iban }}'
-		}">
-			<form @submit.prevent="editUser($data).then(() => profileEditMode = false)">
+		<div class="p-2">
 				<h3 class="text-center text-xl text-gray-900 font-medium leading-8">
 					{{ current_user.given_name }} {{ current_user.family_name }}
 				</h3>
@@ -27,7 +22,7 @@
 				<!-- Seller or Buyer -->
 				{% if current_user.sellers %}
 					<div class="text-center text-gray-400 text-xs font-semibold my-4">
-						<p>Seller</p>
+						<p>Seller account</p>
 					</div>
 				{% else %}
 					<a href="/sellers/register"
@@ -43,16 +38,16 @@
 					<tbody>
 					<tr>
 						<td class="py-2 text-gray-500 font-semibold">Address</td>
-						<td class="py-2" x-text="destinationAddress"></td>
+						<td class="py-2" x-text="profile.destination_address"></td>
 					</tr>
 					<tr>
 						<td class="py-2 pr-2 text-gray-500 font-semibold">Card Number</td>
-						<td class="py-2" x-text="cardNumber"></td>
+						<td class="py-2" x-text="profile.card_number"></td>
 					</tr>
 					{% if current_user.sellers %}
 						<tr>
-							<td class="px-2 py-2 text-gray-500 font-semibold">IBAN</td>
-							<td class="px-2 py-2" x-text="iban"></td>
+							<td class="pr-2 py-2 text-gray-500 font-semibold">IBAN</td>
+							<td class="pr-2 py-2" x-text="profile.iban"></td>
 						</tr>
 					{% endif %}
 					</tbody>
@@ -65,8 +60,8 @@
 							<label for="destinationAddress">Address</label>
 						</td>
 						<td class="py-2">
-							<input x-model="destinationAddress" id="destinationAddress" type="text"
-							       class="w-full border border-gray-300 rounded-lg">
+							<input x-model="profile.destination_address" id="destinationAddress" type="text"
+							       class="border-2 border-gray-200 rounded-lg p-2 my-2">
 						</td>
 					</tr>
 					<tr>
@@ -74,16 +69,16 @@
 							<label for="cardNumber">Card Number</label>
 						</td>
 						<td class="py-2">
-							<input x-model="cardNumber" id="cardNumber" type="text" class="w-full border border-gray-300 rounded-lg">
+							<input x-model="profile.card_number" id="cardNumber" type="text" class="border-2 border-gray-200 rounded-lg p-2 my-2">
 						</td>
 					</tr>
 					{% if current_user.sellers %}
 						<tr>
-							<td class="px-2 py-2 text-gray-500 font-semibold">
+							<td class="pr-2 py-2 text-gray-500 font-semibold">
 								<label for="iban">IBAN</label>
 							</td>
-							<td class="px-2 py-2">
-								<input x-model="iban" id="iban" type="text" class="w-full border border-gray-300 rounded-lg">
+							<td class="pr-2 py-2">
+								<input x-model="profile.iban" id="iban" type="text" class="border-2 border-gray-200 rounded-lg p-2 my-2">
 							</td>
 						</tr>
 					{% endif %}
@@ -104,16 +99,15 @@
 				</div>
 
 				<div class="flex justify-center space-x-4" x-show="profileEditMode">
-					<button type="submit"
+					<button @click="await editUser()"
 					        class="flex rounded-lg bg-green-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
 						Save
 					</button>
-					<button type="reset" @click="profileEditMode = false; destinationAddress = '{{ current_user.buyers[0].destination_address }}'; cardNumber = '{{ current_user.buyers[0].card_number }}'; iban = '{{ current_user.sellers[0].iban }}'"
+					<button @click="profileEditMode = false; profile = originalProfile"
 					        class="flex rounded-lg bg-red-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
 						Cancel
 					</button>
 				</div>
-			</form>
 		</div>
 	</div>
 {% endblock %}
