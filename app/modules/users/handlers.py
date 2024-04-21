@@ -9,3 +9,12 @@ def create_user(email: str, given_name: str, family_name: str, password: str):
     db.session.add(user)
     db.session.commit()
     return user
+
+
+def update_user(user_id: int, password: str):
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return None
+    user.password = generate_password_hash(password)
+    db.session.commit()
+    return user

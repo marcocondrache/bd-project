@@ -1,0 +1,61 @@
+{% block profile_card %}
+	<!-- Modal Background -->
+	<div x-show="profileOpen" class="fixed inset-0 bg-black opacity-50"></div>
+
+	<!-- Modal Content -->
+	<div x-show="profileOpen" @click.outside="profileOpen = false" x-transition
+	     class="fixed inset right-0 top-16 m-2 max-w-xs bg-white shadow-xl rounded-lg py-3"
+	>
+		<!-- User Profile Content -->
+		<div class="photo-wrapper p-2">
+			<img class="w-32 h-32 rounded-full mx-auto" src="https://source.boringavatars.com/"
+			     alt={{ current_user.given_name }}>
+		</div>
+		<div class="p-2">
+			<h3 class="text-center text-xl text-gray-900 font-medium leading-8">
+				{{ current_user.given_name }} {{ current_user.family_name }}
+			</h3>
+			{% if current_user.sellers %}
+				<div class="text-center text-gray-400 text-xs font-semibold">
+					<p>Seller</p>
+				</div>
+			{% else %}
+				<div class="text-center text-xs text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium">
+					<a> Become a seller! </a>
+				</div>
+			{% endif %}
+			<table class="text-xs my-3">
+				<tbody>
+				<tr>
+					<td class="px-2 py-2 text-gray-500 font-semibold">Email</td>
+					<td class="px-2 py-2">{{ current_user.email }}</td>
+				</tr>
+				<tr>
+					<td class="px-2 py-2 text-gray-500 font-semibold">Address</td>
+					<td class="px-2 py-2">{{ current_user.buyers[0].destination_address }}</td>
+				</tr>
+				<tr>
+					<td class="px-2 py-2 text-gray-500 font-semibold">Card Number</td>
+					<td class="px-2 py-2">{{ current_user.buyers[0].card_number }}</td>
+				</tr>
+				{% if current_user.sellers %}
+					<tr>
+						<td class="px-2 py-2 text-gray-500 font-semibold">IBAN</td>
+						<td class="px-2 py-2">{{ current_user.sellers[0].iban }}</td>
+					</tr>
+				{% endif %}
+				</tbody>
+			</table>
+
+			<div class="mt-4 mb-2 flex gap-8 justify-center">
+				<a class="text-xs text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium" href="#">
+					Edit Profile
+				</a>
+				<a class="text-xs text-red-500 italic hover:underline hover:text-red-500 font-medium" href="/auth/logout">
+					Logout
+				</a>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

@@ -11,3 +11,13 @@ def create_buyer(destination_address: str, card_number: str, user_id: int):
     db.session.add(buyer)
     db.session.commit()
     return user
+
+
+def update_buyer(buyer_id: int, destination_address: str, card_number: str):
+    buyer = Buyer.query.filter_by(id=buyer_id).first()
+    if not buyer:
+        return None
+    buyer.destination_address = destination_address
+    buyer.card_number = card_number
+    db.session.commit()
+    return buyer
