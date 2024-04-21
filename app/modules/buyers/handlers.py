@@ -1,20 +1,16 @@
 from app.modules.buyers.models import Buyer
-from app.modules.users.models import User
 from extensions import db
 
 
 def create_buyer(destination_address: str, card_number: str, user_id: int):
-    user = User.query.filter_by(id=user_id).first()
-    if not user:
-        return None
     buyer = Buyer(destination_address=destination_address, card_number=card_number, user_id=user_id)
     db.session.add(buyer)
     db.session.commit()
-    return user
+    return buyer
 
 
-def update_buyer(guid: str, destination_address: str, card_number: str):
-    buyer = Buyer.query.filter_by(guid=guid).first()
+def update_buyer(user_id: int, destination_address: str, card_number: str):
+    buyer = Buyer.query.filter_by(user_id=user_id).first()
     if not buyer:
         return None
     buyer.destination_address = destination_address
