@@ -1,6 +1,6 @@
 import os
 
-from extentions import db, login_manager, migrate
+from extensions import db, login_manager, migrate
 from dotenv import load_dotenv
 
 
@@ -22,8 +22,11 @@ class Prod(object):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
     BLUEPRINTS = ["main", "auth", "home"]
-    EXTENSIONS = [db, login_manager, migrate]
-
+    EXTENSIONS = [
+        'extensions.db', 
+        'extensions.login_manager', 
+        'extensions.migrate'
+        ]
 
 class Dev(Prod):
     DEBUG = True

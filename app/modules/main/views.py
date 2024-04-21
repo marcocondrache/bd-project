@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for
-from extentions import login_manager
+from extensions import login_manager
 from app.modules.main import main
 from flask_login import current_user
 from flask_login import login_required

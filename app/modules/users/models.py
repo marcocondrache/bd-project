@@ -1,4 +1,4 @@
-from extentions import db
+from extensions import db
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from flask_login import UserMixin
