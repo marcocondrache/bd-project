@@ -1,0 +1,31 @@
+{% extends 'layouts/auth.html' %}
+
+{% block title %}  Seller Registration{% endblock %}
+{% block h1_title %}  Become a seller!{% endblock %}
+
+{% block content %}
+	{% with errors = get_flashed_messages() %}
+		{% if errors %}
+			<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 my-2 rounded relative" role="alert">
+				<strong class="font-bold">Error!</strong>
+				<span class="block sm:inline">{{ errors[0] }}</span>
+			</div>
+		{% endif %}
+	{% endwith %}
+	<form action="/sellers/register" method="POST">
+		<div class="mb-4">
+			<label for="iban" class="block text-gray-700 text-sm font-bold mb-2">IBAN</label>
+			<input type="text" name="iban" id="iban" required
+			       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+		</div>
+		<div class="mb-4">
+			<input type="checkbox" name="show_soldout_products" id="show_soldout_products" class="mr-2">
+			<label for="show_soldout_products" class="text-gray-700 text-sm font-bold mb-2">Show sold out products</label>
+		</div>
+		<div class="mb-4">
+			<button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+				Register
+			</button>
+		</div>
+	</form>
+{% endblock %}

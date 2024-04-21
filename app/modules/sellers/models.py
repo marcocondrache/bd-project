@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 else:
     User = "User"
 
+
 class Seller(db.Model):
     __tablename__ = "sellers"
 

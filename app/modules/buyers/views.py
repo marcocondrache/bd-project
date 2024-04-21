@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 from flask import request
 
 
-@buyers.route('/', methods=['PUT'])
+@buyers.route('', methods=['PUT'])
 @login_required
 def edit_buyer():
     current_user_id = current_user.id

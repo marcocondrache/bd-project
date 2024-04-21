@@ -29,7 +29,7 @@
 					<p>Seller</p>
 				</div>
 			{% else %}
-				<a href="/sellers/create" class="flex rounded-lg bg-indigo-500 h-10 text-white text-xs font-semibold py-1 px-2 my-4 block justify-center items-center align-center">
+				<a href="/sellers/register" class="flex rounded-lg bg-indigo-500 h-10 text-white text-xs font-semibold py-1 px-2 my-4 block justify-center items-center align-center">
 					Become a seller!
 				</a>
 			{% endif %}
@@ -63,7 +63,7 @@
 				</tbody>
 			</table>
 
-			<!-- Edit Profile and Logout Buttons , should be in the same row and occupate the whole row -->
+			<!-- Edit Profile and Logout Buttons should be in the same row and occupation the whole row -->
 			<div class="flex justify-center space-x-4">
 				<button x-show="!profileEditMode" x-on:click="profileEditMode = true"
 				 class="flex rounded-lg bg-indigo-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">

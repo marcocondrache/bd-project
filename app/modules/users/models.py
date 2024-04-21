@@ -7,9 +7,11 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from extensions import db
 if TYPE_CHECKING:
+    from app.modules.sellers.models import Seller
     from app.modules.buyers.models import Buyer
 else:
     Buyer = "Buyer"
+    Seller = "Seller"
 
 
 class User(UserMixin, db.Model):
@@ -28,6 +30,7 @@ class User(UserMixin, db.Model):
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     buyers: Mapped[List["Buyer"]] = db.relationship("Buyer", back_populates="user")
+    sellers: Mapped[List["Seller"]] = db.relationship("Seller", back_populates="user")
 
     def get_id(self):
         return str(self.guid)
