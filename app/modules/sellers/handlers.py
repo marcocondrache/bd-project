@@ -13,8 +13,8 @@ def create_seller(user_id: int, iban: str, show_soldout_products: bool):
     return user
 
 
-def update_seller(user_id: int, iban: str, show_soldout_products: bool):
-    seller = Seller.query.filter_by(user_id=user_id).first()
+def update_seller(guid: str, iban: str, show_soldout_products: bool):
+    seller = Seller.query.filter_by(guid=guid).first()
     if not seller:
         return None
     seller.iban = iban

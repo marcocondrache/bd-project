@@ -83,16 +83,11 @@
 		}));
 	});
 
-	async function saveProfile(card_number, destination_address) {
-		return await fetch('/buyers', {
+	async function editUser(body) {
+		return await fetch('/users/{{ current_user.guid }}', {
 			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				card_number,
-				destination_address,
-			})
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(body)
 		});
 	}
 </script>
