@@ -31,12 +31,15 @@ class Base(Flask):
         extensions = self.config.get('EXTENSIONS', [])
 
         for extension in extensions:
-            init = getattr(extension, 'init_app', False)
+            ext = import_string(extension)
+            init = getattr(ext, 'init_app', False) or ext
+
             # load additional kwargs
             try:
                 init_kwargs = import_string('%s_init_kwargs' % extension)()
             except ImportError:
                 init_kwargs = dict()
+
             init(self, **init_kwargs)
 
     def setup(self):
