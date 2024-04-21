@@ -1,4 +1,4 @@
-from extentions import login_manager, db
+from extensions import login_manager, db
 from app.modules.users.models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 
