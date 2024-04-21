@@ -39,7 +39,6 @@ class Base(Flask):
                 init_kwargs = import_string('%s_init_kwargs' % extension)()
             except ImportError:
                 init_kwargs = dict()
-
             init(self, **init_kwargs)
 
     def setup(self):

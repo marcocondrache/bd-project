@@ -1,5 +1,6 @@
 import os
 
+from extensions import db, login_manager, migrate
 from dotenv import load_dotenv
 
 
@@ -26,7 +27,6 @@ class Prod(object):
         'extensions.login_manager', 
         'extensions.migrate'
         ]
-
 
 class Dev(Prod):
     DEBUG = True
