@@ -18,4 +18,6 @@ def seller_registration():
             flash('Seller not created')
         else:
             return redirect(url_for('home.index'))
+    if current_user.sellers:
+        return redirect(url_for('home.index'))
     return render_template('sellers/register.html')

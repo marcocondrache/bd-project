@@ -15,6 +15,13 @@ if TYPE_CHECKING:
 else:
     Seller = "Seller"
 
+association_table = Table(
+    "product_categories_association",
+    Base.metadata,
+    db.Column("product_id", db.ForeignKey("products.id"), primary_key=True),
+    db.Column("product_category_id", db.ForeignKey("product_categories.id"), primary_key=True),
+)
+
 
 class ProductCategory(db.Model):
     __tablename__ = "product_categories"
@@ -28,16 +35,12 @@ class ProductCategory(db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
+    products: Mapped[List[Product]] = db.relationship(
+        "Product", secondary=association_table, back_populates="categories"
+    )
+
     def __repr__(self):
         return f"<ProductCategory name={self.name} description={self.description}>"
-
-
-association_table = Table(
-    "product_categories_association",
-    Base.metadata,
-    db.Column("product_id", db.ForeignKey("products.id")),
-    db.Column("product_category_id", db.ForeignKey("product_categories.id")),
-)
 
 
 class Product(db.Model):
@@ -60,11 +63,13 @@ class Product(db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
-    seller: Mapped["Seller"] = db.relationship("Seller", back_populates="products")
+    seller: Mapped[Seller] = db.relationship("Seller", back_populates="products")
 
-    categories: Mapped[List[ProductCategory]] = db.relationship(ProductCategory, secondary=association_table, back_populates="products")
+    categories: Mapped[List[ProductCategory]] = db.relationship(
+        ProductCategory, secondary=association_table, back_populates="products"
+    )
 
     def __repr__(self):
-        return (f"<Product guid={self.guid} owner_seller_id={self.owner_seller_id} name={self.name} description={self.description} "
-                f"brand={self.brand} is_second_hand={self.is_second_hand} sequence={self.sequence} price={self.price} "
-                f"currency={self.currency} stock={self.stock}>")
+        return (f"<Product guid={self.guid} owner_seller_id={self.owner_seller_id} name={self.name} "
+                f"description={self.description} brand={self.brand} is_second_hand={self.is_second_hand} "
+                f"sequence={self.sequence} price={self.price} currency={self.currency} stock={self.stock}>")

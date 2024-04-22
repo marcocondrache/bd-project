@@ -17,7 +17,7 @@ class Buyer(db.Model):
     card_number: Mapped[str] = mapped_column("current_card_number", db.String(255), nullable=False)
     user_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    user: Mapped["User"] = db.relationship("User", back_populates="buyers")
+    user: Mapped[User] = db.relationship("User", back_populates="buyers")
 
     def __repr__(self):
         return (f"<Buyer user={self.user.email} destination_address={self.destination_address} "

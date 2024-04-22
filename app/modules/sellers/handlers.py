@@ -1,3 +1,5 @@
+from flask_login import current_user
+
 from app.modules.sellers.models import Seller
 from app.modules.users.models import User
 from extensions import db

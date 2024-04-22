@@ -1,11 +1,11 @@
 from flask_login import login_required, current_user
-from flask import request
+from flask import request, render_template
 
 from app.modules.products import products
 from app.modules.products.handlers import create_product
 
 
-@products.route('', methods=['GET, POST'])
+@products.route('', methods=['GET', 'POST'])
 @login_required
 def user_products():
     if request.method == 'POST':
@@ -23,5 +23,4 @@ def user_products():
             return {'message': 'seller not found'}, 404
 
         return {'message': 'product created'}, 200
-    else:
-        return {'message': 'user products'}, 200
+    return render_template('products/index.html')

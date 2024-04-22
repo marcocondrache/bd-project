@@ -11,7 +11,7 @@
 	{% endblock %}
 </head>
 <body>
-<main class="min-h-screen w-full bg-gray-100 text-gray-700" x-data="layout">
+<main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout">
 	<!-- header page -->
 	<header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 h-16">
 		<!-- logo -->
@@ -21,52 +21,50 @@
 		</div>
 
 		<!-- button profile -->
-		<button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
-			Hello, {{ current_user.given_name }}
-		</button>
+		<div class="flex gap-4">
+			{% if not current_user.sellers %}
+				<a href="/sellers/register"
+				   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-white text-xs font-semibold p-2 flex items-center justify-center">
+					Become a seller!
+				</a>
+			{% endif %}
+			<button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
+				Hello, {{ current_user.given_name }}
+			</button>
+		</div>
 
 		<!-- profile card -->
 		{% include "includes/profile.html" %}
 	</header>
 
-	<div class="flex h-[calc(100vh-4rem)]">
+	<div class="flex grow border border-red">
 		<!-- aside -->
-		<aside class="flex w-72 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+		<aside class="flex w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
 		       x-show="asideOpen"
-		       x-transition:enter="transition ease-out duration-300"
-		       x-transition:enter-start="opacity-0 scale-90"
-		       x-transition:enter-end="opacity-100 scale-100"
-		       x-transition:leave="transition ease-in duration-300"
-		       x-transition:leave-start="opacity-100 scale-100"
-		       x-transition:leave-end="opacity-0 scale-90">
-			<a href="#" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
+				{# FIXME #}
+				   x-transition:enter="transition ease-out duration-300"
+				   x-transition:enter-start="opacity-0 scale-90"
+				   x-transition:enter-end="opacity-100 scale-100"
+				   x-transition:leave="transition ease-in duration-300"
+				   x-transition:leave-start="opacity-100 scale-100"
+				   x-transition:leave-end="opacity-0 scale-90">
+
+			<a href="/" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
 				<span class="text-2xl"><i class="bx bx-home"></i></span>
 				<span>Dashboard</span>
 			</a>
 
-			<a href="#" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-				<span class="text-2xl"><i class="bx bx-cart"></i></span>
-				<span>Cart</span>
-			</a>
-
-			<a href="#" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-				<span class="text-2xl"><i class="bx bx-shopping-bag"></i></span>
-				<span>Shopping</span>
-			</a>
-
-			<a href="#" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-				<span class="text-2xl"><i class="bx bx-heart"></i></span>
-				<span>My Favourite</span>
-			</a>
-
-			<a href="#" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-				<span class="text-2xl"><i class="bx bx-user"></i></span>
-				<span>Profile</span>
-			</a>
+			{% if current_user.sellers %}
+				<a href="/products"
+				   class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
+					<span class="text-2xl"><i class="bx bx-cart"></i></span>
+					<span>Your Products</span>
+				</a>
+			{% endif %}
 		</aside>
 
 		<!-- main content page -->
-		<div class="w-full p-4">
+		<div class="border-red">
 			{% block content %}
 			{% endblock %}
 		</div>
@@ -110,7 +108,7 @@
 
 				{% if current_user.sellers %} iban: "{{ current_user.sellers[0].iban }}", {% endif %}
 			}
-	}));
+		}));
 	});
 </script>
 </body>
