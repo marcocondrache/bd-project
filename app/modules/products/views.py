@@ -31,7 +31,7 @@ def user_products():
 
 @products.route('/<int:product_id>', methods=['GET'])
 def product(product_id: int):
-    return product_id
+    return str(product_id)
 
 
 @products.route("/shop")
