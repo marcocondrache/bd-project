@@ -38,5 +38,6 @@ def register_user(
     return user
 
 
-def is_seller():
-    return bool(current_user.sellers)
+# TODO evaluate if this is necessary, now it's a case of circular dependency
+# def is_seller():
+#     return bool(current_user.sellers)
