@@ -11,12 +11,12 @@ class Prod(object):
 
     TESTING = False
 
-    SECRET_KEY = os.getenv('SECRET_KEY', '')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'defaultSecret')
 
-    DB_USER = os.getenv('DB_USER', '')
-    DB_PASS = os.getenv('DB_PASS', '')
-    DB_HOST = os.getenv('DB_HOST', '')
-    DB_NAME = os.getenv('DB_NAME', '')
+    DB_USER = os.getenv('DB_USER', 'db_admin')
+    DB_PASS = os.getenv('DB_PASS', 'password')
+    DB_HOST = os.getenv('DB_HOST', '0.0.0.0')
+    DB_NAME = os.getenv('DB_NAME', 'kepler_db')
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 

@@ -1,0 +1,17 @@
+{% import 'products/macros/product.html' as product %}
+{% extends 'layouts/base.html' %}
+
+{% block title %}Kepler Shop{% endblock %}
+
+{% block content %}
+    {% if products|length == 0 %}
+        <div class="flex flex-col justify-center items-center h-full w-full">
+            <i class='bx bx-x bx-lg'></i>
+            The shop doesn't have any product
+        </div>
+    {% else %}
+        {% for p in products %}
+            {{ product.card(p) }}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

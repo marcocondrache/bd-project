@@ -3,6 +3,11 @@ from app.modules.sellers.models import Seller
 from extensions import db
 
 
+# TODO: Implement paginated query
+def get_products(seller_id: int = None):
+    return Product.query.filter_by(owner_seller_id=seller_id).all()
+
+
 def create_product(seller_id: int, name: str, price: float, stock: int, categories: list, description: str = None,
                    brand: str = None, is_second_hand: bool = False):
     seller = Seller.query.filter_by(id=seller_id).first()

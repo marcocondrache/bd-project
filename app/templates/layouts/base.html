@@ -1,3 +1,5 @@
+{% import 'layouts/macros/menu.html' as menu %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +9,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="https://cdn.tailwindcss.com"></script>
-		<link rel="stylesheet" href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"/>
+		<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	{% endblock %}
 </head>
 <body>
@@ -16,7 +18,9 @@
 	<header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 h-16">
 		<!-- logo -->
 		<div class="flex items-center space-x-2 gap-4">
-			<button type="button" class="text-3xl bx bx-menu" @click="asideOpen = !asideOpen"></button>
+			<button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
+                <box-icon name="menu"></box-icon>
+            </button>
 			<div>Kepler Shop</div>
 		</div>
 
@@ -49,22 +53,16 @@
 				   x-transition:leave-start="opacity-100 scale-100"
 				   x-transition:leave-end="opacity-0 scale-90">
 
-			<a href="/" class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-				<span class="text-2xl"><i class="bx bx-home"></i></span>
-				<span>Dashboard</span>
-			</a>
+			{{ menu.row("Dashboard", "/", "home") }}
+			{{ menu.row("Shop", "/products/shop", "home") }}
 
 			{% if current_user.sellers %}
-				<a href="/products"
-				   class="flex items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600">
-					<span class="text-2xl"><i class="bx bx-cart"></i></span>
-					<span>Your Products</span>
-				</a>
+				{{ menu.row("Your products", "/products", "bx-cart") }}
 			{% endif %}
 		</aside>
 
 		<!-- main content page -->
-		<div class="border-red">
+		<div class="flex-1 w-full">
 			{% block content %}
 			{% endblock %}
 		</div>

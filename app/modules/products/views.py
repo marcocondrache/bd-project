@@ -2,7 +2,7 @@ from flask import request, render_template
 from flask_login import login_required, current_user
 
 from app.modules.products import products
-from app.modules.products.handlers import create_product
+from app.modules.products.handlers import create_product, get_products
 
 
 @products.route('', methods=['GET', 'POST'])
@@ -25,4 +25,16 @@ def user_products():
             return {'message': 'seller not found'}, 404
 
         return {'message': 'product created'}, 200
+
     return render_template('products/index.html')
+
+
+@products.route('/<int:product_id>', methods=['GET'])
+def product(product_id: int):
+    return product_id
+
+
+@products.route("/shop")
+def shop_products():
+    all_products = get_products()
+    return render_template('products/shop.html', products=all_products)
