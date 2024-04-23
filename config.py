@@ -1,14 +1,13 @@
 import os
 
-from extensions import db, login_manager, migrate
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
+
 class Prod(object):
     ENV = os.getenv("FLASK_ENV", "production")
-    DEBUG = os.getenv('FLASK_DEBUG', '0') == '1'
+    DEBUG = os.getenv('FLASK_DEBUG', 'False') == 'True'
 
     TESTING = False
 
@@ -21,12 +20,13 @@ class Prod(object):
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
-    BLUEPRINTS = ["main", "auth", "home"]
+    BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products"]
     EXTENSIONS = [
-        'extensions.db', 
-        'extensions.login_manager', 
+        'extensions.db',
+        'extensions.login_manager',
         'extensions.migrate'
-        ]
+    ]
+
 
 class Dev(Prod):
     DEBUG = True
