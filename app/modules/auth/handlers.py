@@ -1,11 +1,11 @@
 from uuid import UUID
 
-from werkzeug.security import check_password_hash
+from flask_login import current_user
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.modules.buyers.handlers import create_buyer
-from app.modules.users.handlers import create_user
+from app.modules.buyers.models import Buyer
 from app.modules.users.models import User
-from extensions import login_manager
+from extensions import login_manager, db
 
 
 @login_manager.user_loader
@@ -30,6 +30,14 @@ def validate_user(email: str, password: str):
 def register_user(
     email: str, given_name: str, family_name: str, password: str, destination_address: str, card_number: str
 ):
-    user = create_user(email, given_name, family_name, password)
-    create_buyer(destination_address, card_number, user.id)
+    user = User(email=email, given_name=given_name, family_name=family_name, password=generate_password_hash(password))
+    db.session.add(user)
+    buyer = Buyer(destination_address=destination_address, card_number=card_number, user_id=user.id)
+    db.session.add(buyer)
+    db.session.commit()
     return user
+
+
+# TODO evaluate if this is necessary, now it's a case of circular dependency
+# def is_seller():
+#     return bool(current_user.sellers)
