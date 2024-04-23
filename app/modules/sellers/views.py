@@ -1,6 +1,7 @@
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 
+from app.modules.auth.handlers import is_seller
 from app.modules.sellers import sellers
 from app.modules.sellers.handlers import create_seller
 
@@ -18,6 +19,7 @@ def seller_registration():
             flash('Seller not created')
         else:
             return redirect(url_for('home.index'))
-    if current_user.sellers:
+
+    if is_seller():
         return redirect(url_for('home.index'))
     return render_template('sellers/register.html')

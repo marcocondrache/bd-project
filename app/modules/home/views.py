@@ -1,6 +1,7 @@
 from flask import redirect, url_for, render_template
 from flask_login import login_required
 
+from app.modules.auth.handlers import is_seller
 from app.modules.home import home
 from extensions import login_manager
 
@@ -13,4 +14,4 @@ def unauthorized():
 @home.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', is_seller=is_seller)

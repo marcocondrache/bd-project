@@ -1,18 +1,12 @@
-from flask_login import current_user
-
 from app.modules.sellers.models import Seller
-from app.modules.users.models import User
 from extensions import db
 
 
 def create_seller(user_id: int, iban: str, show_soldout_products: bool):
-    user = User.query.filter_by(id=user_id).first()
-    if not user:
-        return None
     seller = Seller(iban=iban, show_soldout_products=show_soldout_products, user_id=user_id)
     db.session.add(seller)
     db.session.commit()
-    return user
+    return seller
 
 
 def update_seller(user_id: int, iban: str, show_soldout_products: bool):

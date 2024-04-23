@@ -100,13 +100,19 @@
 				destination_address: "{{ current_user.buyers[0].destination_address }}",
 				card_number: "{{ current_user.buyers[0].card_number }}",
 
-				{% if current_user.sellers %} iban: "{{ current_user.sellers[0].iban }}", {% endif %}
+				{% if is_seller() %}
+					iban: "{{ current_user.sellers[0].iban }}",
+					show_soldout: {{ current_user.sellers[0].show_soldout_products }},
+				{% endif %}
 			},
 			originalProfile: {
 				destination_address: "{{ current_user.buyers[0].destination_address }}",
 				card_number: "{{ current_user.buyers[0].card_number }}",
 
-				{% if current_user.sellers %} iban: "{{ current_user.sellers[0].iban }}", {% endif %}
+				{% if is_seller() %}
+					iban: "{{ current_user.sellers[0].iban }}",
+					show_soldout: {{ current_user.sellers[0].show_soldout_products }},
+				{% endif %}
 			}
 		}));
 	});
