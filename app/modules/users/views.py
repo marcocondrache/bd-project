@@ -6,7 +6,7 @@ from app.modules.sellers.handlers import update_seller
 from app.modules.users import users
 
 
-@users.route('/', methods=['PUT'])
+@users.route('', methods=['PUT'])
 @login_required
 def edit_user():
     destination_address = request.json.get('destination_address')

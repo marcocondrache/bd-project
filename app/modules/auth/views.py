@@ -16,6 +16,7 @@ def login():
         if not subject:
             flash("Invalid credentials")
             return redirect(url_for("home.index"))
+
         login_user(subject, remember=remember)
         return redirect(url_for("home.index"))
 

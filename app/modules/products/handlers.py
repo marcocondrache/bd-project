@@ -29,6 +29,8 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
     for category in categories:
         product.categories.append(category)
 
+    # TODO: add keywords to a table (TODO add the table)
+
     db.session.add(product)
     db.session.commit()
     return product

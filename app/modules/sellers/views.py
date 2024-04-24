@@ -15,10 +15,11 @@ def seller_registration():
         # create seller
         seller = create_seller(current_user.id, iban, show_sold_products)
         if not seller:
-            flash('Seller not created')
+            flash('An error occurred, seller not created')
         else:
             return redirect(url_for('home.index'))
 
     if current_user.sellers:
         return redirect(url_for('home.index'))
+
     return render_template('sellers/register.html')

@@ -20,8 +20,8 @@ class Seller(db.Model):
     show_soldout_products: Mapped[bool] = mapped_column("show_soldout_products", db.Boolean, nullable=False,
                                                         default=False)
 
-    user: Mapped["User"] = db.relationship("User", back_populates="sellers")
-    products: Mapped[List["Product"]] = db.relationship("Product", back_populates="seller")
+    user: Mapped[User] = db.relationship("User", back_populates="sellers")
+    products: Mapped[List[Product]] = db.relationship("Product", back_populates="seller")
 
     def __repr__(self):
         return f"<Seller user={self.user.email} iban={self.iban} show_soldout_products={self.show_soldout_products}>"

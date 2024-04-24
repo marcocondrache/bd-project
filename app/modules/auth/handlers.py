@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from flask_login import current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.modules.buyers.models import Buyer
@@ -19,7 +18,6 @@ def get_user_by_email(email: str):
     return User.query.filter_by(email=email).first()
 
 
-# Login user
 def validate_user(email: str, password: str):
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
