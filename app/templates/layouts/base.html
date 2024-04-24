@@ -1,4 +1,6 @@
 {% import 'layouts/macros/menu.html' as menu %}
+{% import 'layouts/macros/profile.html' as profile %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,8 +21,8 @@
 		<!-- logo -->
 		<div class="flex items-center space-x-2 gap-4">
 			<button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
-                <box-icon name="menu"></box-icon>
-            </button>
+				<box-icon name="menu"></box-icon>
+			</button>
 			<div>Kepler Shop</div>
 		</div>
 
@@ -38,7 +40,7 @@
 		</div>
 
 		<!-- profile card -->
-		{% include "includes/profile.html" %}
+		{{ profile.profile_card(current_user) }}
 	</header>
 
 	<div class="flex grow border border-red">

@@ -1,4 +1,4 @@
-{% block profile_card %}
+{% macro profile_card(current_user) %}
 	<!-- Modal Background -->
 	<div x-show="profileOpen" class="fixed inset-0 bg-black opacity-50"></div>
 
@@ -92,25 +92,25 @@
 				<!-- Edit Profile and Logout Buttons should be in the same row and occupation the whole row -->
 				<div class="flex justify-center space-x-4" x-show="!profileEditMode">
 					<button @click="profileEditMode = true"
-					        class="flex rounded-lg bg-indigo-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
+					        class="rounded-md bg-indigo-500 text-white text-xs font-semibold py-2 px-4 my-2 flex justify-center items-center">
 						Edit Profile
 					</button>
 					<button @click="window.location.href = 'auth/logout'"
-					        class="flex rounded-lg bg-red-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
+					        class="rounded-md bg-red-500 text-white text-xs font-semibold py-2 px-4 my-2 flex justify-center items-center">
 						Logout
 					</button>
 				</div>
 
 				<div class="flex justify-center space-x-4" x-show="profileEditMode">
 					<button @click="await editUser()"
-					        class="flex rounded-lg bg-green-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
+					        class="rounded-md bg-green-500 text-white text-xs font-semibold py-2 px-4 flex justify-center items-center">
 						Save
 					</button>
 					<button @click="profileEditMode = false; profile = originalProfile"
-					        class="flex rounded-lg bg-red-500 h-10 text-white text-xs font-semibold py-1 px-2 my-2 block justify-center items-center align-center">
+					        class="rounded-md bg-red-500 text-white text-xs font-semibold py-2 px-4 flex justify-center items-center">
 						Cancel
 					</button>
 				</div>
 		</div>
 	</div>
-{% endblock %}
+{% endmacro %}
