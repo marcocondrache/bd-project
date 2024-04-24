@@ -60,8 +60,8 @@ Human id: product code
 Technical id: product id
 
 The product has a category subset.
-- Implicitly, the sellers create the categories i.e. 
-  The category is a subset of the users.
+- Implicitly, the sellers create the categories i.e.,
+  the category is a subset of the users.
   So we don't want a series of equivalent categories.
 One product can belong to one or more categories.
 
@@ -130,7 +130,7 @@ When the user buys the cart:
 
 When the user wants to complete the order,
 it has to check if the real amount has not changed.
-(optimistic lock, use a only-increasing value to save the state of transaction)
+(optimistic lock, use an only-increasing value to save the state of transaction)
 If it has changed then the "accept the difference or leave it" process starts
 
 The user can assess the history of the orders, only the finalized orders.
@@ -216,6 +216,7 @@ The user can search for keywords:
 - amount range
 
 > when creating a product  
-> string[] keys = text.split(" .,;:!?...").filter(word => word.length > 3)  
-> insert keys into a table, 
-> with a reference to the products + how many products have that key
+> separators = new char[] { ' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n' }
+> string[] keys = text.split(separators).filter(word => word.length > 3)
+> insert into keywords (key, reference_count) values (key, 1) on conflict (key)
+> do update set reference_count = reference_count + 1

@@ -2,6 +2,8 @@ from app.modules.products.models import Product
 from app.modules.sellers.models import Seller
 from extensions import db
 
+separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
+
 
 # TODO: Implement paginated query
 def get_products(seller_id: int = None):
@@ -29,7 +31,9 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
     for category in categories:
         product.categories.append(category)
 
-    # TODO: add keywords to a table
+    # add keywords if not exists
+    for keyword in [keywords for keywords in name.split(separators) if len(keywords) > 3]:
+        product.keywords.append(keyword)
 
     db.session.add(product)
     db.session.commit()
