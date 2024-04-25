@@ -10,9 +10,9 @@ Each action has:
 - the flow of the action, divided into steps 
 (with the italicized steps being the changes in the database).
 
-# Auth flow
+## Auth flow
 The user can do the following actions:
-## Register
+### Register
 **Input**: (email*, password*, given name*, family name*, card number*, destination address*)
 
 **Output**: Redirect
@@ -26,7 +26,7 @@ The user can do the following actions:
 - _A new session is created._
 - The user is logged in and redirected to the home page.
 
-## Register as a seller
+### Register as a seller
 **Input**: (IBAN*, "show sold-out products" options)
 
 **Output**: User
@@ -37,7 +37,7 @@ The user can do the following actions:
 - The user must provide an IBAN, optionally the "show sold-out products" option.
 - _A new seller entity is created._
 
-## Login
+### Login
 **Input**: (email*, password*)
 
 **Output**: Redirect
@@ -49,7 +49,7 @@ The user can do the following actions:
 - _A new session is created._
 - The user is logged in and redirected to the home page.
 
-## Logout
+### Logout
 **Input**: None
 
 **Output**: Redirect
@@ -60,9 +60,9 @@ The user can do the following actions:
 - _The session is deleted._
 - The user is redirected to the welcome page.
 
-# User
+## User
 The user can do the following actions:
-## Update profile
+### Update profile
 **Input**: (password, IBAN, show sold-out products, card number, destination address)
 
 **Output**: User
@@ -78,7 +78,7 @@ The user can do the following actions:
 
 > Update: the password cannot be updated.
 
-## Delete profile
+### Delete profile
 **Input**: (guid*)
 
 **Output**: None
@@ -90,11 +90,11 @@ The user can do the following actions:
 - _Deleted_at is set to the current timestamp._
 - _The session is deleted._
 - The user is redirected to the welcome page.
-## Search for other users (?)
+### Search for other users (?)
 
-# Product
+## Product
 The user can do the following actions:
-## Create product
+### Create product
 **Input**: 
 (name*, price*, quantity*, categories*, description, brand, is second-hand)
 
@@ -111,7 +111,7 @@ The user can do the following actions:
 - If the categories do not exist, _new category entities are created._
 - _New product-category associations are created._
 
-## Update product
+### Update product
 **Input**: (price, quantity, categories, description)
 
 **Output**: Product
@@ -126,7 +126,7 @@ The user can do the following actions:
 - _New product-category associations are created._
 - _The history is triggered._
 
-## Delete product
+### Delete product
 **Input**: (guid)
 
 **Output**: None
@@ -139,7 +139,7 @@ The user can do the following actions:
 - _The product sequence is incremented._
 - _The history is triggered._
 
-## Search for products
+### Search for products
 **Input**: (query*, categories, brand, price range, amount range)
 
 **Output**: List of products
@@ -154,10 +154,10 @@ The user can do the following actions:
 - The user can filter the products by categories, brand, price range, amount range.
 - _The displayed products are filtered by the filters._
 
-# Cart
+## Cart
 **Only a buyer** can do the following actions:
 
-## Create a cart (add one product)
+### Create a cart (add the first product)
 **Input**: (product_guid*, quantity*)
 
 **Output**: Cart
@@ -166,10 +166,10 @@ The user can do the following actions:
 
 **Flow**:
 - The user adds a product to its cart, specifying the quantity.
-- _A new cart entity is created, with status "created"_
-- _A new products reservation is created with the same sequence as the product._
+- _A new `cart` entity is created, with status "active"_
+- _A new `products reservation` is created with the same sequence as the `product`._
 
-## Update a cart (add/remove products)
+### Update a cart (add more products)
 **Input**: (product_guid*, quantity*)
 
 **Output**: Cart
@@ -178,13 +178,31 @@ The user can do the following actions:
 
 **Flow**:
 - The user can add products from the cart, specifying the quantity.
-- _A new products reservation is created with the same sequence as the product._
+- _A new `products reservation` to the only "active" 
+  `cart` is created with the same sequence as the `product`._
+
+
 - The user can modify the quantity of the products in the cart.
 - _The products' reservation is updated._
-- The user can remove products from the cart.
-- _The products' reservation is deleted._
-- **check sequence**: _If the products' reservation sequence is different from the product sequence, the transaction is aborted._ 
-  - If the stock is not enough, the user can choose to remove the product from the cart or update the quantity.
-  - If the user chooses to remove the product, _the products' reservation is deleted._
-  - If the user chooses to update the quantity, _the products' reservation is updated, updating the sequence to the product sequence._
+- **check sequence**: _If the `products reservation` sequence is different from 
+  the `product` sequence, the transaction is aborted._ 
+  - If the stock is not enough, the user can choose to remove the product from 
+    the cart or update the quantity.
+  - If the user chooses to remove the product, _the `products reservation` is 
+    deleted._
+  - If the user chooses to update the quantity, _the `products reservation` is 
+    updated, updating the `sequence` to the `product` sequence._
 - _The history is triggered._
+
+### Delete from cart (remove products)
+**Input**: (product_guid*)
+
+**Output**: Cart
+
+**From**: cart page
+
+**Flow**:
+- The user can remove products from the cart.
+- _`deleted_at` is set to the current timestamp._
+
+> Note: the carts cannot be deleted, only the products in it.
