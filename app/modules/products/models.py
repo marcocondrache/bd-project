@@ -48,6 +48,12 @@ class ProductCategory(db.Model):
 
     def __repr__(self):
         return f"<ProductCategory name={self.name} description={self.description}>"
+    
+    def to_json(self):
+        return {
+            "guid": self.guid,
+            "name": self.name,
+        }
 
 
 class Keyword(db.Model):

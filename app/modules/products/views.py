@@ -2,12 +2,24 @@ from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 
 from app.modules.products import products
-from app.modules.products.handlers import create_product, get_products
+from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories
 
 
-@products.route('', methods=['GET', 'POST'])
+@products.route('', methods=['GET'])
 @login_required
 def user_products():
+    if not current_user.sellers:
+        return redirect(url_for('home.index'))
+    
+    page = request.args.get('page', 1, type=int)
+    seller_products = get_seller_products(current_user.sellers[0].id, page=page)
+
+    return render_template('products/index.html', products=seller_products)
+
+
+@products.route('/create', methods=['GET', 'POST'])
+@login_required
+def create():
     if request.method == 'POST':
         if not current_user.sellers:
             return {'message': 'not a seller'}, 403
@@ -19,18 +31,12 @@ def user_products():
         description = request.form.get('description')
         brand = request.form.get('brand')
         is_second_hand = request.form.get('is_second_hand') == 'on'
-        if not name or not price or not stock or not categories:
-            return {'message': 'missing data'}, 400
 
-        new_product = create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
-        if not new_product:
-            return {'message': 'an error occurred'}, 404
-
-        return {'message': 'product created'}, 200
-
-    if not current_user.sellers:
-        return redirect(url_for('home.index'))
-    return render_template('products/index.html')
+        create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
+        return redirect(url_for('products.user_products'))
+    
+    categories = get_all_product_categories()
+    return render_template('products/create.html', categories=[c.to_json() for c in categories])
 
 
 @products.route('/<int:product_id>', methods=['GET'])
