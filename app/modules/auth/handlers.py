@@ -30,12 +30,7 @@ def register_user(
 ):
     user = User(email=email, given_name=given_name, family_name=family_name, password=generate_password_hash(password))
     db.session.add(user)
-    buyer = Buyer(destination_address=destination_address, card_number=card_number, user_id=user.id)
+    buyer = Buyer(destination_address=destination_address, card_number=card_number, user=user)
     db.session.add(buyer)
     db.session.commit()
     return user
-
-
-# TODO evaluate if this is necessary, now it's a case of circular dependency
-# def is_seller():
-#     return bool(current_user.sellers)
