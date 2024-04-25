@@ -32,8 +32,10 @@ def manage_products():
 
     #  request.method == 'GET'
     page = request.args.get('page', 1, type=int)
-    seller_products = get_seller_products(current_user.sellers[0].id, page=page)
 
+    seller_products = get_seller_products(
+        current_user.sellers[0].id, current_user.sellers[0].show_soldout_products, page=page
+    )
     return render_template('products/index.html', products=seller_products)
 
 

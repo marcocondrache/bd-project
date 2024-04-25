@@ -10,12 +10,13 @@ def get_products(seller_id: int = None):
     return Product.query.filter_by(owner_seller_id=seller_id).all()
 
 
-def get_seller_products(seller_id: int, page: int = 1, per_page: int = 10):
-    return db.paginate(
-        Product.query.filter_by(owner_seller_id=seller_id).order_by(Product.created_at.desc()),
-        page=page,
-        per_page=per_page
-    )
+def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
+    query = Product.query.filter_by(owner_seller_id=seller_id).order_by(Product.created_at.desc())
+
+    if not show_sold_out:
+        query = query.filter(Product.stock > 0)
+
+    return query.paginate(page=page, per_page=per_page)
 
 
 def get_all_product_categories():
