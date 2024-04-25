@@ -15,7 +15,7 @@ def get_seller_products(seller_id: int, page: int = 1, per_page: int = 10):
         Product.query.filter_by(owner_seller_id=seller_id).order_by(Product.created_at.desc()),
         page=page,
         per_page=per_page
-        )
+    )
 
 
 def get_all_product_categories():
@@ -44,8 +44,14 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
         product.categories.append(category)
 
     # add keywords if not exists
-    for keyword in [keywords for keywords in name.split(separators) if len(keywords) > 3]:
-        product.keywords.append(keyword)
+    keywords = (
+        name.split(separators) +
+        description.split(separators) if description else [] +
+        brand.split(separators) if brand else []
+    )
+    for keyword in keywords:
+        if len(keyword) > 3:
+            product.keywords.append(keyword)
 
     db.session.add(product)
     db.session.commit()

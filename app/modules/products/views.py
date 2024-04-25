@@ -5,24 +5,13 @@ from app.modules.products import products
 from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories
 
 
-@products.route('', methods=['GET'])
+@products.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @login_required
-def user_products():
+def manage_products():
     if not current_user.sellers:
         return redirect(url_for('home.index'))
-    
-    page = request.args.get('page', 1, type=int)
-    seller_products = get_seller_products(current_user.sellers[0].id, page=page)
 
-    return render_template('products/index.html', products=seller_products)
-
-
-@products.route('/create', methods=['GET', 'POST'])
-@login_required
-def create():
     if request.method == 'POST':
-        if not current_user.sellers:
-            return {'message': 'not a seller'}, 403
         seller_id = current_user.sellers[0].id
         name = request.form.get('name')
         price = float(request.form.get('price'))
@@ -34,7 +23,26 @@ def create():
 
         create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.user_products'))
-    
+
+    if request.method == 'PUT':
+        pass
+
+    if request.method == 'DELETE':
+        pass
+
+    #  request.method == 'GET'
+    page = request.args.get('page', 1, type=int)
+    seller_products = get_seller_products(current_user.sellers[0].id, page=page)
+
+    return render_template('products/index.html', products=seller_products)
+
+
+@products.route('/create', methods=['GET'])
+@login_required
+def product_creation():
+    if not current_user.sellers:
+        return redirect(url_for('home.index'))
+
     categories = get_all_product_categories()
     return render_template('products/create.html', categories=[c.to_json() for c in categories])
 
