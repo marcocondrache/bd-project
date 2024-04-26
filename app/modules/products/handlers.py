@@ -41,26 +41,27 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
     )
 
     # add categories if not exists
-    for category in categories:
-        category = ProductCategory.query.filter_by(name=category).first()
+    for category_name in categories:
+        category = ProductCategory.query.filter_by(name=category_name).first()
         if not category:
-            category = ProductCategory(name=category)
+            category = ProductCategory(name=category_name)
             db.session.add(category)
         product.categories.append(category)
 
     # add keywords if not exists
-    keywords = (
+    keywords = [k for k in (
         name.split(separators) +
         description.split(separators) if description else [] +
         brand.split(separators) if brand else []
-    )
-    for keyword in keywords:
-        if len(keyword) > 3:
-            keyword = Keyword.query.filter_by(key=keyword).first()
-            if not keyword:
-                keyword = Keyword(key=keyword)
-                db.session.add(keyword)
-            product.keywords.append(keyword)
+    ) if len(k) > 2]
+    for keyword_key in keywords:
+        keyword = Keyword.query.filter_by(key=keyword_key).first()
+        if not keyword:
+            keyword = Keyword(key=keyword_key, reference_count=1)
+            db.session.add(keyword)
+        else:
+            keyword.reference_count += 1
+        product.keywords.append(keyword)
 
     db.session.add(product)
     db.session.commit()

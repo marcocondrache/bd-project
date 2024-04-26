@@ -23,9 +23,7 @@
 					{{ product.card(p) }}
 				{% endfor %}
 			</div>
-			<div class="h-16">
-				{{ pagination.render_pagination(paginated_products) }}
-			</div>
+			{{ pagination.render_pagination(paginated_products) }}
 		</div>
 	{% endif %}
 {% endblock %}

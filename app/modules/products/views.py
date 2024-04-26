@@ -61,7 +61,7 @@ def product_creation():
         return redirect(url_for('home.index'))
 
     categories = get_all_product_categories()
-    return render_template('products/create.html', categories=[c.to_json() for c in categories])
+    return render_template('products/create.html', categories=[c.name for c in categories])
 
 
 @products.route('/<product_guid>', methods=['GET'])
