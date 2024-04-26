@@ -2,6 +2,7 @@ from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 
 from app.modules.products import products
+from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories, \
     update_product, delete_product
 
@@ -70,7 +71,12 @@ def get_product(product_guid: str):
     return str(product_guid)
 
 
-@products.route('/shop')
-def shop_products():
-    all_products = get_products()
-    return render_template('products/shop.html', products=all_products)
+@products.route('/search', methods=['POST'])
+def search_products():
+    search = SearchForm()
+
+    if search.validate_on_submit():
+        all_products = get_products()
+        return render_template('products/list.html', products=all_products)
+
+    return 'invalid form', 400
