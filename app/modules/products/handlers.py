@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
 from extensions import db
@@ -5,9 +7,17 @@ from extensions import db
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
 
 
+def get_all_product_categories():
+    return ProductCategory.query.all()
+
+
 # TODO: Implement paginated query
 def get_products(seller_id: int = None):
     return Product.query.filter_by(owner_seller_id=seller_id).all()
+
+
+def get_product_by_guid(guid: UUID):
+    return Product.query.filter_by(guid=guid).first()
 
 
 def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
@@ -17,10 +27,6 @@ def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int =
         query = query.filter(Product.stock > 0)
 
     return query.paginate(page=page, per_page=per_page)
-
-
-def get_all_product_categories():
-    return ProductCategory.query.all()
 
 
 def create_product(seller_id: int, name: str, price: float, stock: int, categories: list, description: str = None,

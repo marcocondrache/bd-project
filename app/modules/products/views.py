@@ -1,9 +1,11 @@
-from flask import request, render_template, url_for, redirect
+from uuid import UUID
+
+from flask import request, render_template, url_for, redirect, abort
 from flask_login import login_required, current_user
 
 from app.modules.products import products
 from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories, \
-    update_product, delete_product
+    update_product, delete_product, get_product_by_guid
 
 
 @products.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -66,8 +68,14 @@ def product_creation():
 
 @products.route('/<product_guid>', methods=['GET'])
 def get_product(product_guid: str):
-    # TODO: Implement product view
-    return str(product_guid)
+    try:
+        product_guid = UUID(product_guid)
+        product = get_product_by_guid(product_guid)
+        if not product:
+            return abort(404)
+        return render_template('products/[guid].html', product=product)
+    except ValueError:
+        return redirect(url_for('products.manage_products'))
 
 
 @products.route('/shop')
