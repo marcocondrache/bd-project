@@ -75,12 +75,8 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
 
 
 def update_product(
-    product_id: int, price: float = None, stock: int = None, categories: list = None, description: str = None
+    product: Product, price: float = None, stock: int = None, categories: list = None, description: str = None
 ):
-    product = Product.query.filter_by(id=product_id).first()
-    if not product:
-        return None
-
     if price:
         product.price = price
     if stock:
@@ -96,11 +92,7 @@ def update_product(
     return product
 
 
-def delete_product(sellers_id: int, product_guid: str):
-    product = Product.query.filter_by(owner_seller_id=sellers_id, guid=product_guid).first()
-    if not product:
-        return None
-
+def delete_product(product: Product):
     product.sequence += 1
     product.deleted_at = db.func.now()
 

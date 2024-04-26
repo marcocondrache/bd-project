@@ -5,117 +5,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	{% block head %}
-		<title>{% block title %}{% endblock %}</title>
-		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="https://cdn.tailwindcss.com"></script>
-		<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-	{% endblock %}
+    {% block head %}
+        <title>{% block title %}{% endblock %}</title>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    {% endblock %}
 </head>
 <body>
 <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout">
-	<!-- header page -->
-	<header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 h-16">
-		<!-- logo -->
-		<div class="flex items-center space-x-2 gap-4">
-			<button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
-				<box-icon name="menu"></box-icon>
-			</button>
-			<div>Kepler Shop</div>
-		</div>
+    <!-- header page -->
+    <header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 h-16">
+        <!-- logo -->
+        <div class="flex items-center space-x-2 gap-4">
+            <button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
+                <box-icon name="menu"></box-icon>
+            </button>
+            <a href="{{ url_for('home.index') }}" class="text-xl font-semibold">Kepler Shop</a>
+        </div>
 
-		<!-- button profile -->
-		<div class="flex gap-4">
-			{% if not current_user.sellers %}
-				<a href="/sellers/register"
-				   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-white text-xs font-semibold p-2 flex items-center justify-center">
-					Become a seller!
-				</a>
-			{% endif %}
-			<button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
-				Hello, {{ current_user.given_name }}
-			</button>
-		</div>
+        <!-- button profile -->
+        <div class="flex gap-4">
+            {% if not current_user.sellers %}
+                <a href="/sellers/register"
+                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-white text-xs font-semibold p-2 flex items-center justify-center">
+                    Become a seller!
+                </a>
+            {% endif %}
+            <button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
+                Hello, {{ current_user.given_name }}
+            </button>
+        </div>
 
-		<!-- profile card -->
-		{{ profile.profile_card(current_user) }}
-	</header>
+        <!-- profile card -->
+        {{ profile.profile_card(current_user) }}
+    </header>
 
-	<div class="flex grow border border-red">
-		<!-- aside -->
-		<aside class="flex w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
-		       x-show="asideOpen"
-				{# FIXME #}
-				   x-transition:enter="transition ease-out duration-300"
-				   x-transition:enter-start="opacity-0 scale-90"
-				   x-transition:enter-end="opacity-100 scale-100"
-				   x-transition:leave="transition ease-in duration-300"
-				   x-transition:leave-start="opacity-100 scale-100"
-				   x-transition:leave-end="opacity-0 scale-90">
+    <div class="flex grow border border-red">
+        <!-- aside -->
+        <aside class="flex w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+               x-show="asideOpen"
+            {# FIXME #}
+               x-transition:enter="transition ease-out duration-300"
+               x-transition:enter-start="opacity-0 scale-90"
+               x-transition:enter-end="opacity-100 scale-100"
+               x-transition:leave="transition ease-in duration-300"
+               x-transition:leave-start="opacity-100 scale-100"
+               x-transition:leave-end="opacity-0 scale-90">
 
-			{{ menu.row("Dashboard", "/", "home") }}
-			{{ menu.row("Shop", "/products/shop", "store") }}
+            {{ menu.row("Dashboard", url_for("home.index"), "home") }}
+            {{ menu.row("Shop", "/products/shop", "store") }}
 
-			{% if current_user.sellers %}
-				{{ menu.row("Your products", "/products", "collection") }}
-			{% endif %}
-		</aside>
+            {% if current_user.sellers %}
+                {{ menu.row("Your products", url_for("products.index"), "collection") }}
+            {% endif %}
+        </aside>
 
-		<!-- main content page -->
-		<div class="grow">
-			{% block content %}
-			{% endblock %}
-		</div>
-	</div>
+        <!-- main content page -->
+        <div class="grow">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
 </main>
 
 <script>
-	async function editUser() {
-		console.log("edit user", JSON.stringify(this.profile))
+    async function editUser() {
+        console.log("edit user", JSON.stringify(this.profile))
 
-		const response = await fetch('/users', {
-			method: 'PUT',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(this.profile)
-		});
+        const response = await fetch('/users', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(this.profile)
+        });
 
-		if (response.ok) {
-			this.originalProfile = this.profile;
-			this.profileEditMode = false;
-		} else {
-			alert("Failed to update user"); // TODO find the will to do
-		}
-	}
+        if (response.ok) {
+            this.originalProfile = this.profile;
+            this.profileEditMode = false;
+        } else {
+            alert("Failed to update user"); // TODO find the will to do
+        }
+    }
 
-	document.addEventListener("alpine:init", () => {
-		Alpine.data("layout", () => ({
-			profileOpen: false,
-			asideOpen: true,
-			linkShown: false,
-			profileEditMode: false,
-			editUser,
-			profile: {
-				destination_address: "{{ current_user.buyers[0].destination_address }}",
-				card_number: "{{ current_user.buyers[0].card_number }}",
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("layout", () => ({
+            profileOpen: false,
+            asideOpen: true,
+            linkShown: false,
+            profileEditMode: false,
+            editUser,
+            profile: {
+                destination_address: "{{ current_user.buyers[0].destination_address }}",
+                card_number: "{{ current_user.buyers[0].card_number }}",
 
-				{% if current_user.sellers %}
-					iban: "{{ current_user.sellers[0].iban }}",
-					show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
-				{% endif %}
-			},
-			originalProfile: {
-				destination_address: "{{ current_user.buyers[0].destination_address }}",
-				card_number: "{{ current_user.buyers[0].card_number }}",
+                {% if current_user.sellers %}
+                    iban: "{{ current_user.sellers[0].iban }}",
+                    show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                {% endif %}
+            },
+            originalProfile: {
+                destination_address: "{{ current_user.buyers[0].destination_address }}",
+                card_number: "{{ current_user.buyers[0].card_number }}",
 
-				{% if current_user.sellers %}
-					iban: "{{ current_user.sellers[0].iban }}",
-					show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
-				{% endif %}
-			}
-		}));
-	});
+                {% if current_user.sellers %}
+                    iban: "{{ current_user.sellers[0].iban }}",
+                    show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                {% endif %}
+            }
+        }));
+    });
 </script>
 </body>
 </html>

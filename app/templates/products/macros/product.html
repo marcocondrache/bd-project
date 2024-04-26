@@ -20,9 +20,10 @@
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-3xl font-bold text-gray-900">${{ product.price }}</span>
-                <a href="/products/{{ product.guid }}"
-                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">View
-                    details</a>
+                <a href="{{ url_for('products.manage_product', product_guid=product.guid) }}"
+                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    View details
+                </a>
             </div>
         </div>
     </div>
