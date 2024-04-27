@@ -22,11 +22,14 @@ def index():
     seller_products_pagination = get_seller_products(
         current_user.sellers[0].id, current_user.sellers[0].show_soldout_products, page=page
     )
-    return render_template('products/index.html', paginated_products=seller_products_pagination,
-                           section='your_products')
+    return render_template(
+        'products/index.html',
+        paginated_products=seller_products_pagination,
+        section='your_products'
+    )
 
 
-@products.route('/<product_guid>', methods=['GET', 'PUT', 'DELETE'])
+@products.route('/<product_guid>', methods=['GET', 'PUT'])
 @login_required
 def manage_product(product_guid: str):
     if not current_user.sellers:
@@ -51,11 +54,7 @@ def manage_product(product_guid: str):
             update_product(product, price, stock, categories, description)
             return redirect(url_for('products.index'))
 
-        if request.method == 'DELETE':
-            delete_product(product)
-            return redirect(url_for('products.index'))
-
-        #  request.method == 'GET'
+        # request.method == 'GET'
         return render_template(
             'products/[guid].html', product=product,
             product_categories=[c.name for c in product.categories],
@@ -65,6 +64,19 @@ def manage_product(product_guid: str):
         )
     except ValueError:
         return redirect(url_for('products.index'))
+
+
+@products.route('/<product_guid>/delete', methods=['POST'])
+@login_required
+def delete_seller_product(product_guid: str):
+    if not current_user.sellers:
+        return redirect(url_for('home.index'))
+
+    product_guid = UUID(product_guid)
+    product = get_product_by_guid(product_guid)
+
+    delete_product(product)
+    return redirect(url_for('products.index'))
 
 
 @products.route('/create', methods=['GET', 'POST'])
