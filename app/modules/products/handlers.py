@@ -17,11 +17,11 @@ def get_products(seller_id: int = None):
 
 
 def get_product_by_guid(guid: UUID):
-    return Product.query.filter_by(guid=guid).first()
+    return Product.query.filter_by(guid=guid, deleted_at=None).first()
 
 
 def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
-    query = Product.query.filter_by(owner_seller_id=seller_id).order_by(Product.created_at.desc())
+    query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.created_at.desc())
 
     if not show_sold_out:
         query = query.filter(Product.stock > 0)
@@ -29,8 +29,9 @@ def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int =
     return query.paginate(page=page, per_page=per_page)
 
 
-def create_seller_product(seller_id: int, name: str, price: float, stock: int, categories: list, description: str = None,
-                   brand: str = None, is_second_hand: bool = False):
+def create_seller_product(seller_id: int, name: str, price: float, stock: int, categories: list,
+                          description: str = None,
+                          brand: str = None, is_second_hand: bool = False):
     seller = Seller.query.filter_by(id=seller_id).first()
     if not seller:
         return None
@@ -58,7 +59,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
     keywords = [k for k in (
         name.split(separators) +
         description.split(separators) if description else [] +
-        brand.split(separators) if brand else []
+                                                          brand.split(separators) if brand else []
     ) if len(k) > 2]
     for keyword_key in keywords:
         keyword = Keyword.query.filter_by(key=keyword_key).first()

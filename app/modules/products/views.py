@@ -22,7 +22,8 @@ def index():
     seller_products_pagination = get_seller_products(
         current_user.sellers[0].id, current_user.sellers[0].show_soldout_products, page=page
     )
-    return render_template('products/index.html', paginated_products=seller_products_pagination, section='your_products')
+    return render_template('products/index.html', paginated_products=seller_products_pagination,
+                           section='your_products')
 
 
 @products.route('/<product_guid>', methods=['GET', 'PUT', 'DELETE'])
@@ -55,7 +56,13 @@ def manage_product(product_guid: str):
             return redirect(url_for('products.index'))
 
         #  request.method == 'GET'
-        return render_template('products/[guid].html', product=product, section='your_products')
+        return render_template(
+            'products/[guid].html', product=product,
+            product_categories=[c.name for c in product.categories],
+            categories=[c.name for c in get_all_product_categories()],
+            is_seller_product=True,
+            section='your_products'
+        )
     except ValueError:
         return redirect(url_for('products.index'))
 
