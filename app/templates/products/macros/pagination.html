@@ -1,5 +1,5 @@
 {% macro render_pagination(pagination) %}
-    <div class="h-24 pb-4 flex justify-center items-end space-x-2 border-t border-white relative">
+    <div class="min-h-20 pb-4 flex justify-center items-end space-x-2 relative">
         {% if pagination.has_prev %}
             <a href="{{ url_for('products.index', page=pagination.prev_num) }}"
                class="text-blue-700 hover:text-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Previous</a>
@@ -14,16 +14,5 @@
         {% else %}
             <span class="text-gray-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Next</span>
         {% endif %}
-        <a
-            class="absolute
-            top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-            bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
-            text-white font-medium rounded-lg text-sm px-4 py-2.5
-    flex justify-center items-center gap-2"
-            href="{{ url_for('products.create_product') }}"
-        >
-            <box-icon name='plus' color='white'></box-icon>
-            Add a new product!
-        </a>
     </div>
 {% endmacro %}
