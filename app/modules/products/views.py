@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from app.modules.products import products
 from app.modules.products.handlers import (
-    create_product, get_seller_products,
+    create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid
 )
@@ -22,7 +22,7 @@ def index():
     seller_products_pagination = get_seller_products(
         current_user.sellers[0].id, current_user.sellers[0].show_soldout_products, page=page
     )
-    return render_template('products/index.html', paginated_products=seller_products_pagination)
+    return render_template('products/index.html', paginated_products=seller_products_pagination, section='your_products')
 
 
 @products.route('/<product_guid>', methods=['GET', 'PUT', 'DELETE'])
@@ -55,7 +55,7 @@ def manage_product(product_guid: str):
             return redirect(url_for('products.index'))
 
         #  request.method == 'GET'
-        return render_template('products/[guid].html', product=product)
+        return render_template('products/[guid].html', product=product, section='your_products')
     except ValueError:
         return redirect(url_for('products.index'))
 
@@ -76,15 +76,15 @@ def create_product():
         brand = request.form.get('brand')
         is_second_hand = request.form.get('is_second_hand') == 'on'
 
-        create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
+        create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index'))
 
     #  request.method == 'GET'
     categories = get_all_product_categories()
-    return render_template('products/create.html', categories=[c.name for c in categories])
+    return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
 @products.route('/shop')
 def shop_products():
     all_products = index()
-    return render_template('products/shop.html', products=all_products)
+    return render_template('products/shop.html', products=all_products, section='shop')

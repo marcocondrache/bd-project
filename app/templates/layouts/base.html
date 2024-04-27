@@ -55,11 +55,11 @@
                x-transition:leave-start="opacity-100 scale-100"
                x-transition:leave-end="opacity-0 scale-90">
 
-            {{ menu.row("Dashboard", url_for("home.index"), "home") }}
-            {{ menu.row("Shop", "/products/shop", "store") }}
+            {{ menu.row("Dashboard", url_for("home.index"), "home", section == "dashboard") }}
+            {{ menu.row("Shop", "/products/shop", "store", section == "shop") }}
 
             {% if current_user.sellers %}
-                {{ menu.row("Your products", url_for("products.index"), "collection") }}
+                {{ menu.row("Your products", url_for("products.index"), "collection", section == "your_products") }}
             {% endif %}
         </aside>
 

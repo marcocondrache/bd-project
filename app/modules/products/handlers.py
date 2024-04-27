@@ -29,7 +29,7 @@ def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int =
     return query.paginate(page=page, per_page=per_page)
 
 
-def create_product(seller_id: int, name: str, price: float, stock: int, categories: list, description: str = None,
+def create_seller_product(seller_id: int, name: str, price: float, stock: int, categories: list, description: str = None,
                    brand: str = None, is_second_hand: bool = False):
     seller = Seller.query.filter_by(id=seller_id).first()
     if not seller:
