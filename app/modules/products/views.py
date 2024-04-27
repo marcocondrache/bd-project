@@ -2,15 +2,18 @@ from flask import request, render_template, url_for, redirect
 from flask_login import login_required, current_user
 
 from app.modules.products import products
-from app.modules.products.handlers import create_product, get_products
+from app.modules.products.forms import SearchForm
+from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories, \
+    update_product, delete_product
 
 
-@products.route('', methods=['GET', 'POST'])
+@products.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @login_required
-def user_products():
+def manage_products():
+    if not current_user.sellers:
+        return redirect(url_for('home.index'))
+
     if request.method == 'POST':
-        if not current_user.sellers:
-            return {'message': 'not a seller'}, 403
         seller_id = current_user.sellers[0].id
         name = request.form.get('name')
         price = float(request.form.get('price'))
@@ -19,27 +22,61 @@ def user_products():
         description = request.form.get('description')
         brand = request.form.get('brand')
         is_second_hand = request.form.get('is_second_hand') == 'on'
-        if not name or not price or not stock or not categories:
-            return {'message': 'missing data'}, 400
 
-        new_product = create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
-        if not new_product:
-            return {'message': 'an error occurred'}, 404
+        create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
+        return redirect(url_for('products.manage_products'))
 
-        return {'message': 'product created'}, 200
+    if request.method == 'PUT':
+        seller_id = current_user.sellers[0].id
+        price = float(request.form.get('price'))
+        stock = int(request.form.get('stock'))
+        categories = request.form.getlist('categories')
+        description = request.form.get('description')
+        if not price and not stock and not categories and not description:
+            return 'No data to update', 400
 
+        update_product(seller_id, price, stock, categories, description)
+        return redirect(url_for('products.manage_products'))
+
+    if request.method == 'DELETE':
+        product_guid = request.form.get('product_guid')
+        if not product_guid:
+            return 'No product id provided', 400
+
+        delete_product(current_user.sellers[0].id, product_guid)
+        return redirect(url_for('products.manage_products'))
+
+    #  request.method == 'GET'
+    page = request.args.get('page', 1, type=int)
+
+    seller_products_pagination = get_seller_products(
+        current_user.sellers[0].id, current_user.sellers[0].show_soldout_products, page=page
+    )
+    return render_template('products/index.html', paginated_products=seller_products_pagination)
+
+
+@products.route('/create', methods=['GET'])
+@login_required
+def product_creation():
     if not current_user.sellers:
         return redirect(url_for('home.index'))
-    return render_template('products/index.html')
+
+    categories = get_all_product_categories()
+    return render_template('products/create.html', categories=[c.to_json() for c in categories])
 
 
-@products.route('/<int:product_id>', methods=['GET'])
-def get_product(product_id: int):
+@products.route('/<product_guid>', methods=['GET'])
+def get_product(product_guid: str):
     # TODO: Implement product view
-    return str(product_id)
+    return str(product_guid)
 
 
-@products.route('/shop')
-def shop_products():
-    all_products = get_products()
-    return render_template('products/shop.html', products=all_products)
+@products.route('/search', methods=['POST'])
+def search_products():
+    search = SearchForm()
+
+    if search.validate_on_submit():
+        all_products = get_products()
+        return render_template('products/list.html', products=all_products)
+
+    return 'invalid form', 400

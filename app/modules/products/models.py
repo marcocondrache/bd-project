@@ -36,11 +36,6 @@ class ProductCategory(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
     guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(255), nullable=False, unique=True)
-    created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
-    updated_at: Mapped[str] = mapped_column(
-        db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now()
-    )
-    deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     products: Mapped[List[Product]] = db.relationship(
         "Product", secondary=products_categories_association_table, back_populates="categories"
@@ -48,6 +43,12 @@ class ProductCategory(db.Model):
 
     def __repr__(self):
         return f"<ProductCategory name={self.name} description={self.description}>"
+    
+    def to_json(self):
+        return {
+            "guid": self.guid,
+            "name": self.name,
+        }
 
 
 class Keyword(db.Model):

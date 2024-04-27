@@ -2,6 +2,7 @@ Flask
 Flask-SQLAlchemy
 Flask-Login
 Flask-Migrate
+Flask-WTF
 SQLAlchemy
 invoke
 python-dotenv

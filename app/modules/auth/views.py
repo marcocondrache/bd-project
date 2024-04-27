@@ -15,7 +15,7 @@ def login():
         subject = validate_user(email, password)
         if not subject:
             flash("Invalid credentials")
-            return redirect(url_for("home.index"))
+            return redirect(url_for("auth.login"))
 
         login_user(subject, remember=remember)
         return redirect(url_for("home.index"))

@@ -1,5 +1,14 @@
 from importlib import import_module
+
+from app.modules.products.forms import SearchForm
 from factory.app import Base
+
+
+def register_processor(app):
+    @app.context_processor
+    def injectors():
+        search = SearchForm()
+        return dict(search=search)
 
 
 def read_config(path):
@@ -15,5 +24,7 @@ def build(name, config_path, base_path="app"):
 
     app.configure(config)
     app.setup()
+
+    register_processor(app)
 
     return app
