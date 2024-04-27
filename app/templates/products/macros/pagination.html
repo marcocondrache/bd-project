@@ -1,7 +1,7 @@
 {% macro render_pagination(pagination) %}
     <div class="min-h-20 pb-4 flex justify-center items-end space-x-2 relative">
         {% if pagination.has_prev %}
-            <a href="{{ url_for('products.index', page=pagination.prev_num) }}"
+            <a href="{{ url_for('products.index_view', page=pagination.prev_num) }}"
                class="text-blue-700 hover:text-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Previous</a>
         {% else %}
             <span class="text-gray-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Previous</span>
@@ -9,7 +9,7 @@
         <span
             class="text-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Page {{ pagination.page }} of {{ pagination.pages }}</span>
         {% if pagination.has_next %}
-            <a href="{{ url_for('products.index', page=pagination.next_num) }}"
+            <a href="{{ url_for('products.index_view', page=pagination.next_num) }}"
                class="text-blue-700 hover:text-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Next</a>
         {% else %}
             <span class="text-gray-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Next</span>

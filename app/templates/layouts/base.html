@@ -30,7 +30,7 @@
         <div class="flex gap-4">
             {% if not current_user.sellers %}
                 <a href="/sellers/register"
-                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-white text-xs font-semibold p-2 flex items-center justify-center">
+                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
                     Become a seller!
                 </a>
             {% endif %}
@@ -56,7 +56,7 @@
         >
             {{ menu.row("Dashboard", url_for("home.index"), "home", section == "dashboard") }}
             {% if current_user.sellers %}
-                {{ menu.row("Your products", url_for("products.index"), "collection", section == "your_products") }}
+                {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
         </aside>
 

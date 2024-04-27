@@ -1,0 +1,105 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div x-data='{
+        name: "{{ product.name }}",
+        description: "{{ product.description }}" || "No description available",
+        brand: "{{ product.brand }}",
+        isSecondHand: "{{ product.is_second_hand }}",
+        price: {{ product.price }},
+        currency: "{{ product.currency }}",
+        stock: {{ product.stock }},
+        isRemoved: "{{ product.deleted_at is not none }}" === "True",
+        categories: {{ product_categories|tojson }},
+
+        confirmDelete: false,
+
+        selectedQuantity: 1,
+    }' class="bg-gray-100 text-gray-900">
+        <div class="container mx-auto p-4">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:flex relative">
+                <div class="lg:flex-shrink-0">
+                    {% if product.image %}
+                        <img class="lg:w-64 w-full h-64 lg:h-full" src="{{ product.image }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="lg:w-64 w-full h-64 lg:h-full flex items-center justify-center">
+                            <box-icon name="image-alt" size="lg"></box-icon>
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="p-4 flex flex-col w-full">
+                    <form action="{{ url_for("products.product_edit_view", product_guid=product.guid) }}"
+                          method="POST"
+                          enctype="multipart/form-data"
+                    >
+                        <div class="mb-4">
+                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="name" name="name" x-model="name"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                            <textarea id="description" name="description" x-model="description"
+                                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            ></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
+                            <input type="text" id="brand" name="brand" x-model="brand"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="isSecondHand" class="block text sm font-medium text-gray-700">Is second
+                                hand?</label>
+                            <input type="checkbox" id="isSecondHand" name="isSecondHand" x-model="isSecondHand"
+                                   class="mt-1 block"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                            <input type="number" id="price" name="price" x-model="price"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
+                            <input type="text" id="currency" name="currency" x-model="currency"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                            <input type="number" id="stock" name="stock" x-model="stock"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="mb-4">
+                            <label for="categories" class="block text-sm font-medium text-gray-700">Categories</label>
+                            <input type="text" id="categories" name="categories" x-model="categories"
+                                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="reset"
+                                    class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                            >
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
