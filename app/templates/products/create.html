@@ -90,9 +90,8 @@
 
             <script>
                 document.addEventListener("alpine:init", () => {
-                    console.log("categories initialized", {{ categories }});
                     Alpine.data('categories', () => ({
-                        options: {{ categories }},
+                        options: {{ categories|tojson }},
                         filteredOptions: [],
                         categories: [],
                         search: '',
