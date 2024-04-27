@@ -66,6 +66,27 @@ class Keyword(db.Model):
         return f"<Keyword key={self.key} reference_count={self.reference_count}>"
 
 
+class ProductHistory(db.Model):
+    __tablename__ = "product_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
+    product_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+
+    sequence: Mapped[int] = mapped_column("sequence", db.Integer, nullable=False, default=0)
+    price: Mapped[float] = mapped_column("price", db.Float, nullable=False)
+    currency: Mapped[str] = mapped_column("currency", db.String(3), nullable=False)
+    stock: Mapped[int] = mapped_column("stock", db.Integer, nullable=False)
+
+    product = db.relationship("Product", back_populates="history")
+
+    created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
+    deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return (f"<ProductHistory product_id={self.product_id} sequence={self.sequence} price={self.price}"
+                f"currency={self.currency} stock={self.stock}>")
+
+
 class Product(db.Model):
     __tablename__ = "products"
 
@@ -94,6 +115,10 @@ class Product(db.Model):
 
     keywords: Mapped[List[Keyword]] = db.relationship(
         Keyword, secondary=products_keywords_association_table, back_populates="products"
+    )
+
+    history: Mapped[List[ProductHistory]] = db.relationship(
+        ProductHistory, back_populates="product"
     )
 
     def __repr__(self):
