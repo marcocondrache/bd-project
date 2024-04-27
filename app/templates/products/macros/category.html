@@ -1,0 +1,92 @@
+{% macro categories_field(categories, selected_categories) %}
+    <div class="flex flex-col gap-2 flex-grow relative" x-data="categories">
+        <label for="categories" class="text-sm font-semibold">Categories</label>
+        <select name="categories" id="categories" class="hidden" multiple x-model="categories">
+            <template x-for="(category, index) in categories" :key="index">
+                <option x-text="category" x-bind:value="category" selected></option>
+            </template>
+        </select>
+
+
+        <!-- Chips -->
+        <div
+            x-show="categories.length > 0"
+            class="absolute bottom-0 right-0 max-w-1/2 h-[42px] flex gap-2 p-1.5">
+            <template x-show="categories.length > 0" x-for="(category, index) in categories" :key="index">
+                <div
+                    class="pl-3 pr-1 h-full bg-indigo-100 text-indigo-800 rounded-full cursor-pointer flex items-center gap-1 text-white text-sm"
+                    @click="removeCategory(index)"
+                >
+                    <p x-text="category"></p>
+                    <box-icon name="x" size="sm" color="indigo"></box-icon>
+                </div>
+            </template>
+        </div>
+
+        <!-- Input -->
+        <input
+            x-model="search"
+            @input="filterOptions"
+            @keydown.enter="addCategory"
+            @keydown.enter.prevent
+            class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+            type="text"
+        >
+
+        <!-- Options -->
+        <div
+            x-show="filteredOptions.length > 0 && search.length > 0"
+            class="absolute z-10 w-full top-full bg-white text-black border rounded-b-md shadow-lg flex flex-col"
+        >
+            <template x-for="(option, index) in filteredOptions" :key="index">
+                <div
+                    class="px-4 py-2 cursor-pointer hover:bg-blue-100"
+                    @click="addCategory(option)"
+                    x-text="option"
+                ></div>
+            </template>
+        </div>
+
+        <script>
+            document.addEventListener("alpine:init", () => {
+                Alpine.data('categories', () => ({
+                    options: {{ categories|tojson }},
+                    filteredOptions: [],
+                    {% if selected_categories %}
+                        categories: {{ selected_categories|tojson }},
+                    {% else %}
+                        categories: [],
+                    {% endif %}
+                    search: '',
+
+                    clear() {
+                        this.search = '';
+                        this.filteredOptions = [];
+                    },
+
+                    filterOptions() {
+                        this.filteredOptions = this.options.filter((option, index, self) =>
+                            option.toLowerCase().includes(this.search.toLowerCase()) &&
+                            !this.categories.includes(option) &&
+                            self.indexOf(option) === index
+                        );
+                    },
+
+                    addCategory(category) {
+                        if (this.search.length === 0) return;
+
+                        // triggered from "enter" key
+                        if (typeof category === 'object') category = this.search;
+
+                        if (!this.categories.includes(category)) this.categories.push(category);
+                        this.clear();
+                    },
+
+                    removeCategory(index) {
+                        this.categories.splice(index, 1);
+                    },
+                }))
+            });
+        </script>
+    </div>
+{% endmacro %}

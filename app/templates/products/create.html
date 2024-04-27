@@ -1,4 +1,5 @@
 {% extends 'layouts/base.html' %}
+{% import 'products/macros/category.html' as category %}
 
 {% block title %}Kepler Shop{% endblock %}
 
@@ -41,94 +42,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-2 flex-grow relative" x-data="categories">
-            <label for="categories" class="text-sm font-semibold">Categories</label>
-            <select name="categories" id="categories" class="hidden" multiple x-model="categories">
-                <template x-for="(category, index) in categories" :key="index">
-                    <option x-text="category" x-bind:value="category" selected></option>
-                </template>
-            </select>
-
-            <!-- Input with Chips -->
-            <input
-                x-model="search"
-                @input="filterOptions"
-                @keydown.tab="addCategory"
-                @keydown.tab.prevent
-                class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-                type="text"
-            >
-
-            <!-- Chips -->
-            <div
-                x-show="categories.length > 0"
-                class="absolute bottom-0 right-0 max-w-1/2 h-[42px] flex gap-2 p-1.5">
-                <template x-show="categories.length > 0" x-for="(category, index) in categories" :key="index">
-                    <div
-                        class="pl-3 pr-1 h-full bg-blue-500 rounded-xl cursor-pointer flex items-center gap-1 text-white text-sm"
-                        @click="removeCategory(index)"
-                    >
-                        <p x-text="category"></p>
-                        <box-icon name="x" size="sm" color="white"></box-icon>
-                    </div>
-                </template>
-            </div>
-
-
-            <div
-                x-show="filteredOptions.length > 0 && search.length > 0"
-                class="absolute z-10 w-full top-full bg-white text-black border rounded-b-md shadow-lg flex flex-col"
-            >
-                <template x-for="(option, index) in filteredOptions" :key="index">
-                    <div
-                        class="px-4 py-2 cursor-pointer hover:bg-blue-100"
-                        @click="addCategory(option)"
-                        x-text="option"
-                    ></div>
-                </template>
-            </div>
-
-            <script>
-                document.addEventListener("alpine:init", () => {
-                    Alpine.data('categories', () => ({
-                        options: {{ categories|tojson }},
-                        filteredOptions: [],
-                        categories: [],
-                        search: '',
-
-                        unique(value, index, self) {
-                            return self.indexOf(value) === index;
-                        },
-
-                        clear() {
-                            this.search = '';
-                            this.filteredOptions = [];
-                        },
-
-                        filterOptions() {
-                            this.filteredOptions = this.options.filter(option =>
-                                option.toLowerCase().includes(this.search.toLowerCase()) &&
-                                !this.categories.includes(option)
-                            ).filter(this.unique)
-                        },
-
-                        addCategory(category) {
-                            if (this.search.length === 0) return;
-
-                            // triggered from tab
-                            if (typeof category === 'object') category = this.search;
-
-                            if (!this.categories.includes(category)) this.categories.push(category);
-                            this.clear();
-                        },
-
-                        removeCategory(index) {
-                            this.categories.splice(index, 1);
-                        },
-                    }))
-                });
-            </script>
-        </div>
+        {{ category.categories_field(categories) }}
 
         <div class="flex flex-row gap-2">
             <div class="flex gap-2 flex-grow">

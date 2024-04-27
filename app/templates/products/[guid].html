@@ -30,28 +30,27 @@
                     {% endif %}
                 </div>
 
-                {# View #}
                 <div class="p-4 flex flex-col w-full">
                     <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
                     <div class="flex gap-2 mb-4" x-show="categories.length > 0">
                         <template x-for="category in categories">
                             <span
                                 x-text="category"
-                                class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full"
+                                class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full shadow-md"
                             ></span>
                         </template>
                     </div>
                     <p class="mb-2" x-text="description"></p>
                     <p class="mb-2">Brand: <span class="font-semibold" x-text="brand"></span></p>
-                    <p class="mb-2">Stock: <span class="font-semibold" x-text="stock"></span></p>
-                    <div class="flex items-center gap-2 mb-4 mb-8">
+                    <p class="mb-4">Stock: <span class="font-semibold" x-text="stock"></span></p>
+                    <div class="flex items-center gap-4 mb-8">
                         <div>
-                            <span class="text-2xl font-semibold" x-text="price"></span>
+                            <span class="text-3xl font-bold" x-text="price"></span>
                             <span class="text font-medium" x-text="currency"></span>
                         </div>
                         <span
                             x-show="isSecondHand"
-                            class="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full"
+                            class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
                         >
                             New
                         </span>

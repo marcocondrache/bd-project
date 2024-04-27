@@ -85,8 +85,7 @@ def product_edit_view(product_guid: str):
         stock = int(request.form.get('stock'))
         categories = request.form.getlist('categories')
         description = request.form.get('description')
-        if not price and not stock and not categories and not description:
-            return 'No data to update', 400
+
         update_product(product, price, stock, categories, description)
         return redirect(url_for('products.index_view'))
 
