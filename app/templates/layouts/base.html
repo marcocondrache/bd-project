@@ -19,11 +19,11 @@
     <!-- header page -->
     <header class="h-16 flex w-full items-center justify-between bg-white px-4 border-b-2 border-gray-200">
         <!-- logo -->
-        <div class="flex items-center space-x-2 gap-4">
-            <button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
-                <box-icon name="menu"></box-icon>
+        <div class="flex items-center gap-4">
+            <button type="button" @click="asideOpen = !asideOpen">
+                <box-icon name="menu" class="flex items-center"></box-icon>
             </button>
-            <a href="{{ url_for('home.index') }}" class="text-xl font-semibold">Kepler Shop</a>
+            <a href="{{ url_for('home.index') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler Shop</a>
         </div>
 
         <!-- button profile -->
@@ -34,7 +34,7 @@
                     Become a seller!
                 </a>
             {% endif %}
-            <button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
+            <button type="button" @click="profileOpen = true" class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
                 Hello, {{ current_user.given_name }}
             </button>
         </div>

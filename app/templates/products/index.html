@@ -19,17 +19,18 @@
         </div>
     {% else %}
         <div class="flex flex-col h-[calc(100vh-4rem)]">
-        <div class="text-2xl font-semibold m-4 flex items-center justify-between">
-            Your products
-            <a
-                class="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
+            <div class="text-2xl font-semibold m-4 flex items-center justify-between">
+                Your products
+                <a
+                    @keydown.window="if (event.key === 'n') window.location.href = `{{ url_for('products.create_view') }}`;"
+                    class="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
                     text-white font-medium rounded-lg text-sm px-4 py-2.5
                     flex justify-center items-center gap-2 shadow-lg transition-colors duration-250"
-                href="{{ url_for('products.create_view') }}"            >
-                <box-icon name='plus' color='white'></box-icon>
-                Add a new product!
-            </a>
-        </div>
+                    href="{{ url_for('products.create_view') }}">
+                    <box-icon name='plus' color='white'></box-icon>
+                    Add a new product!
+                </a>
+            </div>
             <div class="overflow-auto flex-grow p-4 shadow-inner">
                 <div class="flex flex-wrap justify-center gap-4">
                     {% for p in paginated_products.items %}
