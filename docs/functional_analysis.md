@@ -171,24 +171,20 @@ the buyer and the products can be shown.
 
 > ## States
 > - Cart
-    >
-- created (from one product)
+>   - created (from one product)
 >   - finalized
 > - Order
-    >
-- created (from cart)
+>   - created (from cart)
 >   - finalized
 > - Shipment
-    >
-- created (from order)
+>   - created (from order)
 >   - accepted
 >   - shipped
->   - in delivery
->   - delivered
-      >
-- accepted
->     - rejected
->     - returned
+>      - in delivery
+>      - delivered
+>      - accepted
+>           - rejected
+>           - returned
 >
 > If the shipment is not delivered, the order must be refunded.
 > When the shipment is delivered, the order is resolved.
@@ -238,7 +234,10 @@ The user can search for keywords:
 - amount range
 
 > when creating a product  
+> 
 > separators = new char[] { ' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n' }
+> 
 > string[] keys = text.split(separators).filter(word => word.length > 3)
+> 
 > insert into keywords (key, reference_count) values (key, 1) on conflict (key)
 > do update set reference_count = reference_count + 1
