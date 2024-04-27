@@ -23,13 +23,13 @@
             <button type="button" @click="asideOpen = !asideOpen">
                 <box-icon name="menu" class="flex items-center"></box-icon>
             </button>
-            <a href="{{ url_for('home.index') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler Shop</a>
+            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler Shop</a>
         </div>
 
         <!-- button profile -->
         <div class="flex gap-4">
             {% if not current_user.sellers %}
-                <a href="/sellers/register"
+                <a href="{{ url_for('sellers.register_view') }}"
                    class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
                     Become a seller!
                 </a>
@@ -54,7 +54,7 @@
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="-translate-x-full"
         >
-            {{ menu.row("Dashboard", url_for("home.index"), "home", section == "dashboard") }}
+            {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
             {% if current_user.sellers %}
                 {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}

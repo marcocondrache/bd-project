@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{%  import 'products/macros/category.html' as category %}
+{% import 'products/macros/category.html' as category %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -55,13 +55,13 @@
                     </div>
                     <div class="mb-8">
                         <label for="price" class="text-sm font-semibold">Price</label>
-                        <input type="number" id="price" name="price" x-model="price"
+                        <input type="number" id="price" name="price" x-model="price" step="any"
                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
                     </div>
                     <div class="flex gap-4">
                         <a href="{{ url_for("products.product_view", product_guid=product.guid) }}"
-                                class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                           class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
                         >
                             Cancel
                         </a>

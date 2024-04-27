@@ -13,7 +13,7 @@ from app.modules.products.handlers import (
 
 def authorize_seller():
     if not current_user.sellers:
-        return redirect(url_for('home.index'))
+        return redirect(url_for('home.index_view'))
 
 
 def validate_product(product_guid: str):

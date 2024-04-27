@@ -21,7 +21,7 @@ def get_product_by_guid(guid: UUID):
 
 
 def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
-    query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.created_at.desc())
+    query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.name)
 
     if not show_sold_out:
         query = query.filter(Product.stock > 0)
