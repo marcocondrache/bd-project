@@ -2,25 +2,28 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user
 
 from app.modules.auth import auth
+from app.modules.auth.forms import LoginForm
 from app.modules.auth.handlers import validate_user, get_user_by_email, register_user
 
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
+    form = LoginForm()
+
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        remember = request.form.get("remember") == "on"
+        if form.validate_on_submit():
+            subject = validate_user(**form.data.fromkeys(("email", "password")))
+            if not subject:
+                flash("Invalid credentials")
+                return redirect(url_for("auth.login"))
 
-        subject = validate_user(email, password)
-        if not subject:
-            flash("Invalid credentials")
-            return redirect(url_for("auth.login"))
+            login_user(subject, remember=form.remember.data)
+        else:
+            flash(next(iter(form.errors.values()))[0])
 
-        login_user(subject, remember=remember)
         return redirect(url_for("home.index"))
 
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", form=form)
 
 
 @auth.route("/signup", methods=["GET", "POST"])
