@@ -3,8 +3,8 @@ from flask_login import login_required, current_user
 
 from app.modules.products import products
 from app.modules.products.forms import SearchForm
-from app.modules.products.handlers import create_product, get_products, get_seller_products, get_all_product_categories, \
-    update_product, delete_product
+from app.modules.products.handlers import create_product, get_seller_products, get_all_product_categories, \
+    update_product, delete_product, get_products_by_keyword
 
 
 @products.route('', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -65,18 +65,15 @@ def product_creation():
     return render_template('products/create.html', categories=[c.to_json() for c in categories])
 
 
-@products.route('/<product_guid>', methods=['GET'])
-def get_product(product_guid: str):
-    # TODO: Implement product view
-    return str(product_guid)
-
-
-@products.route('/search', methods=['POST'])
+@products.route('/search', methods=['GET'])
+@login_required
 def search_products():
-    search = SearchForm()
+    search = SearchForm(request.args)
 
-    if search.validate_on_submit():
-        all_products = get_products()
-        return render_template('products/list.html', products=all_products)
+    if search.validate():
+        query_key = search.search.data
+        page = get_products_by_keyword(query_key, search.page.data)
 
-    return 'invalid form', 400
+        return render_template('products/list.html', page=page)
+
+    return redirect(url_for('home.index'))

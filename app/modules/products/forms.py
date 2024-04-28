@@ -1,7 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms.fields.simple import StringField
+from wtforms import validators
+from wtforms.fields.numeric import IntegerField
+from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import DataRequired
 
 
 class SearchForm(FlaskForm):
-    search = StringField('Search', validators=[DataRequired()], render_kw={"placeholder": "Search products..."})
+    class Meta:
+        csrf = False
+
+    page = IntegerField('Page', validators=[validators.optional()], default=1)
+    search = StringField('Search', validators=[validators.data_required()], render_kw={"placeholder": "Search products..."})

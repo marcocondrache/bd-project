@@ -7,3 +7,6 @@ SQLAlchemy
 invoke
 python-dotenv
 psycopg2
+werkzeug
+wtforms
+alembic

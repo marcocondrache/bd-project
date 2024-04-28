@@ -5,9 +5,13 @@ from extensions import db
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
 
 
-# TODO: Implement paginated query
-def get_products(seller_id: int = None):
-    return Product.query.filter_by(owner_seller_id=seller_id).all()
+def get_products_by_keyword(query_key: str, page: int = 1, per_page: int = 20) -> list:
+    query = Product.query.join(Product.keywords)
+    query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
+    # TODO: Choose correct sorting
+    query = query.order_by(Product.name.desc())
+
+    return query.paginate(page=page, per_page=per_page)
 
 
 def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
@@ -52,7 +56,7 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
     keywords = (
         name.split(separators) +
         description.split(separators) if description else [] +
-        brand.split(separators) if brand else []
+                                                          brand.split(separators) if brand else []
     )
     for keyword in keywords:
         if len(keyword) > 3:
@@ -68,7 +72,7 @@ def create_product(seller_id: int, name: str, price: float, stock: int, categori
 
 
 def update_product(
-    product_id: int, price: float = None, stock: int = None, categories: list = None, description: str = None
+        product_id: int, price: float = None, stock: int = None, categories: list = None, description: str = None
 ):
     product = Product.query.filter_by(id=product_id).first()
     if not product:
