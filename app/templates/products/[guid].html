@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col md:flex-row" x-data="{ editing: false, name: '{{ product.name }}', description: '{{ product.description }}', price: '{{ product.price }}' }">
+        <div class="md:w-1/2">
+            <img :src="image" alt="name" class="w-full h-64 object-cover md:h-full md:w-48">
+        </div>
+        <div class="md:w-1/2 px-3">
+            <h2 class="font-bold text-2xl mb-2" x-show="!editing" x-text="name"></h2>
+            <input x-show="editing" type="text" x-model="name" class="form-control">
+
+            <p class="text-gray-700 text-base" x-show="!editing" x-text="description"></p>
+            <input x-show="editing" type="text" x-model="description" class="form-control">
+
+            <p class="font-bold text-xl mb-2" x-show="!editing">Price: $<span x-text="price"></span></p>
+            <input x-show="editing" type="number" x-model="price" class="form-control">
+
+            <button x-show="!editing" @click="editing = true" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
+            <button x-show="editing" @click="editing = false" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
+        </div>
+    </div>
+{% endblock %}

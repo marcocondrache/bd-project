@@ -3,149 +3,142 @@
 {% block title %}Kepler Shop{% endblock %}
 
 {% block content %}
-	<div class="flex items-center justify-between w-full p-4">
-		<h1 class="text-2xl font-semibold">Create a new product</h1>
-	</div>
+    <div class="flex items-center justify-between w-full p-4">
+        <h1 class="text-2xl font-semibold">Add a new product</h1>
+    </div>
 
-	<form action="{{ url_for('products.manage_products') }}" method="POST" class="flex flex-col gap-4 p-4">
-		<div class="flex flex-row gap-2">
-			<div class="flex flex-col gap-2 flex-grow">
-				<label for="name" class="text-sm font-semibold">Name</label>
-				<input type="text" name="name" id="name"
-				       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
-			</div>
-			<div class="flex flex-col gap-2 flex-grow">
-				<label for="brand" class="text-sm font-semibold">Brand</label>
-				<input type="text" name="brand" id="brand"
-				       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
-			</div>
-		</div>
+    <form action="{{ url_for('products.create_product') }}" method="POST" class="flex flex-col gap-4 p-4">
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="name" class="text-sm font-semibold">Name</label>
+                <input type="text" name="name" id="name"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="brand" class="text-sm font-semibold">Brand</label>
+                <input type="text" name="brand" id="brand"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+        </div>
 
-		<div class="flex flex-col gap-2">
-			<label for="description" class="text-sm font-semibold">Description</label>
-			<textarea name="description" id="description"
-			          class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-			></textarea>
-		</div>
+        <div class="flex flex-col gap-2">
+            <label for="description" class="text-sm font-semibold">Description</label>
+            <textarea name="description" id="description"
+                      class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+            ></textarea>
+        </div>
 
-		<div class="flex flex-row gap-2">
-			<div class="flex flex-col gap-2 flex-grow">
-				<label for="price" class="text-sm font-semibold">Price</label>
-				<input type="number" name="price" id="price"
-				       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
-			</div>
-			<div class="flex flex-col gap-2 flex-grow">
-				<label for="stock" class="text-sm font-semibold">Stock</label>
-				<input type="number" name="stock" id="stock"
-				       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
-			</div>
-		</div>
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="price" class="text-sm font-semibold">Price</label>
+                <input type="number" name="price" id="price"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="stock" class="text-sm font-semibold">Stock</label>
+                <input type="number" name="stock" id="stock"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+        </div>
 
-		<div class="flex flex-col gap-2 flex-grow relative" x-data="categories">
-			<label for="categories" class="text-sm font-semibold">Categories</label>
-			<select name="categories" id="categories" class="hidden" multiple x-model="categories">
-				<template x-for="(category, index) in categories" :key="index">
-					<option x-text="category" x-bind:value="category" selected></option>
-				</template>
-			</select>
+        <div class="flex flex-col gap-2 flex-grow relative" x-data="categories">
+            <label for="categories" class="text-sm font-semibold">Categories</label>
+            <select name="categories" id="categories" class="hidden" multiple x-model="categories">
+                <template x-for="(category, index) in categories" :key="index">
+                    <option x-text="category" x-bind:value="category" selected></option>
+                </template>
+            </select>
 
-			<!-- Input with Chips -->
-			<input
-					x-model="search"
-					@input="filterOptions"
-					@keydown.enter="addCategory"
-					@keydown.tab="addCategory"
-					class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
-					type="text"
-			>
+            <!-- Input with Chips -->
+            <input
+                x-model="search"
+                @input="filterOptions"
+                @keydown.tab="addCategory"
+                @keydown.tab.prevent
+                class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+                type="text"
+            >
 
-			<!-- Chips -->
-			<div
-					x-show="categories.length > 0"
-					class="absolute bottom-0 right-0 max-w-1/2 h-[42px] flex gap-2 p-1.5">
-				<template x-show="categories.length > 0" x-for="(category, index) in categories" :key="index">
-					<div
-							class="pl-3 pr-1 h-full bg-blue-500 rounded-xl cursor-pointer flex items-center gap-1 text-white text-sm"
-							@click="removeCategory(index)"
-					>
-						<p x-text="category"></p>
-						<box-icon name="x" size="sm" color="white"></box-icon>
-					</div>
-				</template>
-			</div>
+            <!-- Chips -->
+            <div
+                x-show="categories.length > 0"
+                class="absolute bottom-0 right-0 max-w-1/2 h-[42px] flex gap-2 p-1.5">
+                <template x-show="categories.length > 0" x-for="(category, index) in categories" :key="index">
+                    <div
+                        class="pl-3 pr-1 h-full bg-blue-500 rounded-xl cursor-pointer flex items-center gap-1 text-white text-sm"
+                        @click="removeCategory(index)"
+                    >
+                        <p x-text="category"></p>
+                        <box-icon name="x" size="sm" color="white"></box-icon>
+                    </div>
+                </template>
+            </div>
 
 
-			<div
-					x-show="filteredOptions.length > 0 && search.length > 0"
-					class="absolute z-10 w-full top-full bg-white text-black border rounded-b-md shadow-lg flex flex-col"
-			>
-				<template x-for="(option, index) in filteredOptions" :key="index">
-					<div
-							class="px-4 py-2 cursor-pointer hover:bg-blue-100"
-							@click="addCategory(option)"
-							x-text="option"
-					></div>
-				</template>
-			</div>
+            <div
+                x-show="filteredOptions.length > 0 && search.length > 0"
+                class="absolute z-10 w-full top-full bg-white text-black border rounded-b-md shadow-lg flex flex-col"
+            >
+                <template x-for="(option, index) in filteredOptions" :key="index">
+                    <div
+                        class="px-4 py-2 cursor-pointer hover:bg-blue-100"
+                        @click="addCategory(option)"
+                        x-text="option"
+                    ></div>
+                </template>
+            </div>
 
-			<script>
-				document.addEventListener("alpine:init", () => {
-					Alpine.data('categories', () => ({
-						categories: [],
-						options: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
-						filteredOptions: [],
-						search: '',
-						unique(value, index, self) {
-							return self.indexOf(value) === index;
-						},
-						arrayRemove(arr, value) {
-							return arr.filter(function (ele) {
-								return ele !== value;
-							});
-						},
-						arrayContains(arr, value) {
-							return arr.includes(value);
-						},
-						filterOptions() {
-							this.filteredOptions = this.options.filter(option =>
-								option.toLowerCase().includes(this.search.toLowerCase()) &&
-								!this.categories.includes(option)
-							).filter(this.unique);
-						},
-						addCategory(category) {
-							console.log(this.categories, category)
-							if (typeof category === 'string' && !this.arrayContains(this.categories, category)) {
-								this.categories.push(category);
-								this.search = '';
-								this.filteredOptions = [];
-							} else if (typeof category === 'object' && !this.arrayContains(this.categories, category)) {
-								this.categories.push(this.search);
-								this.search = '';
-								this.filteredOptions = [];
-							}
-						},
+            <script>
+                document.addEventListener("alpine:init", () => {
+                    Alpine.data('categories', () => ({
+                        options: {{ categories|tojson }},
+                        filteredOptions: [],
+                        categories: [],
+                        search: '',
 
-						removeCategory(index) {
-							this.categories.splice(index, 1);
-						},
+                        unique(value, index, self) {
+                            return self.indexOf(value) === index;
+                        },
 
-						onFocusOut() {
-							this.search = '';
-							this.filteredOptions = [];
-						}
+                        clear() {
+                            this.search = '';
+                            this.filteredOptions = [];
+                        },
 
-					}))
-				});
-			</script>
-		</div>
+                        filterOptions() {
+                            this.filteredOptions = this.options.filter(option =>
+                                option.toLowerCase().includes(this.search.toLowerCase()) &&
+                                !this.categories.includes(option)
+                            ).filter(this.unique)
+                        },
 
-		<div class="flex flex-row gap-2">
-			<div class="flex gap-2 flex-grow">
-				<label for="is_second_hand" class="text-sm font-semibold">Is second hand?</label>
-				<input type="checkbox" name="is_second_hand" id="is_second_hand" class="rounded-md border border-gray-300 p-2">
-			</div>
-		</div>
+                        addCategory(category) {
+                            if (this.search.length === 0) return;
 
-		<button type="submit" class="rounded-md bg-blue-500 hover:bg-blue-600 text-white font-semibold p-2">Create</button>
-	</form>
+                            // triggered from tab
+                            if (typeof category === 'object') category = this.search;
+
+                            if (!this.categories.includes(category)) this.categories.push(category);
+                            this.clear();
+                        },
+
+                        removeCategory(index) {
+                            this.categories.splice(index, 1);
+                        },
+                    }))
+                });
+            </script>
+        </div>
+
+        <div class="flex flex-row gap-2">
+            <div class="flex gap-2 flex-grow">
+                <label for="is_second_hand" class="text-sm font-semibold">Is second hand?</label>
+                <input type="checkbox" name="is_second_hand" id="is_second_hand"
+                       class="rounded-md border border-gray-300 p-2">
+            </div>
+        </div>
+
+        <button type="submit" class="rounded-md bg-blue-500 hover:bg-blue-600 text-white font-semibold p-2">Create
+        </button>
+    </form>
 {% endblock %}
