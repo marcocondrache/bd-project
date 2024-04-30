@@ -1,3 +1,5 @@
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 from enum import Enum
 from typing import TYPE_CHECKING, List
 
@@ -48,7 +50,7 @@ class Cart(db.Model):
     __tablename__ = "carts"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
-    guid: Mapped[str] = mapped_column(db.String(255), nullable=False, unique=True)
+    guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     owner_buyer_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("buyers.id"), nullable=False)
 
     status: Mapped[CartStatus] = mapped_column(db.Enum(CartStatus), nullable=False, default=CartStatus.ACTIVE)

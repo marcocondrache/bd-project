@@ -87,7 +87,7 @@ def product_edit_view(product_guid: str):
         description = request.form.get('description')
 
         update_product(product, price, stock, categories, description)
-        return redirect(url_for('products.index_view'))
+        return redirect(url_for('products.product_edit_view'))
 
     # request.method == 'GET'
     categories = get_all_product_categories()
