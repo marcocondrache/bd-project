@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from flask_login import current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.modules.buyers.models import Buyer
@@ -19,7 +18,6 @@ def get_user_by_email(email: str):
     return User.query.filter_by(email=email).first()
 
 
-# Login user
 def validate_user(email: str, password: str):
     user = User.query.filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
@@ -32,12 +30,7 @@ def register_user(
 ):
     user = User(email=email, given_name=given_name, family_name=family_name, password=generate_password_hash(password))
     db.session.add(user)
-    buyer = Buyer(destination_address=destination_address, card_number=card_number, user_id=user.id)
+    buyer = Buyer(destination_address=destination_address, card_number=card_number, user=user)
     db.session.add(buyer)
     db.session.commit()
     return user
-
-
-# TODO evaluate if this is necessary, now it's a case of circular dependency
-# def is_seller():
-#     return bool(current_user.sellers)

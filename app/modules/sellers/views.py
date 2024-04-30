@@ -7,7 +7,7 @@ from app.modules.sellers.handlers import create_seller
 
 @sellers.route('/register', methods=['GET', 'POST'])
 @login_required
-def seller_registration():
+def register_view():
     if request.method == 'POST':
         iban = request.form.get('iban')
         show_sold_products = request.form.get('show_sold_products') == 'on'
@@ -15,10 +15,11 @@ def seller_registration():
         # create seller
         seller = create_seller(current_user.id, iban, show_sold_products)
         if not seller:
-            flash('Seller not created')
+            flash('An error occurred, seller not created')
         else:
-            return redirect(url_for('home.index'))
+            return redirect(url_for('home.index_view'))
 
     if current_user.sellers:
-        return redirect(url_for('home.index'))
+        return redirect(url_for('home.index_view'))
+
     return render_template('sellers/register.html')

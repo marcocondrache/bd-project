@@ -12,7 +12,7 @@
 			</div>
 		{% endif %}
 	{% endwith %}
-	<form action="/sellers/register" method="POST">
+	<form action="{{ url_for('sellers.register_view') }}" method="POST">
 		<div class="mb-4">
 			<label for="iban" class="block text-gray-700 text-sm font-bold mb-2">IBAN</label>
 			<input type="text" name="iban" id="iban" required

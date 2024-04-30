@@ -1,0 +1,78 @@
+{% extends 'layouts/base.html' %}
+{% import 'products/macros/category.html' as category %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+    <div x-data='{
+        name: "{{ product.name }}",
+        description: "{{ product.description }}" || "No description available",
+        brand: "{{ product.brand }}",
+        isSecondHand: "{{ product.is_second_hand }}",
+        price: {{ product.price }},
+        currency: "{{ product.currency }}",
+        stock: {{ product.stock }},
+        isRemoved: "{{ product.deleted_at is not none }}" === "True",
+        categories: {{ product_categories|tojson }},
+    }' class="bg-gray-100 text-gray-900">
+        <div class="container mx-auto p-4">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:flex relative">
+                <div class="lg:flex-shrink-0">
+                    {% if product.image %}
+                        <img class="lg:w-64 w-full h-64 lg:h-full" src="{{ product.image }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="lg:w-64 w-full h-64 lg:h-full flex items-center justify-center">
+                            <box-icon name="image-alt" size="lg"></box-icon>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <form action="{{ url_for("products.product_edit_view", product_guid=product.guid) }}"
+                      method="POST"
+                      class="flex flex-col p-4 w-full"
+                >
+                    <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
+
+                    {{ category.categories_field(categories, product_categories) }}
+
+                    <div class="my-2">
+                        <label for="description" class="text-sm font-semibold">Description</label>
+                        <textarea id="description" name="description" x-model="description" autofocus
+                                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        ></textarea>
+                    </div>
+                    <div class="my-2">
+                        <div class="text-sm font-semibold">Brand</div>
+                        <div x-text="brand"
+                             class="mt-1 block w-full py-2 rounded-md"
+                        ></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="stock" class="block text-sm font-semibold">Stock</label>
+                        <input type="number" id="stock" name="stock" x-model="stock" min="0"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                    </div>
+                    <div class="mb-8">
+                        <label for="price" class="text-sm font-semibold">Price</label>
+                        <input type="number" id="price" name="price" x-model="price" step="any"
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="{{ url_for("products.product_view", product_guid=product.guid) }}"
+                           class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                        >
+                            Cancel
+                        </a>
+                        <button type="submit"
+                                class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

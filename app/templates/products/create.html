@@ -1,0 +1,58 @@
+{% extends 'layouts/base.html' %}
+{% import 'products/macros/category.html' as category %}
+
+{% block title %}Kepler Shop{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-between w-full p-4">
+        <h1 class="text-2xl font-semibold">Add a new product</h1>
+    </div>
+
+    <form action="{{ url_for('products.create_view') }}" method="POST" class="flex flex-col gap-4 p-4">
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="name" class="text-sm font-semibold">Name</label>
+                <input type="text" name="name" id="name" autofocus
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="brand" class="text-sm font-semibold">Brand</label>
+                <input type="text" name="brand" id="brand"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label for="description" class="text-sm font-semibold">Description</label>
+            <textarea name="description" id="description"
+                      class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none"
+            ></textarea>
+        </div>
+
+        <div class="flex flex-row gap-2">
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="price" class="text-sm font-semibold">Price</label>
+                <input type="number" name="price" id="price" step="any"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+            <div class="flex flex-col gap-2 flex-grow">
+                <label for="stock" class="text-sm font-semibold">Stock</label>
+                <input type="number" name="stock" id="stock"
+                       class="rounded-md border border-gray-300 p-2 focus:border-blue-500 focus:outline-none" required>
+            </div>
+        </div>
+
+        {{ category.categories_field(categories) }}
+
+        <div class="flex flex-row gap-2">
+            <div class="flex gap-2 flex-grow">
+                <label for="is_second_hand" class="text-sm font-semibold">Is second hand?</label>
+                <input type="checkbox" name="is_second_hand" id="is_second_hand"
+                       class="rounded-md border border-gray-300 p-2">
+            </div>
+        </div>
+
+        <button type="submit" class="rounded-md bg-blue-500 hover:bg-blue-600 text-white font-semibold p-2">Create
+        </button>
+    </form>
+{% endblock %}

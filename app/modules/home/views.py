@@ -12,5 +12,5 @@ def unauthorized():
 
 @home.route('/')
 @login_required
-def index():
-    return render_template('index.html')
+def index_view():
+    return render_template('index.html', section='dashboard')

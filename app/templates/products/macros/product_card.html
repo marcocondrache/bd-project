@@ -1,0 +1,49 @@
+{% macro card(product) -%}
+    <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+        {% if product.image %}
+            <img class="p-8 rounded-t-lg" src="#" alt="product image"/>
+        {% else %}
+            <div class="flex flex-col justify-center items-center h-32">
+                <box-icon name="image-alt" size="lg"></box-icon>
+            </div>
+        {% endif %}
+        <div class="px-5 pb-5">
+            <div>
+                <h3 class="text-xl font-semibold tracking-tight text-gray-900">{{ product.name }}</h3>
+                <span class="text-xs text-gray-700 -mt-4">By {{ product.brand }}</span>
+            </div>
+            <div class="flex items-center mt-2.5 mb-4 space-x-2">
+                {% if product.stock > 0 %}
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        In stock
+                    </span>
+                {% else %}
+                    <span
+                        class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        Out of stock
+                    </span>
+                {% endif %}
+                {% if product.is_second_hand %}
+                    <span
+                        class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        Second hand
+                    </span>
+                {% else %}
+                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        New
+                    </span>
+                {% endif %}
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-3xl font-bold">{{ product.price }}</span>
+                    <span class="text font-medium">{{ product.currency }}</span>
+                </div>
+                <a href="{{ url_for('products.product_view', product_guid=product.guid) }}"
+                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center shadow-md">
+                    View details
+                </a>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
