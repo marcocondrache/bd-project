@@ -17,13 +17,13 @@
 <body>
 <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout">
     <!-- header page -->
-    <header class="flex w-full items-center justify-between border-b-2 border-gray-200 bg-white px-4 h-16">
+    <header class="h-16 flex w-full items-center justify-between bg-white px-4 border-b-2 border-gray-200">
         <!-- logo -->
-        <div class="flex items-center space-x-2 gap-4">
-            <button type="button" class="text-3xl" @click="asideOpen = !asideOpen">
-                <box-icon name="menu"></box-icon>
+        <div class="flex items-center gap-4">
+            <button type="button" @click="asideOpen = !asideOpen">
+                <box-icon name="menu" class="flex items-center"></box-icon>
             </button>
-            <a href="{{ url_for('home.index') }}" class="text-xl font-semibold">Kepler Shop</a>
+            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler Shop</a>
         </div>
 
         <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.search_products') }}">
@@ -48,12 +48,12 @@
         <!-- button profile -->
         <div class="flex gap-4">
             {% if not current_user.sellers %}
-                <a href="/sellers/register"
-                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-white text-xs font-semibold p-2 flex items-center justify-center">
+                <a href="{{ url_for('sellers.register_view') }}"
+                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
                     Become a seller!
                 </a>
             {% endif %}
-            <button type="button" @click="profileOpen = true" class="overflow-hidden rounded-full">
+            <button type="button" @click="profileOpen = true" class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
                 Hello, {{ current_user.given_name }}
             </button>
         </div>
@@ -62,23 +62,20 @@
         {{ profile.profile_card(current_user) }}
     </header>
 
-    <div class="flex grow border border-red">
+    <div class="flex grow">
         <!-- aside -->
-        <aside class="flex w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+        <aside class="flex min-w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
                x-show="asideOpen"
-                {# FIXME #}
-               x-transition:enter="transition ease-out duration-300"
-               x-transition:enter-start="opacity-0 scale-90"
-               x-transition:enter-end="opacity-100 scale-100"
-               x-transition:leave="transition ease-in duration-300"
-               x-transition:leave-start="opacity-100 scale-100"
-               x-transition:leave-end="opacity-0 scale-90">
-
-            {{ menu.row("Dashboard", url_for("home.index"), "home", section == "dashboard") }}
-            {{ menu.row("Shop", "/products/shop", "store", section == "shop") }}
-
+               x-transition:enter="transition ease-out duration-300 transform"
+               x-transition:enter-start="-translate-x-full"
+               x-transition:enter-end="translate-x-0"
+               x-transition:leave="transition ease-in duration-300 transform"
+               x-transition:leave-start="translate-x-0"
+               x-transition:leave-end="-translate-x-full"
+        >
+            {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
             {% if current_user.sellers %}
-                {{ menu.row("Your products", url_for("products.index"), "collection", section == "your_products") }}
+                {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
         </aside>
 

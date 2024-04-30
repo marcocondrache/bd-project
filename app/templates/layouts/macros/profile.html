@@ -1,10 +1,10 @@
 {% macro profile_card(current_user) %}
 	<!-- Modal Background -->
-	<div x-show="profileOpen" class="fixed inset-0 bg-black opacity-50"></div>
+	<div x-show="profileOpen" class="z-20 fixed inset-0 bg-black opacity-50"></div>
 
 	<!-- Modal Content -->
 	<div x-show="profileOpen" @click.outside="profileOpen = false" x-transition
-	     class="fixed inset right-0 top-16 m-2 max-w-xs bg-white shadow-xl rounded-lg p-4"
+	     class="z-20 fixed inset right-0 top-16 m-2 max-w-xs bg-white shadow-xl rounded-lg p-4"
 	>
 		<!-- User Profile Content -->
 		<div class="photo-wrapper p-2">
@@ -15,13 +15,13 @@
 				<h3 class="text-center text-xl text-gray-900 font-medium leading-8">
 					{{ current_user.given_name }} {{ current_user.family_name }}
 				</h3>
-				<div class="text-center text-gray-400 text-xs font-semibold">
+				<div class="text-center text-gray-400 text-xs font-semibold mb-4">
 					<p>{{ current_user.email }}</p>
 				</div>
 
 				<!-- Seller or Buyer -->
 				{% if current_user.sellers %}
-					<div class="text-center text-gray-400 text-xs font-semibold my-4">
+					<div class="text-center text-gray-400 text-xs font-semibold mb-4">
 						<p>Seller account</p>
 					</div>
 				{% endif %}

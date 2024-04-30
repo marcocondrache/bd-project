@@ -21,7 +21,7 @@ def login():
         else:
             flash(next(iter(form.errors.values()))[0])
 
-        return redirect(url_for("home.index"))
+        return redirect(url_for("home.index_view"))
 
     return render_template("auth/login.html", form=form)
 
@@ -49,7 +49,7 @@ def signup():
         # create user
         user = register_user(email, given_name, family_name, password, destination_address, card_number)
         login_user(user)
-        return redirect(url_for("home.index"))
+        return redirect(url_for("home.index_view"))
 
     return render_template("auth/signup.html")
 

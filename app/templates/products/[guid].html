@@ -3,22 +3,126 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-    <div class="flex flex-col md:flex-row" x-data="{ editing: false, name: '{{ product.name }}', description: '{{ product.description }}', price: '{{ product.price }}' }">
-        <div class="md:w-1/2">
-            <img :src="image" alt="name" class="w-full h-64 object-cover md:h-full md:w-48">
-        </div>
-        <div class="md:w-1/2 px-3">
-            <h2 class="font-bold text-2xl mb-2" x-show="!editing" x-text="name"></h2>
-            <input x-show="editing" type="text" x-model="name" class="form-control">
+    <div x-data='{
+        name: "{{ product.name }}",
+        description: "{{ product.description }}" || "No description available",
+        brand: "{{ product.brand }}",
+        isSecondHand: "{{ product.is_second_hand }}",
+        price: {{ product.price }},
+        currency: "{{ product.currency }}",
+        stock: {{ product.stock }},
+        isRemoved: "{{ product.deleted_at is not none }}" === "True",
+        categories: {{ product_categories|tojson }},
 
-            <p class="text-gray-700 text-base" x-show="!editing" x-text="description"></p>
-            <input x-show="editing" type="text" x-model="description" class="form-control">
+        confirmDelete: false,
 
-            <p class="font-bold text-xl mb-2" x-show="!editing">Price: $<span x-text="price"></span></p>
-            <input x-show="editing" type="number" x-model="price" class="form-control">
+        selectedQuantity: 1,
+    }' class="bg-gray-100 text-gray-900">
+        <div class="container mx-auto p-4">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:flex relative">
+                <div class="lg:flex-shrink-0">
+                    {% if product.image %}
+                        <img class="lg:w-64 w-full h-64 lg:h-full" src="{{ product.image }}" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="lg:w-64 w-full h-64 lg:h-full flex items-center justify-center">
+                            <box-icon name="image-alt" size="lg"></box-icon>
+                        </div>
+                    {% endif %}
+                </div>
 
-            <button x-show="!editing" @click="editing = true" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Edit</button>
-            <button x-show="editing" @click="editing = false" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Save</button>
+                <div class="p-4 flex flex-col w-full">
+                    <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
+                    <div class="flex gap-2 mb-4" x-show="categories.length > 0">
+                        <template x-for="category in categories">
+                            <span
+                                x-text="category"
+                                class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full shadow-md"
+                            ></span>
+                        </template>
+                    </div>
+                    <p class="mb-2" x-text="description"></p>
+                    <p class="mb-2">Brand: <span class="font-semibold" x-text="brand"></span></p>
+                    <p class="mb-4">Stock: <span class="font-semibold" x-text="stock"></span></p>
+                    <div class="flex items-center gap-4 mb-8">
+                        <div>
+                            <span class="text-3xl font-bold" x-text="price"></span>
+                            <span class="text font-medium" x-text="currency"></span>
+                        </div>
+                        <span
+                            x-show="isSecondHand"
+                            class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
+                        >
+                            New
+                        </span>
+                        <span
+                            x-show="!isSecondHand"
+                            class="my-4 text-sm font-medium bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
+                        >
+                            Second hand
+                        </span>
+                    </div>
+                    {% if is_seller_product %}
+                        <div class="flex gap-4">
+                            <a href="{{ url_for("products.product_edit_view", product_guid=product.guid) }}"
+                               class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                            >
+                                Edit
+                            </a>
+                            <button @click="confirmDelete = true"
+                                    class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                            >
+                                Delete
+                            </button>
+
+                            <div x-show="confirmDelete"
+                                 class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+                                <div class="bg-white p-4 rounded-lg shadow-lg">
+                                    <p class="mb-4">Are you sure you want to delete this product?</p>
+                                    <form class="flex gap-2"
+                                          action="{{ url_for("products.product_delete_view", product_guid=product.guid) }}"
+                                          method="POST">
+                                        <button @click="confirmDelete = false" type="reset"
+                                                class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                                class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex gap-4 justify-end">
+                            <div class="flex gap-2 items-center">
+                                <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5"
+                                        @click="selectedQuantity = Math.max(1, selectedQuantity - 1)"
+                                >
+                                    <box-icon name="minus" size="xs" color="white"></box-icon>
+                                </button>
+                                <input type="number" class="w-8 text-center" x-model="selectedQuantity"
+                                       x-bind:max="stock" x-bind:min="1"
+                                >
+                                <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5"
+                                        @click="selectedQuantity = Math.min(stock, selectedQuantity + 1)"
+                                >
+                                    <box-icon name="plus" size="xs" color="white"></box-icon>
+                                </button>
+                            </div>
+
+                            <button
+                                class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                            >
+                                Add to Cart
+
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

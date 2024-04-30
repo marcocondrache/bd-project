@@ -21,11 +21,11 @@ def get_products_by_keyword(query_key: str, page: int = 1, per_page: int = 20) -
 
 
 def get_product_by_guid(guid: UUID):
-    return Product.query.filter_by(guid=guid).first()
+    return Product.query.filter_by(guid=guid, deleted_at=None).first()
 
 
 def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
-    query = Product.query.filter_by(owner_seller_id=seller_id).order_by(Product.created_at.desc())
+    query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.name)
 
     if not show_sold_out:
         query = query.filter(Product.stock > 0)
@@ -80,16 +80,21 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
 
 
 def update_product(
-    product: Product, price: float = None, stock: int = None, categories: list = None, description: str = None
+    product: Product, price: float, stock: int, categories: list, description: str
 ):
-    if price:
+    if price != product.price:
         product.price = price
-    if stock:
+    if stock != product.stock:
         product.stock = stock
-    if description:
+    if description != product.description:
         product.description = description
-    if categories:
-        product.categories = categories
+    for category_name in categories:
+        category = ProductCategory.query.filter_by(name=category_name).first()
+        if category is None:
+            category = ProductCategory(name=category_name)
+            db.session.add(category)
+        if category not in product.categories:
+            product.categories.append(category)
 
     product.sequence += 1
 
