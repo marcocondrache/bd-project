@@ -33,10 +33,12 @@ def index_view():
 
     buyer_id = current_user.buyers[0].id
 
+    # TODO: add pagination
     cart = get_cart_by_buyer(buyer_id)  # should use "get_cart_or_create"?
     return render_template(
         'carts/index.html',
         cart=cart,
+        products=[r.product for r in cart.reservations] if cart else [],
         section='your_cart'
     )
 
@@ -52,10 +54,9 @@ def product_put_view(product_guid: str):
 
     cart, product = update_cart(buyer_id, product, quantity)
     if product:
-        pass  # TODO the reservation failed, offer alternative with product.stock
+        return product.to_json(), 400
 
-    # FIXME: it actually depends from where it has been called
-    return redirect(url_for('carts.index_view'))
+    return None, 200
 
 
 @carts.route('/<product_guid>/delete', methods=['POST'])
@@ -68,5 +69,4 @@ def product_delete_view(product_guid: str):
 
     remove_from_cart(buyer_id, product)
 
-    # FIXME: it actually depends from where it has been called
     return redirect(url_for('carts.index_view'))

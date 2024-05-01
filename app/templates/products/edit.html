@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% import 'products/macros/category.html' as category %}
+{% from 'macros/forms.html' import categories_field %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -33,7 +33,7 @@
                 >
                     <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
 
-                    {{ category.categories_field(categories, product_categories) }}
+                    {{ categories_field(categories, product_categories) }}
 
                     <div class="my-2">
                         <label for="description" class="text-sm font-semibold">Description</label>

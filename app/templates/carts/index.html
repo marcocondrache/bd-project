@@ -1,7 +1,21 @@
 {% extends 'layouts/base.html' %}
+{% from 'macros/products.html' import products_list %}
 
 {% block title %}Kepler Shop{% endblock %}
 
 {% block content %}
-    Caaaaarrito
+    {% if products|length == 0 %}
+        <div class="flex flex-col justify-center items-center h-full w-full gap-2">
+            <box-icon name="cart" size="lg" color="grey"></box-icon>
+            <span>You don't have any product yet</span>
+        </div>
+    {% else %}
+        <div class="flex flex-col h-[calc(100vh-4rem)]">
+            <div class="text-2xl font-semibold m-4 flex items-center justify-between">
+                Your cart
+            </div>
+
+            {{ products_list(products) }}
+        </div>
+    {% endif %}
 {% endblock %}

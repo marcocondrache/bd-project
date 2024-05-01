@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
-{% import 'products/macros/pagination.html' as pagination %}
-{% import 'products/macros/product_card.html' as product %}
+{% import 'macros/pagination.html' as pagination %}
+{% from 'macros/products.html' import products_list %}
 
 {% block title %}Kepler Shop{% endblock %}
 
@@ -31,13 +31,8 @@
                     Add a new product!
                 </a>
             </div>
-            <div class="overflow-auto flex-grow p-4 shadow-inner">
-                <div class="flex flex-wrap justify-center gap-4">
-                    {% for p in paginated_products.items %}
-                        {{ product.card(p) }}
-                    {% endfor %}
-                </div>
-            </div>
+
+            {{ products_list(paginated_products.items) }}
             {{ pagination.render_pagination(paginated_products) }}
         </div>
     {% endif %}

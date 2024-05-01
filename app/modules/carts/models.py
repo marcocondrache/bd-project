@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List
 
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.modules.products.models import Product
 from extensions import db
 
 if TYPE_CHECKING:
@@ -34,8 +35,8 @@ class ProductReservation(db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
-    product = db.relationship("Product")
-    cart = db.relationship("Cart", back_populates="reservations")
+    product: Mapped[Product] = db.relationship("Product")
+    cart: Mapped["Cart"] = db.relationship("Cart", back_populates="reservations")
 
     def __repr__(self):
         return (f"<ProductReservation id={self.id} product_id={self.product_id} cart_id={self.cart_id}"

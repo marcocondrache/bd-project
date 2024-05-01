@@ -1,6 +1,17 @@
-{% import 'layouts/macros/menu.html' as menu %}
-{% import 'layouts/macros/profile.html' as profile %}
+{% from 'macros/profile.html' import profile_card %}
 
+{% macro row(name, path, icon, selected=False) -%}
+    <a href="{{ path }}"
+        {%- if selected -%}
+       class="flex items-center space-x-4 rounded-md px-2 py-3 bg-gray-100 text-blue-600"
+        {%- else -%}
+       class="flex items-center space-x-4 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600"
+        {%- endif -%}
+    >
+        <box-icon name="{{ icon }}" size="sm"></box-icon>
+        <span>{{ name }}</span>
+    </a>
+{%- endmacro %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,8 +50,7 @@
             </button>
         </div>
 
-        <!-- profile card -->
-        {{ profile.profile_card(current_user) }}
+        {{ profile_card(current_user) }}
     </header>
 
     <div class="flex grow">
@@ -54,9 +64,12 @@
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="-translate-x-full"
         >
-            {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
+            {{ row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
             {% if current_user.sellers %}
-                {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
+                {{ row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
+            {% endif %}
+            {% if current_user.buyers %}
+                {{ row("Your cart", url_for("carts.index_view"), "cart", section == "your_cart") }}
             {% endif %}
         </aside>
 

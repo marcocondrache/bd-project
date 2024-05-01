@@ -1,4 +1,4 @@
-{% macro card(product) -%}
+{% macro product_card(product) -%}
     <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
         {% if product.image %}
             <img class="p-8 rounded-t-lg" src="#" alt="product image"/>
@@ -20,7 +20,7 @@
                 {% else %}
                     <span
                         class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
-                        Out of stock
+                        Sold out
                     </span>
                 {% endif %}
                 {% if product.is_second_hand %}
@@ -44,6 +44,16 @@
                     View details
                 </a>
             </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro products_list(products) -%}
+    <div class="overflow-auto flex-grow p-4 shadow-inner">
+        <div class="flex flex-wrap justify-center gap-4">
+            {% for p in products %}
+                {{ product_card(p) }}
+            {% endfor %}
         </div>
     </div>
 {%- endmacro %}
