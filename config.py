@@ -20,7 +20,7 @@ class Prod(object):
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 
-    BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products"]
+    BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts"]
     EXTENSIONS = [
         'extensions.db',
         'extensions.login_manager',
