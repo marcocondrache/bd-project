@@ -2,7 +2,12 @@ Flask
 Flask-SQLAlchemy
 Flask-Login
 Flask-Migrate
+Flask-WTF
 SQLAlchemy
 invoke
 python-dotenv
 psycopg2
+werkzeug
+wtforms
+alembic
+email-validator

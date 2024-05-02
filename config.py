@@ -24,7 +24,8 @@ class Prod(object):
     EXTENSIONS = [
         'extensions.db',
         'extensions.login_manager',
-        'extensions.migrate'
+        'extensions.migrate',
+        'extensions.csrf'
     ]
 
 
