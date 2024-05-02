@@ -43,9 +43,9 @@ def index_view():
     )
 
 
-@carts.route('/<product_guid>/put', methods=['POST'])
+@carts.route('/<product_guid>/update', methods=['POST'])
 @login_required
-def cart_put_view(product_guid: str):
+def cart_update_view(product_guid: str):
     authorize_buyer()
 
     buyer_id = current_user.buyers[0].id
@@ -56,7 +56,7 @@ def cart_put_view(product_guid: str):
     if product:
         return product.to_json(), 400
 
-    return None, 200
+    return '', 200
 
 
 @carts.route('/<product_guid>/delete', methods=['POST'])

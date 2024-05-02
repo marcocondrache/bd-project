@@ -129,7 +129,7 @@ def search_products():
     search = SearchForm(request.args)
 
     if search.validate():
-        query_key = search.search.data
+        query_key = search.search.data.lower()
         page = get_products_filtered(query_key, search.page.data)
 
         return render_template('products/list.html', page=page, section='shop')

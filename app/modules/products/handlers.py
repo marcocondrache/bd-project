@@ -62,7 +62,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
         product.categories.append(category)
 
     # add keywords if not exists
-    keywords = [k for k in (
+    keywords = [k.lower() for k in (
         name.split(separators) +
         description.split(separators) if description else [] +
         brand.split(separators) if brand else []

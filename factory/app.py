@@ -1,5 +1,5 @@
 from importlib import import_module
-from flask import Flask, render_template
+from flask import Flask, render_template, abort, flash
 from flask_wtf.csrf import CSRFError
 from werkzeug.utils import import_string
 
@@ -21,17 +21,17 @@ class Base(Flask):
 
     def configure_error_handlers(self):
         @self.errorhandler(500)
-        def internal_error(_):
-            return render_template("http/500.html"), 500
+        def internal_error(e):
+            return render_template("http/500.html", reason=e.description), 500
 
         @self.errorhandler(404)
-        def not_found(_):
-            return render_template("http/404.html"), 404
+        def not_found(e):
+            return render_template("http/404.html", reason=e.description), 404
 
         @self.errorhandler(CSRFError)
         def handle_csrf_error(e):
-            # TODO: Return 403
-            return render_template('http/404.html', reason=e.description), 404
+            self.logger.error(e.description)
+            return '', 403
 
     def configure_extensions(self):
         extensions = self.config.get('EXTENSIONS', [])

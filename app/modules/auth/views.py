@@ -57,6 +57,7 @@ def signup():
 
 
 @auth.route("/logout", methods=["GET"])
+@csrf.exempt
 @login_required
 def logout():
     logout_user()

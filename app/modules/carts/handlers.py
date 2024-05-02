@@ -35,7 +35,7 @@ def update_cart(buyer_id: int, product: Product, quantity: int) -> (Cart | None,
         )
         cart.reservations.append(product_reservation)
         db.session.commit()
-        return cart
+        return cart, None
 
     if product.sequence != product_reservation.product_sequence:
         product_reservation.deleted_at = db.func.now()
@@ -51,7 +51,7 @@ def remove_from_cart(buyer_id: int, product: Product) -> Cart | None:
     if not cart:
         return None
 
-    product_reservation = db.session.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
+    product_reservation = ProductReservation.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
     if not product_reservation:
         return None
 
