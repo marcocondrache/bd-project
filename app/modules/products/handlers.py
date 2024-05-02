@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from flask_sqlalchemy.pagination import QueryPagination
+
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
 from extensions import db
@@ -11,7 +13,11 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
-def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20) -> list:
+def get_all_products(page: int = 1, per_page: int = 20) -> QueryPagination:
+    return Product.query.paginate(page=page, per_page=per_page)
+
+
+def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20) -> QueryPagination:
     query = Product.query.join(Product.keywords).filter(Product.deleted_at == None)
 
     if query_key:

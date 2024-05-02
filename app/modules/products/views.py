@@ -8,8 +8,9 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_filtered
+    get_product_by_guid, get_products_filtered, get_all_products
 )
+from extensions import csrf
 
 
 def validate_product(product_guid: str, check_owner=False):
@@ -99,6 +100,7 @@ def product_edit_view(product_guid: str):
 
 @products.route('/create', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def create_view():
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
@@ -120,15 +122,16 @@ def create_view():
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
-@products.route('/search', methods=['GET'])
+@products.route('/shop', methods=['GET'])
 @login_required
-def search_products():
+def shop_products():
     search = SearchForm(request.args)
 
     if search.validate():
         query_key = search.search.data
         page = get_products_filtered(query_key, search.page.data)
 
-        return render_template('products/list.html', page=page, section='shop')
+        return render_template('products/shop.html', page=page, section='shop')
 
-    return redirect(url_for('home.index'))
+    page = get_all_products()
+    return render_template('products/shop.html', page=page, section='shop')

@@ -32,7 +32,7 @@
                 Shop</a>
         </div>
 
-        <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.search_products') }}">
+        <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.shop_products') }}">
             {{ search.search.label(class="sr-only") }}
             <div class="relative w-full">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -81,7 +81,7 @@
                x-transition:leave-end="-translate-x-full"
         >
             {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
-            {{ menu.row("Shop", url_for("products.search_products"), "store", section == "shop") }}
+            {{ menu.row("Shop", url_for("products.shop_products"), "store", section == "shop") }}
             {% if current_user.sellers %}
                 {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
