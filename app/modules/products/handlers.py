@@ -11,9 +11,11 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
-def get_products_by_keyword(query_key: str, page: int = 1, per_page: int = 20) -> list:
-    query = Product.query.join(Product.keywords)
-    query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
+def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20) -> list:
+    query = Product.query.join(Product.keywords).filter(Product.deleted_at == None)
+
+    if query_key:
+        query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
     # TODO: Choose correct sorting
     query = query.order_by(Product.name.desc())
 

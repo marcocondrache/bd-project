@@ -9,22 +9,17 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_by_keyword
+    get_product_by_guid, get_products_filtered
 )
 
 
-def authorize_seller():
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
-
-
-def validate_product(product_guid: str):
+def validate_product(product_guid: str, check_owner=False):
     try:
         product_guid = UUID(product_guid)
         product = get_product_by_guid(product_guid)
         if not product:
             return abort(404)
-        if product.owner_seller_id != current_user.sellers[0].id:
+        if check_owner and (not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id):
             return abort(403)
         return product
     except ValueError:
@@ -34,7 +29,8 @@ def validate_product(product_guid: str):
 @products.route('', methods=['GET'])
 @login_required
 def index_view():
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     page = request.args.get('page', 1, type=int)
 
@@ -51,7 +47,6 @@ def index_view():
 @products.route('/<product_guid>', methods=['GET'])
 @login_required
 def product_view(product_guid: str):
-    authorize_seller()
 
     product = validate_product(product_guid)
 
@@ -61,7 +56,7 @@ def product_view(product_guid: str):
         product_categories=[c.name for c in product.categories],
         categories=[c.name for c in get_all_product_categories()],
         product_reservation=product_reservation,
-        is_seller_product=True,
+        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
         section='your_products'
     )
 
@@ -69,9 +64,10 @@ def product_view(product_guid: str):
 @products.route('/<product_guid>/delete', methods=['POST'])
 @login_required
 def product_delete_view(product_guid: str):
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
-    product = validate_product(product_guid)
+    product = validate_product(product_guid, check_owner=True)
 
     delete_product(product)
     return redirect(url_for('products.index_view'))
@@ -80,9 +76,10 @@ def product_delete_view(product_guid: str):
 @products.route('/<product_guid>/edit', methods=['POST', 'GET'])
 @login_required
 def product_edit_view(product_guid: str):
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
-    product = validate_product(product_guid)
+    product = validate_product(product_guid, check_owner=True)
 
     if request.method == 'POST':
         price = float(request.form.get('price'))
@@ -93,7 +90,6 @@ def product_edit_view(product_guid: str):
         update_product(product, price, stock, categories, description)
         return redirect(url_for('products.product_edit_view'))
 
-    # request.method == 'GET'
     categories = get_all_product_categories()
     return render_template(
         'products/edit.html',
@@ -107,7 +103,8 @@ def product_edit_view(product_guid: str):
 @products.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_view():
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     if request.method == 'POST':
         seller_id = current_user.sellers[0].id
@@ -122,7 +119,6 @@ def create_view():
         create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index_view'))
 
-    #  request.method == 'GET'
     categories = get_all_product_categories()
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
@@ -134,8 +130,8 @@ def search_products():
 
     if search.validate():
         query_key = search.search.data
-        page = get_products_by_keyword(query_key, search.page.data)
+        page = get_products_filtered(query_key, search.page.data)
 
-        return render_template('products/list.html', page=page)
+        return render_template('products/list.html', page=page, section='shop')
 
     return redirect(url_for('home.index'))

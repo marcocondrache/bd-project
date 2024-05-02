@@ -84,6 +84,7 @@
                x-transition:leave-end="-translate-x-full"
         >
             {{ row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
+            {{ row("Shop", url_for("products.search_products"), "store", section == "shop") }}
             {% if current_user.sellers %}
                 {{ row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
