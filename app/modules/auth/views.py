@@ -12,7 +12,7 @@ def login():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            subject = validate_user(**form.data.fromkeys(("email", "password")))
+            subject = validate_user(form.email.data, form.password.data)
             if not subject:
                 flash("Invalid credentials")
                 return redirect(url_for("auth.login"))

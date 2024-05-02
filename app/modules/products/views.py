@@ -23,7 +23,7 @@ def validate_product(product_guid: str):
         product = get_product_by_guid(product_guid)
         if not product:
             return abort(404)
-        if product.owner_seller_id != current_user.sellers[0].id:
+        if current_user.sellers and product.owner_seller_id != current_user.sellers[0].id:
             return abort(403)
         return product
     except ValueError:
@@ -58,7 +58,7 @@ def product_view(product_guid: str):
         'products/[guid].html', product=product,
         product_categories=[c.name for c in product.categories],
         categories=[c.name for c in get_all_product_categories()],
-        is_seller_product=True,
+        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
         section='your_products'
     )
 
@@ -90,7 +90,6 @@ def product_edit_view(product_guid: str):
         update_product(product, price, stock, categories, description)
         return redirect(url_for('products.index_view'))
 
-    # request.method == 'GET'
     categories = get_all_product_categories()
     return render_template(
         'products/edit.html',
@@ -119,7 +118,6 @@ def create_view():
         create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index_view'))
 
-    #  request.method == 'GET'
     categories = get_all_product_categories()
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 

@@ -25,7 +25,7 @@ class Prod(object):
         'extensions.db',
         'extensions.login_manager',
         'extensions.migrate',
-        'extensions.csrf'
+        # 'extensions.csrf'
     ]
 
 
