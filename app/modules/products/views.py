@@ -12,19 +12,12 @@ from app.modules.products.handlers import (
 )
 
 
-def authorize_seller():
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
-
-
 def validate_product(product_guid: str):
     try:
         product_guid = UUID(product_guid)
         product = get_product_by_guid(product_guid)
         if not product:
             return abort(404)
-        if current_user.sellers and product.owner_seller_id != current_user.sellers[0].id:
-            return abort(403)
         return product
     except ValueError:
         return redirect(url_for('products.index_view'))
@@ -33,7 +26,8 @@ def validate_product(product_guid: str):
 @products.route('', methods=['GET'])
 @login_required
 def index_view():
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     page = request.args.get('page', 1, type=int)
 
@@ -50,7 +44,6 @@ def index_view():
 @products.route('/<product_guid>', methods=['GET'])
 @login_required
 def product_view(product_guid: str):
-    authorize_seller()
 
     product = validate_product(product_guid)
 
@@ -66,7 +59,8 @@ def product_view(product_guid: str):
 @products.route('/<product_guid>/delete', methods=['POST'])
 @login_required
 def product_delete_view(product_guid: str):
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     product = validate_product(product_guid)
 
@@ -77,7 +71,8 @@ def product_delete_view(product_guid: str):
 @products.route('/<product_guid>/edit', methods=['POST', 'GET'])
 @login_required
 def product_edit_view(product_guid: str):
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     product = validate_product(product_guid)
 
@@ -103,7 +98,8 @@ def product_edit_view(product_guid: str):
 @products.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_view():
-    authorize_seller()
+    if not current_user.sellers:
+        return redirect(url_for('home.index_view'))
 
     if request.method == 'POST':
         seller_id = current_user.sellers[0].id
