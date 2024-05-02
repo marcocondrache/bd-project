@@ -15,9 +15,17 @@ def get_cart_or_create(buyer_id: int) -> Cart | None:
     return cart
 
 
+def get_product_in_cart(buyer_id: int, product: Product) -> ProductReservation | None:
+    cart = get_cart_by_buyer(buyer_id)
+    if not cart:
+        return None
+
+    return ProductReservation.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
+
+
 def update_cart(buyer_id: int, product: Product, quantity: int) -> (Cart | None, Product | None):
     cart = get_cart_or_create(buyer_id)
-    product_reservation = db.session.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
+    product_reservation = ProductReservation.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
     if not product_reservation:
         product_reservation = ProductReservation(
             product_id=product.id,

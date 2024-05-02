@@ -45,12 +45,12 @@ def index_view():
 
 @carts.route('/<product_guid>/put', methods=['POST'])
 @login_required
-def product_put_view(product_guid: str):
+def cart_put_view(product_guid: str):
     authorize_buyer()
 
     buyer_id = current_user.buyers[0].id
     product = validate_product(product_guid)
-    quantity = int(request.form.get('quantity'))
+    quantity = int(request.json.get('quantity', 1))
 
     cart, product = update_cart(buyer_id, product, quantity)
     if product:
@@ -61,7 +61,7 @@ def product_put_view(product_guid: str):
 
 @carts.route('/<product_guid>/delete', methods=['POST'])
 @login_required
-def product_delete_view(product_guid: str):
+def cart_delete_view(product_guid: str):
     authorize_buyer()
 
     buyer_id = current_user.buyers[0].id
