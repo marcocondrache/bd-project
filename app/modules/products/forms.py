@@ -9,4 +9,4 @@ class SearchForm(FlaskForm):
         csrf = False
 
     page = IntegerField('Page', validators=[validators.Optional()], default=1)
-    search = StringField('Search', validators=[validators.DataRequired()], render_kw={"placeholder": "Search products..."})
+    search = StringField('Search', validators=[validators.Optional()], render_kw={"placeholder": "Search products..."})

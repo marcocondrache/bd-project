@@ -8,16 +8,18 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_by_keyword
+    get_product_by_guid, get_products_filtered
 )
 
 
-def validate_product(product_guid: str):
+def validate_product(product_guid: str, check_owner=False):
     try:
         product_guid = UUID(product_guid)
         product = get_product_by_guid(product_guid)
         if not product:
             return abort(404)
+        if check_owner and (not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id):
+            return abort(403)
         return product
     except ValueError:
         return redirect(url_for('products.index_view'))
@@ -62,7 +64,7 @@ def product_delete_view(product_guid: str):
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
 
-    product = validate_product(product_guid)
+    product = validate_product(product_guid, check_owner=True)
 
     delete_product(product)
     return redirect(url_for('products.index_view'))
@@ -74,7 +76,7 @@ def product_edit_view(product_guid: str):
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
 
-    product = validate_product(product_guid)
+    product = validate_product(product_guid, check_owner=True)
 
     if request.method == 'POST':
         price = float(request.form.get('price'))
@@ -125,8 +127,8 @@ def search_products():
 
     if search.validate():
         query_key = search.search.data
-        page = get_products_by_keyword(query_key, search.page.data)
+        page = get_products_filtered(query_key, search.page.data)
 
-        return render_template('products/list.html', page=page)
+        return render_template('products/list.html', page=page, section='shop')
 
     return redirect(url_for('home.index'))

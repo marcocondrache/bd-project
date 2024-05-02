@@ -74,6 +74,7 @@
                x-transition:leave-end="-translate-x-full"
         >
             {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
+            {{ menu.row("Shop", url_for("products.search_products"), "store", section == "shop") }}
             {% if current_user.sellers %}
                 {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
