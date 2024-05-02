@@ -4,6 +4,7 @@ from flask_login import login_user, login_required, logout_user
 from app.modules.auth import auth
 from app.modules.auth.forms import LoginForm
 from app.modules.auth.handlers import validate_user, get_user_by_email, register_user
+from extensions import csrf
 
 
 @auth.route("/login", methods=["GET", "POST"])
@@ -12,7 +13,7 @@ def login():
 
     if request.method == "POST":
         if form.validate_on_submit():
-            subject = validate_user(**form.data.fromkeys(("email", "password")))
+            subject = validate_user(form.email.data, form.password.data)
             if not subject:
                 flash("Invalid credentials")
                 return redirect(url_for("auth.login"))
@@ -27,6 +28,7 @@ def login():
 
 
 @auth.route("/signup", methods=["GET", "POST"])
+@csrf.exempt
 def signup():
     if request.method == "POST":
         email = request.form.get('email')
