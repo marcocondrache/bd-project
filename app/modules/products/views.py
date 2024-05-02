@@ -4,10 +4,11 @@ from flask import request, render_template, url_for, redirect, abort
 from flask_login import login_required, current_user
 
 from app.modules.products import products
+from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid
+    get_product_by_guid, get_products_by_keyword
 )
 
 
@@ -123,7 +124,15 @@ def create_view():
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
-@products.route('/shop')
-def shop_products():
-    all_products = index_view()
-    return render_template('products/shop.html', products=all_products, section='shop')
+@products.route('/search', methods=['GET'])
+@login_required
+def search_products():
+    search = SearchForm(request.args)
+
+    if search.validate():
+        query_key = search.search.data
+        page = get_products_by_keyword(query_key, search.page.data)
+
+        return render_template('products/list.html', page=page)
+
+    return redirect(url_for('home.index'))
