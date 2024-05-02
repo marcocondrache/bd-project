@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% import 'products/macros/product.html' as product %}
+{% from 'macros/products.html' import products_list %}
 
 {% block title %}Kepler Shop{% endblock %}
 
@@ -10,10 +10,6 @@
             <span>No products have been found</span>
         </div>
     {% else %}
-        <div class="grid grid-cols-3 gap-4 p-4">
-            {% for p in page.items %}
-                {{ product.card(p) }}
-            {% endfor %}
-        </div>
+        {{ products_list(products) }}
     {% endif %}
 {% endblock %}
