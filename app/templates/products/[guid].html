@@ -33,7 +33,7 @@
                 async updateCart(depth = 3) {
                     if (this.isReserved && this.selectedQuantity === this.reservedQuantity) return
 
-                    const response = await fetch("{{ url_for('cart.cart_put_view', product_guid=product.guid) }}", {
+                    const response = await fetch("{{ url_for('carts.cart_put_view', product_guid=product.guid) }}", {
                         method: "POST",
                         headers: {"Content-Type": "application/json"},
                         body: JSON.stringify({

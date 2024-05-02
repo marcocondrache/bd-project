@@ -10,6 +10,6 @@
             <span>No products have been found</span>
         </div>
     {% else %}
-        {{ products_list(products) }}
+        {{ products_list(page.items) }}
     {% endif %}
 {% endblock %}
