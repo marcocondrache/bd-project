@@ -4,7 +4,7 @@ from flask import request, render_template, url_for, redirect, abort
 from flask_login import login_required, current_user
 
 from app.modules.carts import carts
-from app.modules.carts.handlers import get_cart_by_buyer, update_cart, remove_from_cart
+from app.modules.carts.handlers import get_cart_by_buyer, update_cart, remove_from_cart, get_cart_products
 from app.modules.products.handlers import (
     get_product_by_guid
 )
@@ -38,7 +38,7 @@ def index_view():
     return render_template(
         'carts/index.html',
         cart=cart,
-        products=[r.product for r in cart.reservations] if cart else [],
+        products=get_cart_products(cart),
         section='your_cart'
     )
 

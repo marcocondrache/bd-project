@@ -15,7 +15,13 @@ def get_cart_or_create(buyer_id: int) -> Cart | None:
     return cart
 
 
-def get_product_in_cart(buyer_id: int, product: Product) -> ProductReservation | None:
+def get_cart_products(cart: Cart) -> list[Product]:
+    if not cart:
+        return []
+    return [r.product for r in cart.reservations if r.deleted_at is None]
+
+
+def get_cart_product(buyer_id: int, product: Product) -> ProductReservation | None:
     cart = get_cart_by_buyer(buyer_id)
     if not cart:
         return None
