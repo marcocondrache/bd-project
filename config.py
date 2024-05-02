@@ -11,7 +11,7 @@ class Prod(object):
 
     TESTING = False
 
-    SECRET_KEY = os.getenv('SECRET_KEY', 'defaultSecret')
+    SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24))
 
     DB_USER = os.getenv('DB_USER', 'db_admin')
     DB_PASS = os.getenv('DB_PASS', 'password')
@@ -25,7 +25,8 @@ class Prod(object):
         'extensions.db',
         'extensions.login_manager',
         'extensions.migrate',
-        # 'extensions.csrf'
+        'extensions.csrf',
+        'extensions.cors'
     ]
 
 

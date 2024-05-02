@@ -3,6 +3,7 @@ Flask-SQLAlchemy
 Flask-Login
 Flask-Migrate
 Flask-WTF
+Flask-CORS
 SQLAlchemy
 invoke
 python-dotenv
