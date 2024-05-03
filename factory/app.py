@@ -1,5 +1,6 @@
 from importlib import import_module
-from flask import Flask, render_template, abort, flash
+
+from flask import Flask, render_template
 from flask_wtf.csrf import CSRFError
 from werkzeug.utils import import_string
 
@@ -51,3 +52,7 @@ class Base(Flask):
         self.configure_modules()
         self.configure_extensions()
         self.configure_error_handlers()
+
+        # TODO: find a better place for this
+        self.jinja_env.trim_blocks = True
+        self.jinja_env.lstrip_blocks = True

@@ -21,12 +21,21 @@ def get_cart_products(cart: Cart) -> list[Product]:
     return [r.product for r in cart.reservations if r.deleted_at is None]
 
 
-def get_cart_product(buyer_id: int, product: Product) -> ProductReservation | None:
+def get_product_reservation(buyer_id: int, product: Product) -> (ProductReservation | None, bool):
     cart = get_cart_by_buyer(buyer_id)
     if not cart:
-        return None
+        return None, False
 
-    return ProductReservation.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
+    product_reservation = ProductReservation.query.filter_by(product_id=product.id, cart=cart, deleted_at=None).first()
+    if not product_reservation:
+        return None, False
+
+    if product.sequence != product_reservation.product_sequence:
+        product_reservation.deleted_at = db.func.now()
+        db.session.commit()
+        return None, True
+
+    return product_reservation, False
 
 
 def update_cart(buyer_id: int, product: Product, quantity: int) -> (Cart | None, Product | None):
@@ -45,6 +54,7 @@ def update_cart(buyer_id: int, product: Product, quantity: int) -> (Cart | None,
 
     if product.sequence != product_reservation.product_sequence:
         product_reservation.deleted_at = db.func.now()
+        db.session.commit()
         return None, product
 
     product_reservation.quantity = quantity

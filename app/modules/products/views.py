@@ -3,7 +3,7 @@ from uuid import UUID
 from flask import request, render_template, url_for, redirect, abort
 from flask_login import login_required, current_user
 
-from app.modules.carts.handlers import get_cart_product
+from app.modules.carts.handlers import get_product_reservation
 from app.modules.products import products
 from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
@@ -50,12 +50,13 @@ def product_view(product_guid: str):
 
     product = validate_product(product_guid)
 
-    product_reservation = get_cart_product(current_user.buyers[0].id, product)
+    product_reservation, sequence_failed = get_product_reservation(current_user.buyers[0].id, product)
     return render_template(
         'products/[guid].html', product=product,
         product_categories=[c.name for c in product.categories],
         categories=[c.name for c in get_all_product_categories()],
         product_reservation=product_reservation,
+        sequence_failed=sequence_failed,
         is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
         section='your_products'
     )
@@ -88,7 +89,7 @@ def product_edit_view(product_guid: str):
         description = request.form.get('description')
 
         update_product(product, price, stock, categories, description)
-        return redirect(url_for('products.product_edit_view'))
+        return redirect(url_for('products.product_view', product_guid=product_guid))
 
     categories = get_all_product_categories()
     return render_template(

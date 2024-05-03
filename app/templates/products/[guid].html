@@ -9,7 +9,7 @@
                 categories: {{ product_categories|tojson }},
 
                 name: "{{ product.name }}",
-                description: "{{ product.description }}" || "No description available",
+                description: "{{ product.description|default('No description available') }}",
                 brand: "{{ product.brand }}",
                 isSecondHand: "{{ product.is_second_hand }}",
                 price: {{ product.price }},
@@ -27,9 +27,11 @@
                     reservedQuantity: 0,
                     selectedQuantity: 1,
                 {% endif %}
-                showWarning: false,
 
-                async updateCart(depth = 3) {
+                showWarning: false,
+                sequenceFailed: {{ sequence_failed|tojson }},
+
+                async updateCart(_, depth = 3) {
                     if (this.isReserved && this.selectedQuantity === this.reservedQuantity) return
 
                     const response = await fetch("{{ url_for('carts.cart_update_view', product_guid=product.guid) }}", {
@@ -46,6 +48,7 @@
                     if (response.ok) {
                         this.isReserved = true;
                         this.reservedQuantity = this.selectedQuantity;
+                        this.showWarning = false;
                         return
                     }
 
@@ -53,13 +56,13 @@
                     const data = await response.json();
 
                     // try again, 3 times to avoid DOS
-                    if (data.stock >= this.stock) {
-                        if (depth) await this.updateCart(depth - 1);
-                        return
+                    if (data.stock >= this.selectedQuantity && depth > 0) {
+                        return this.updateCart(_, depth - 1);
                     }
 
                     // let user decide
                     this.stock = data.stock;
+                    this.selectedQuantity = data.stock;
                     this.showWarning = true;
                 },
 
@@ -214,21 +217,37 @@
                             </div>
 
                             <!-- stock has been updated -->
-                            <div class="bg-white p-4 rounded-lg shadow-lg" x-show="stock > 0">
+                            <div class="bg-white p-4 rounded-lg shadow-lg flex flex-col items-end" x-show="stock > 0">
                                 <p class="mb-4" x-show="stock > 0">
                                     Unfortunately,
                                     since the page was loaded only <span x-text="stock"></span> items are available.
                                     Would you like to proceed with this quantity?
                                 </p>
-                                <button @click="updateCart"
-                                        class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                                <div class="flex gap-2">
+                                    <button @click="showWarning = false"
+                                            class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button @click="updateCart"
+                                            class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                                    >
+                                        Update Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div x-show="sequenceFailed"
+                             class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+                            <div class="bg-white p-4 rounded-lg shadow-lg flex flex-col items-end">
+                                <p class="mb-4">
+                                    Unfortunately, this product has been updated and it was removed from your cart.
+                                </p>
+                                <button @click="sequenceFailed = false"
+                                        class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
                                 >
-                                    Update Cart
-                                </button>
-                                <button @click="showWarning = false"
-                                        class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-                                >
-                                    Cancel
+                                    Ok
                                 </button>
                             </div>
                         </div>

@@ -84,12 +84,10 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
 def update_product(
     product: Product, price: float, stock: int, categories: list, description: str
 ):
-    if price != product.price:
-        product.price = price
-    if stock != product.stock:
-        product.stock = stock
-    if description != product.description:
-        product.description = description
+    product.price = price
+    product.stock = stock
+    product.description = description
+
     for category_name in categories:
         category = ProductCategory.query.filter_by(name=category_name).first()
         if category is None:

@@ -28,7 +28,6 @@ def login():
 
 
 @auth.route("/signup", methods=["GET", "POST"])
-@csrf.exempt
 def signup():
     if request.method == "POST":
         email = request.form.get('email')
