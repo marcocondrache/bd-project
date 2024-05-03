@@ -7,6 +7,7 @@
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,11 +17,6 @@
 </head>
 <body>
 <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout">
-    <div class="w-screen h-screen flex justify-center items-center fixed top-0 left-0 z-[9999] bg-white"
-         x-show="isLoading">
-        {{ spinner.spinner() }}
-    </div>
-
     <!-- header page -->
     <header class="h-16 flex w-full items-center justify-between bg-white px-4 border-b-2 border-gray-200">
         <!-- logo -->
@@ -72,6 +68,7 @@
     <div class="flex grow">
         <!-- aside -->
         <aside class="flex min-w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+               x-cloak
                x-show="asideOpen"
                x-transition:enter="transition ease-out duration-300 transform"
                x-transition:enter-start="-translate-x-full"
@@ -115,7 +112,6 @@
 
     document.addEventListener("alpine:init", () => {
         Alpine.data("layout", () => ({
-            isLoading: false,
             profileOpen: false,
             asideOpen: true,
             linkShown: false,

@@ -21,7 +21,7 @@ def read_config(path):
 
 
 def build(name, config_path, base_path="app"):
-    app = Base(name, template_folder="templates", static_folder="static", root_path=base_path)
+    app = Base(name, root_path=base_path)
     config = read_config(config_path)
 
     app.configure(config)
