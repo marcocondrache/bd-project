@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from flask_sqlalchemy.pagination import QueryPagination
+from sqlalchemy import and_
 
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
@@ -13,18 +14,21 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
-def get_all_products(page: int = 1, per_page: int = 20) -> QueryPagination:
-    return Product.query.paginate(page=page, per_page=per_page)
+def get_all_products(page: int = 1, per_page: int = 20, filters=None) -> QueryPagination:
+    query = Product.query
+    if filters:
+        query = query.filter(and_(*filters))
+    return query.paginate(page=page, per_page=per_page)
 
 
-def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20) -> QueryPagination:
-    query = Product.query.join(Product.keywords).filter(Product.deleted_at == None)
+def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
+    query = Product.query.join(Product.keywords).filter(Product.deleted_at is None)
 
     if query_key:
         query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
-    # TODO: Choose correct sorting
-    query = query.order_by(Product.name.desc())
 
+    query = query.filter(*filters)
+    query = query.order_by(Product.name.desc())
     return query.paginate(page=page, per_page=per_page)
 
 
@@ -71,7 +75,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
     keywords = [k for k in (
         name.split(separators) +
         description.split(separators) if description else [] +
-        brand.split(separators) if brand else []
+                                                          brand.split(separators) if brand else []
     ) if len(k) > 2]
     for keyword_key in keywords:
         keyword = Keyword.query.filter_by(key=keyword_key).first()
@@ -88,7 +92,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
 
 
 def update_product(
-    product: Product, price: float, stock: int, categories: list, description: str
+        product: Product, price: float, stock: int, categories: list, description: str
 ):
     if price != product.price:
         product.price = price

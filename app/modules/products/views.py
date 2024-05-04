@@ -10,6 +10,7 @@ from app.modules.products.handlers import (
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_products_filtered, get_all_products
 )
+from app.modules.products.models import Product
 from extensions import csrf
 
 
@@ -47,7 +48,6 @@ def index_view():
 @products.route('/<product_guid>', methods=['GET'])
 @login_required
 def product_view(product_guid: str):
-
     product = validate_product(product_guid)
 
     return render_template(
@@ -127,11 +127,17 @@ def create_view():
 def shop_products():
     search = SearchForm(request.args)
 
+    seller_id = None
+    if current_user.sellers:
+        seller_id = current_user.sellers[0].id
+
+    filters = [Product.owner_seller_id != seller_id]
+
     if search.validate():
         query_key = search.search.data
-        page = get_products_filtered(query_key, search.page.data)
 
+        page = get_products_filtered(query_key, search.page.data, filters=filters)
         return render_template('products/shop.html', page=page, section='shop')
 
-    page = get_all_products()
+    page = get_all_products(filters=filters)
     return render_template('products/shop.html', page=page, section='shop')
