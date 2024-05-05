@@ -196,7 +196,7 @@ The user can do the following actions:
 
 ### Create a cart (add the first product)
 
-**Input**: (product_guid*, quantity*)
+**Input**: (buyer_guid*, product_guid*, quantity*)
 
 **Output**: Cart
 
@@ -211,7 +211,7 @@ The user can do the following actions:
 
 ### Update a cart (add more products)
 
-**Input**: (product_guid*, quantity*)
+**Input**: (buyer_guid*, product_guid*, quantity*)
 
 **Output**: Cart
 
@@ -227,13 +227,12 @@ The user can do the following actions:
 - The user can modify the quantity of the products in the cart.
 - _The products' reservation is updated._
 - **check sequence**: _If the `products reservation` sequence is different from
-  the `product` sequence, the transaction is aborted._
-    - If the stock is not enough, the user can choose to remove the product from
-      the cart or update the quantity.
-    - If the user chooses to remove the product, _the `products reservation` is
-      deleted._
-    - If the user chooses to update the quantity, _the `products reservation` is
-      updated, updating the `sequence` to the `product` sequence._
+  the `product` sequence, the `products reservation` is deleted and the new 
+  `product` is returned._
+    - If the stock is enough and the user chooses to accept the new amount,
+      _a new `products reservation` is created with the same sequence as the
+      `product`._
+    - If the stock is not enough, the user is notified.
 - _The history is triggered._
 
 ### Delete from cart (remove products)
@@ -250,3 +249,115 @@ The user can do the following actions:
 - _`deleted_at` is set to the current timestamp._
 
 > Note: the carts cannot be deleted, only the products in it.
+
+### Get the cart
+
+**Input**: (buyer_guid*)
+
+**Output**: Cart
+
+**From**: cart page
+
+**Flow**:
+
+- The user enters the cart page.
+- _Only the buyer's `cart` entity with status "active" containing all the 
+  product reservations, is returned._
+
+## Order
+
+**Only a buyer** can do the following actions:
+
+### Create a buyer order
+> TODO
+
+**Input**: (buyer_guid*)
+
+**Output**: Order
+
+**From**: cart page
+
+**Flow**:
+
+- The user finalizes the "active" cart.
+- for each product in the cart:
+    - **check sequence**: _If the `products reservation` sequence is different from
+      the `product` sequence, the `products reservation` is deleted._
+    - Every product for which the check sequence failed is returned.
+    - The user, for each product, can accept the new amount or leave it.
+    - If the user accepts the new amount, it's responsibility of the Frontend
+      to create a new `products reservation` and retry to create the order.
+- _A new `buyer_order` entity is created, with status "created"_
+- _The `cart` entity is updated to "finalized"_
+
+### Complete a buyer order
+> TODO
+
+**Input**: (order_guid*)
+
+**Output**: Order
+
+**From**: order page
+
+**Flow**:
+
+- The user completes the order, i.e., pays for the products.
+- _The `buyer_order` entity is updated to "finalized"_
+- For each seller, _A new `seller_order` entity with the sellers' products 
+  present in the cart is created, with status "created"_
+
+### Get the buyers' orders
+> TODO
+
+**Input**: (buyer_guid*)
+
+**Output**: List of orders
+
+**From**: orders' page
+
+**Flow**:
+
+- The user enters the orders' page.
+- _All the buyer's `order` entities both with status "created" and "finalized" 
+  containing the cart's `products` are returned._
+
+## Shipment
+
+**Only a seller** can do the following actions:
+
+### Progress the shipment
+> TODO
+
+**Input**: (shipment_guid*, status*)
+
+**Output**: Shipment
+
+**From**: shipment page
+
+**Flow**:
+
+- The seller can change the shipment status following the states:
+  - accepted
+  - shipped
+  - in delivery
+  - delivered
+- _The `shipment` entity is updated to the new status._
+
+**only a buyer** can do the following actions:
+
+### Complete the shipments
+> TODO
+
+**Input**: (shipment_guid*, status*)
+
+**Output**: Shipment
+
+**From**: shipment page, if the shipment is "delivered"
+
+**Flow**:
+
+- The buyer can change the shipment status following the states:
+  - accepted
+  - rejected
+  - returned
+- _The `shipment` entity is updated to the new status._
