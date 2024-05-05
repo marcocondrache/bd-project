@@ -231,7 +231,7 @@ The user can do the following actions:
 - The user can modify the quantity of the products in the cart.
 - _The products' reservation is updated._
 - **check sequence**: _If the `products reservation` sequence is different from
-  the `product` sequence, the `products reservation` is deleted and the new 
+  the `product` sequence, the `products reservation` is deleted and the new
   `product` is returned._
     - If the new stock is enough, a new `products reservation` is automatically
       created with the same sequence as the `product`.
@@ -267,14 +267,15 @@ The user can do the following actions:
 **Flow**:
 
 - The user enters the cart page.
-- _Only the buyer's `cart` entity with status "active" containing all the 
+- _Only the buyer's `cart` entity with status "active" containing all the
   product reservations, is returned._
 
-## Order
+## Buyer Order
 
 **Only a buyer** can do the following actions:
 
 ### Create a buyer order
+
 > TODO
 
 **Input**: (buyer_guid*)
@@ -287,16 +288,20 @@ The user can do the following actions:
 
 - The user finalizes the "active" cart.
 - for each product in the cart:
-    - **check sequence**: _If the `products reservation` sequence is different from
+    - **check sequence**: _If the `products reservation` sequence is different
+      from
       the `product` sequence, the `products reservation` is deleted._
     - Every product for which the check sequence failed is returned.
     - The user, for each product, can accept the new amount or leave it.
     - If the user accepts the new amount, it's responsibility of the Frontend
       to create a new `products reservation` and retry to create the order.
 - _A new `buyer_order` entity is created, with status "created"_
-- _The `cart` entity is updated to "finalized"_
+- for each product in the cart:
+    - _The `locked_quantity` is increased by the `reservation` quantity._
+- The timeout for the user to complete the order is started.
 
 ### Complete a buyer order
+
 > TODO
 
 **Input**: (order_guid*)
@@ -309,10 +314,15 @@ The user can do the following actions:
 
 - The user completes the order, i.e., pays for the products.
 - _The `buyer_order` entity is updated to "finalized"_
-- For each seller, _A new `seller_order` entity with the sellers' products 
-  present in the cart is created, with status "created"_
+- _The `cart` entity is updated to "finalized"_
+- _The `product` amount and locked amount is decreased_
+- For each seller,
+    - _A new `seller_order` entity with the sellers' products present in the
+      cart
+      is created, with status "created"_
 
 ### Get the buyers' orders
+
 > TODO
 
 **Input**: (buyer_guid*)
@@ -324,14 +334,52 @@ The user can do the following actions:
 **Flow**:
 
 - The user enters the orders' page.
-- _All the buyer's `order` entities both with status "created" and "finalized" 
+- _All the `buyer_order` entities both with status "created"
+  (even though they exist for a limited time) and "finalized"
   containing the cart's `products` are returned._
+
+## Seller Order
+
+**Only a seller** can do the following actions:
+
+### Get the sellers' orders
+
+> TODO
+
+**Input**: (seller_guid*)
+
+**Output**: List of orders
+
+**From**: orders' page
+
+**Flow**:
+
+- The user enters the orders' page.
+- _All the `sellers_order` entities both with statuses "created" and "finalized"
+  containing the seller's products and the ordered amounts are returned._
 
 ## Shipment
 
 **Only a seller** can do the following actions:
 
+### Create a shipment
+
+> TODO
+
+**Input**: (seller_guid*, order_guid*[])
+
+**Output**: Shipment
+
+**From**: shipment page
+
+**Flow**:
+
+- The user creates a shipment, selecting the orders to include.
+- _A new `shipment` entity is created, with status "created"_
+- _The `sellers_order` is linked to the `shipment`_
+
 ### Progress the shipment
+
 > TODO
 
 **Input**: (shipment_guid*, status*)
@@ -343,27 +391,12 @@ The user can do the following actions:
 **Flow**:
 
 - The seller can change the shipment status following the states:
-  - accepted
-  - shipped
-  - in delivery
-  - delivered
+    - accepted
+    - shipped
+    - in delivery
+    - delivered
 - _The `shipment` entity is updated to the new status._
 
-**only a buyer** can do the following actions:
+## Reviews
 
-### Complete the shipments
 > TODO
-
-**Input**: (shipment_guid*, status*)
-
-**Output**: Shipment
-
-**From**: shipment page, if the shipment is "delivered"
-
-**Flow**:
-
-- The buyer can change the shipment status following the states:
-  - accepted
-  - rejected
-  - returned
-- _The `shipment` entity is updated to the new status._
