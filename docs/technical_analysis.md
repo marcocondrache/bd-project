@@ -157,6 +157,8 @@ The user can do the following actions:
 - _New product-category associations are created._
 - _The history is triggered._
 
+> The product's `product_reservation` becomes invalid
+
 ### Delete product
 
 **Input**: (guid)
@@ -171,6 +173,8 @@ The user can do the following actions:
 - _Deleted_at is set to the current timestamp._
 - _The product sequence is incremented._
 - _The history is triggered._
+
+> The product's `product_reservation` becomes invalid
 
 ### Search for products
 
@@ -229,10 +233,12 @@ The user can do the following actions:
 - **check sequence**: _If the `products reservation` sequence is different from
   the `product` sequence, the `products reservation` is deleted and the new 
   `product` is returned._
-    - If the stock is enough and the user chooses to accept the new amount,
+    - If the new stock is enough, a new `products reservation` is automatically
+      created with the same sequence as the `product`.
+    - If the new stock is enough and the user chooses to accept the new amount,
       _a new `products reservation` is created with the same sequence as the
       `product`._
-    - If the stock is not enough, the user is notified.
+    - If the product is sold out, the user is notified.
 - _The history is triggered._
 
 ### Delete from cart (remove products)
