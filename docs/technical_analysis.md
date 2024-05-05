@@ -150,6 +150,8 @@ The user can do the following actions:
 
 **Flow**:
 
+- If the product is not locked by a non-zero `locked_quantity`, the user can
+  update the product.
 - The user can update the price, quantity, categories, description.
 - _The product entity is updated._
 - _The product sequence is incremented._ (for the product reservation)
@@ -169,6 +171,8 @@ The user can do the following actions:
 
 **Flow**:
 
+- If the product is not locked by a non-zero `locked_quantity`, the user can
+  delete the product.
 - The user must confirm the deletion.
 - _Deleted_at is set to the current timestamp._
 - _The product sequence is incremented._
@@ -289,12 +293,14 @@ The user can do the following actions:
 - The user finalizes the "active" cart.
 - for each product in the cart:
     - **check sequence**: _If the `products reservation` sequence is different
-      from
-      the `product` sequence, the `products reservation` is deleted._
+      from the `product` sequence, the `products reservation` is deleted._
     - Every product for which the check sequence failed is returned.
     - The user, for each product, can accept the new amount or leave it.
     - If the user accepts the new amount, it's responsibility of the Frontend
       to create a new `products reservation` and retry to create the order.
+- Also for each product in the cart,
+  if any of the product is locked by a non-zero `locked_quantity`,
+  the process is aborted.
 - _A new `buyer_order` entity is created, with status "created"_
 - for each product in the cart:
     - _The `locked_quantity` is increased by the `reservation` quantity._
