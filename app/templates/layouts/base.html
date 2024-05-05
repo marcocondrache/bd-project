@@ -2,16 +2,23 @@
 {% from 'macros/profile.html' import profile_card %}
 {% import 'macros/category.html' as category %}
 
-{% macro row(name, path, icon, selected=False) -%}
+{% macro row(name, path, icon, shortcut, selected=False) -%}
     <a href="{{ path }}"
         {%- if selected -%}
-       class="flex items-center space-x-4 rounded-md px-2 py-3 bg-gray-100 text-blue-600"
+       class="flex items-center justify-between rounded-md p-3 bg-gray-100 text-blue-600"
         {%- else -%}
-       class="flex items-center space-x-4 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600"
+       class="flex items-center justify-between rounded-md p-3 hover:bg-gray-100 hover:text-blue-600"
         {%- endif -%}
     >
-        <box-icon name="{{ icon }}" size="sm"></box-icon>
-        <span>{{ name }}</span>
+        <div class="flex items-center gap-4">
+            <box-icon name="{{ icon }}" size="sm"></box-icon>
+            <span>{{ name }}</span></div>
+        <div x-show="altHold"
+             class="bg-gray-200 rounded-md h-full aspect-square flex items-center justify-center text-xs text-gray-500"
+             @keydown.window.alt.{{ shortcut }}.prevent="window.location.href = '{{ path }}'"
+        >
+            {{ shortcut }}
+        </div>
     </a>
 {%- endmacro %}
 
@@ -32,20 +39,23 @@
     {% endblock %}
 </head>
 <body>
-<main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout">
+<main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout"
+      @keydown.window.alt="altHold = true" @keyup.window.alt="altHold = false"
+>
     <!-- header page -->
     <header class="h-16 flex w-full items-center justify-between bg-white px-4 border-b-2 border-gray-200">
         <!-- logo -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 pl-1">
             <button type="button" @click="asideOpen = !asideOpen">
                 <box-icon name="menu" class="flex items-center"></box-icon>
             </button>
-            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler
-                Shop</a>
+            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">
+                Kepler Shop
+            </a>
         </div>
 
 
-        <form method="get" class="w-1/2 mx-auto" action="{{ url_for('products.shop_products') }}">
+        <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.shop_products') }}">
             <div class="flex relative"
                  x-id="['filters-dropdown']"
                  x-data="{
@@ -71,6 +81,12 @@
                               d="m1 1 4 4 4-4"></path>
                     </svg>
                 </button>
+                <div x-show="altHold"
+                     class="bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
+                     @keydown.window.alt.f.prevent="document.querySelector('input[name=search]').focus()"
+                >
+                    F
+                </div>
                 <div x-ref="filtersPanel"
                      x-show="open"
                      x-transition.origin.top
@@ -114,13 +130,19 @@
         </form>
 
         <!-- button profile -->
-        <div class="flex gap-4">
+        <div class="flex gap-4 items-center">
             {% if not current_user.sellers %}
                 <a href="{{ url_for('sellers.register_view') }}"
                    class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
                     Become a seller!
                 </a>
             {% endif %}
+            <div x-show="altHold"
+                 class="bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
+                 @keydown.window.alt.w.prevent="profileOpen = !profileOpen"
+            >
+                W
+            </div>
             <button type="button" @click="profileOpen = true"
                     class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
                 Hello, {{ current_user.given_name }}
@@ -143,13 +165,13 @@
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="-translate-x-full"
         >
-            {{ row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
-            {{ row("Shop", url_for("products.shop_products"), "store", section == "shop") }}
+            {{ row("Dashboard", url_for("home.index_view"), "home", "D", section == "dashboard") }}
+            {{ row("Shop", url_for("products.shop_products"), "store", "S", section == "shop") }}
             {% if current_user.sellers %}
-                {{ row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
+                {{ row("Your products", url_for("products.index_view"), "collection", "P", section == "your_products") }}
             {% endif %}
             {% if current_user.buyers %}
-                {{ row("Your cart", url_for("carts.index_view"), "cart", section == "your_cart") }}
+                {{ row("Your cart", url_for("carts.index_view"), "cart", "C", section == "your_cart") }}
             {% endif %}
         </aside>
 
@@ -181,6 +203,8 @@
 
     document.addEventListener("alpine:init", () => {
         Alpine.data("layout", () => ({
+            altHold: false,
+
             profileOpen: false,
             asideOpen: true,
             linkShown: false,
