@@ -61,33 +61,8 @@
                      @click.outside="close($refs.filtersButton)"
                      :id="$id('filters-dropdown')"
                      style="display: none;"
-                     class="z-10 top-12 left-0 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-                    <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdown-button">
-                        <li>
-                            <button type="button"
-                                    class="inline-flex w-full px-4 py-2 hover:bg-gray-100">
-                                Mockups
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button"
-                                    class="inline-flex w-full px-4 py-2 hover:bg-gray-100">
-                                Templates
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button"
-                                    class="inline-flex w-full px-4 py-2 hover:bg-gray-100">
-                                Design
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button"
-                                    class="inline-flex w-full px-4 py-2 hover:bg-gray-100">
-                                Logos
-                            </button>
-                        </li>
-                    </ul>
+                     class="z-10 top-12 left-0 absolute bg-white rounded-lg shadow">
+                    <span class="bg-gray-100 text-gray-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded">Dark</span>
                 </div>
                 <div class="relative w-full">
                     {{ search.search(class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500") }}
