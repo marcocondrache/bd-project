@@ -3,6 +3,7 @@ from importlib import import_module
 from flask import request
 
 from app.modules.products.forms import SearchForm
+from app.modules.products.handlers import get_all_product_categories
 from factory.app import Base
 
 
@@ -10,7 +11,8 @@ def register_processor(app):
     @app.context_processor
     def injectors():
         search = SearchForm(data=request.args) if request.args else SearchForm()
-        return dict(search=search)
+        categories = get_all_product_categories()
+        return dict(search=search, categories=categories)
 
 
 def read_config(path):
