@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort
+from flask import request, render_template, url_for, redirect, abort, flash
 from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_product_reservation
@@ -107,11 +107,17 @@ def create_view():
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
 
+    categories = get_all_product_categories()
     if request.method == 'POST':
         seller_id = current_user.sellers[0].id
         name = request.form.get('name')
         price = float(request.form.get('price'))
         stock = int(request.form.get('stock'))
+        if price < 0 or stock < 0:
+            flash('Price and stock must be positive numbers')
+            return render_template('products/create.html', categories=[c.name for c in categories],
+                                   section='your_products')
+
         categories = request.form.getlist('categories')
         description = request.form.get('description')
         brand = request.form.get('brand')
@@ -120,7 +126,6 @@ def create_view():
         create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index_view'))
 
-    categories = get_all_product_categories()
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
