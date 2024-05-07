@@ -85,10 +85,20 @@ def product_edit_view(product_guid: str):
     if request.method == 'POST':
         price = float(request.form.get('price'))
         stock = int(request.form.get('stock'))
-        categories = request.form.getlist('categories')
+        form_categories = request.form.getlist('categories')
         description = request.form.get('description')
 
-        update_product(product, price, stock, categories, description)
+        if price < 0 or stock < 0:
+            flash('Price and stock must be positive numbers')
+            return render_template(
+                'products/edit.html',
+                product=product,
+                categories=[c.name for c in get_all_product_categories()],
+                product_categories=[c.name for c in product.categories],
+                section='your_products'
+            )
+
+        update_product(product, price, stock, form_categories, description)
         return redirect(url_for('products.product_view', product_guid=product_guid))
 
     categories = get_all_product_categories()
