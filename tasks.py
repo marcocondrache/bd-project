@@ -13,9 +13,9 @@ def setup(c):
     env.write("SECRET_KEY={secret}".format(secret=os.urandom(32)))
 
 
-
 @task
 def dev(c):
+    os.environ.update({'FLASK_CONFIG_DEFAULT': 'Dev'})
     c.run("python wsgi.py")
 
 
