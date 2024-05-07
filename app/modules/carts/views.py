@@ -38,7 +38,7 @@ def index_view():
     return render_template(
         'carts/index.html',
         cart=cart,
-        products=get_cart_products(cart),
+        reservations=cart.reservations if cart else [],
         section='your_cart'
     )
 
