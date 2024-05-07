@@ -150,6 +150,7 @@
                                     <form class="flex gap-2"
                                           action="{{ url_for("products.product_delete_view", product_guid=product.guid) }}"
                                           method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <button @click="confirmDelete = false" type="reset"
                                                 class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
                                         >
