@@ -9,8 +9,10 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_seller_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_filtered
+    get_product_by_guid, get_products_filtered, get_all_products
 )
+from app.modules.products.models import Product
+from extensions import csrf
 
 
 def validate_product(product_guid: str, check_owner=False):
@@ -47,7 +49,6 @@ def index_view():
 @products.route('/<product_guid>', methods=['GET'])
 @login_required
 def product_view(product_guid: str):
-
     product = validate_product(product_guid)
 
     product_reservation, sequence_failed = get_product_reservation(current_user.buyers[0].id, product)
@@ -113,6 +114,7 @@ def product_edit_view(product_guid: str):
 
 @products.route('/create', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def create_view():
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
@@ -139,15 +141,22 @@ def create_view():
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
-@products.route('/search', methods=['GET'])
+@products.route('/shop', methods=['GET'])
 @login_required
-def search_products():
+def shop_products():
     search = SearchForm(request.args)
 
+    seller_id = None
+    if current_user.sellers:
+        seller_id = current_user.sellers[0].id
+
+    filters = [Product.owner_seller_id != seller_id]
+
     if search.validate():
-        query_key = search.search.data.lower() if search.search.data else None
-        page = get_products_filtered(query_key, search.page.data)
+        query_key = search.search.data
 
-        return render_template('products/list.html', page=page, section='shop')
+        page = get_products_filtered(query_key, search.page.data, filters=filters)
+        return render_template('products/shop.html', page=page, section='shop')
 
-    return redirect(url_for('home.index'))
+    page = get_all_products(filters=filters)
+    return render_template('products/shop.html', page=page, section='shop')

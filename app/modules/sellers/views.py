@@ -3,10 +3,12 @@ from flask_login import login_required, current_user
 
 from app.modules.sellers import sellers
 from app.modules.sellers.handlers import create_seller
+from extensions import csrf
 
 
 @sellers.route('/register', methods=['GET', 'POST'])
 @login_required
+@csrf.exempt
 def register_view():
     if request.method == 'POST':
         iban = request.form.get('iban')

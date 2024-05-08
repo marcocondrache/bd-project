@@ -1,0 +1,7 @@
+{% macro badge(guid, name, selected=true) -%}
+    {% if selected %}
+        <span class="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded" @click="badgeClick('{{ guid }}')">{{ name }}</span>
+    {% else %}
+        <span class="bg-gray-100 text-gray-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded" @click="badgeClick('{{ guid }}')">{{ name }}</span>
+    {% endif %}
+{%- endmacro %}
