@@ -1,12 +1,14 @@
+{% import 'macros/spinner.html' as spinner %}
 {% import 'layouts/macros/menu.html' as menu %}
 {% import 'layouts/macros/profile.html' as profile %}
-
+{% import 'layouts/macros/category.html' as category %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,26 +25,77 @@
             <button type="button" @click="asideOpen = !asideOpen">
                 <box-icon name="menu" class="flex items-center"></box-icon>
             </button>
-            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler Shop</a>
+            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">Kepler
+                Shop</a>
         </div>
 
-        <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.search_products') }}">
-            {{ search.search.label(class="sr-only") }}
-            <div class="relative w-full">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+
+        <form method="get" class="w-1/2 mx-auto" action="{{ url_for('products.shop_products') }}">
+            <div class="flex relative"
+                 x-id="['filters-dropdown']"
+                 x-data="{
+                    open: false,
+                    toggle() {
+                        if (this.open) return this.close()
+
+                        this.$refs.filtersButton.focus()
+                        this.open = true
+                    },
+                    close(focusAfter) {
+                        this.open = false
+                        focusAfter && focusAfter.focus()
+                    }
+                }">
+                {{ search.search.label(class="sr-only") }}
+                <button x-ref="filtersButton" @click="toggle()"
+                        class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100"
+                        type="button">Filters
+                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 10 6">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"></path>
+                              d="m1 1 4 4 4-4"></path>
                     </svg>
+                </button>
+                <div x-ref="filtersPanel"
+                     x-show="open"
+                     x-transition.origin.top
+                     @click.outside="close($refs.filtersButton)"
+                     :id="$id('filters-dropdown')"
+                     style="display: none;"
+                     class="z-10 top-12 left-0 absolute bg-white rounded-lg shadow p-3">
+                    <div class="mb-2">Categories</div>
+                    <div x-data="{
+                        badgeClick(guid) {
+                            const url = new URL(window.location.href);
+                            const ct = url.searchParams.getAll('category');
+
+                            if (ct.includes(guid))
+                                url.searchParams.delete('category', guid);
+                             else
+                                url.searchParams.append('category', guid);
+
+                             history.pushState(null, document.title, url.toString());
+                        }
+                    }">
+                        {% set selected = request.args.getlist('category') %}
+                        {% for c in categories %}
+                            {{ category.badge(c.guid, c.name, c.guid in selected) }}
+                        {% endfor %}
+                    </div>
                 </div>
-                {{ search.search(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5") }}
+                <div class="relative w-full">
+                    {{ search.search(class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500") }}
+                    <button type="submit"
+                            class="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+                        </svg>
+                        <span class="sr-only">Search</span>
+                    </button>
+                </div>
             </div>
-            <button type="submit"
-                    class="flex p-1.5 text-base ms-2 bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                <box-icon name="search" color="white"></box-icon>
-                <span class="sr-only">Search</span>
-            </button>
         </form>
 
         <!-- button profile -->
@@ -53,7 +106,8 @@
                     Become a seller!
                 </a>
             {% endif %}
-            <button type="button" @click="profileOpen = true" class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
+            <button type="button" @click="profileOpen = true"
+                    class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
                 Hello, {{ current_user.given_name }}
             </button>
         </div>
@@ -65,6 +119,7 @@
     <div class="flex grow">
         <!-- aside -->
         <aside class="flex min-w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+               x-cloak
                x-show="asideOpen"
                x-transition:enter="transition ease-out duration-300 transform"
                x-transition:enter-start="-translate-x-full"
@@ -74,7 +129,7 @@
                x-transition:leave-end="-translate-x-full"
         >
             {{ menu.row("Dashboard", url_for("home.index_view"), "home", section == "dashboard") }}
-            {{ menu.row("Shop", url_for("products.search_products"), "store", section == "shop") }}
+            {{ menu.row("Shop", url_for("products.shop_products"), "store", section == "shop") }}
             {% if current_user.sellers %}
                 {{ menu.row("Your products", url_for("products.index_view"), "collection", section == "your_products") }}
             {% endif %}
