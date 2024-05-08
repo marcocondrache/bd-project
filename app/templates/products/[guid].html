@@ -18,66 +18,9 @@
 
                 confirmDelete: false,
 
-                {% if product_reservation %}
-                    isReserved: true,
-                    reservedQuantity: {{ product_reservation.quantity }},
-                    selectedQuantity: {{ product_reservation.quantity }},
-                {% else %}
-                    isReserved: false,
-                    reservedQuantity: 0,
-                    selectedQuantity: 1,
-                {% endif %}
-
                 showWarning: false,
                 sequenceFailed: {{ sequence_failed|tojson }},
 
-                async updateCart(_, depth = 3) {
-                    if (this.isReserved && this.selectedQuantity === this.reservedQuantity) return
-
-                    const response = await fetch("{{ url_for('carts.cart_update_view', product_guid=product.guid) }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            quantity: this.selectedQuantity,
-                        }),
-                    })
-
-                    if (response.ok) {
-                        this.isReserved = true;
-                        this.reservedQuantity = this.selectedQuantity;
-                        this.showWarning = false;
-                        return
-                    }
-
-                    // The product stock has been updated since the page was loaded
-                    const data = await response.json();
-
-                    // try again, 3 times to avoid DOS
-                    if (data.stock >= this.selectedQuantity && depth > 0) {
-                        return this.updateCart(_, depth - 1);
-                    }
-
-                    // let user decide
-                    this.stock = data.stock;
-                    this.selectedQuantity = data.stock;
-                    this.showWarning = true;
-                },
-
-                async removeFromCart() {
-                    const response = await fetch("{{ url_for('carts.cart_delete_view', product_guid=product.guid) }}", {
-                        method: "POST",
-                        headers: {"X-CSRFToken": "{{ csrf_token() }}"},
-                    })
-
-                    if (response.ok) {
-                        this.isReserved = false;
-                        this.reservedQuantity = 0;
-                        this.selectedQuantity = 1;
-                    }
-                },
             }));
         });
     </script>
@@ -166,43 +109,6 @@
                             </div>
                         </div>
                     {% else %}
-                        <div class="flex gap-4 justify-end">
-
-                        <form @submit.prevent="removeFromCart">
-                            <button type="submit" x-show="isReserved"
-                                    class="text-white py-2 px-4 rounded bg-red-500 hover:bg-red-600"
-                            >
-                                <p>Remove from Cart</p>
-                            </button>
-                        </form>
-                        <form @submit.prevent="updateCart"
-                              class="flex gap-2 items-center">
-                            <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
-                                    @click="selectedQuantity = Math.max(1, selectedQuantity - 1)"
-                            >
-                                <box-icon name="minus" size="xs" color="white"></box-icon>
-                            </button>
-                            <input type="number" class="w-8 text-center" x-model="selectedQuantity"
-                                   x-bind:max="stock" x-bind:min="1"
-                            >
-                            <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
-                                    @click="selectedQuantity = Math.min(stock, selectedQuantity + 1)"
-                            >
-                                <box-icon name="plus" size="xs" color="white"></box-icon>
-                            </button>
-
-                            <button type="submit"
-                                    class="text-white p ml-2 py-2 px-4 rounded"
-                                    :class="isReserved && selectedQuantity === reservedQuantity ?
-                                        'bg-gray-500' :
-                                        'bg-green-500 hover:bg-green-600'
-                                    "
-                                    :disabled="isReserved && selectedQuantity === reservedQuantity"
-                            >
-                                <p x-text="isReserved ? 'Update Cart' : 'Add to Cart'"></p>
-                            </button>
-                        </form>
-
                         <div x-show="showWarning"
                              class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
                             <!-- ran out of stock -->

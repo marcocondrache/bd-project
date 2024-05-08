@@ -1,7 +1,6 @@
 {% import 'macros/spinner.html' as spinner %}
-{% import 'layouts/macros/menu.html' as menu %}
-{% import 'layouts/macros/profile.html' as profile %}
-{% import 'layouts/macros/category.html' as category %}
+{% from 'macros/profile.html' import profile_card %}
+{% import 'macros/category.html' as category %}
 
 {% macro row(name, path, icon, selected=False) -%}
     <a href="{{ path }}"
@@ -126,7 +125,7 @@
         </div>
 
         <!-- profile card -->
-        {{ profile.profile_card(current_user) }}
+        {{ profile_card(current_user) }}
     </header>
 
     <div class="flex grow">
