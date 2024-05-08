@@ -12,8 +12,10 @@ from extensions import Base
 
 if TYPE_CHECKING:
     from app.modules.sellers.models import Seller
+    from app.modules.carts.models import ProductReservation
 else:
     Seller = "Seller"
+    ProductReservation = "ProductReservation"
 
 products_categories_association_table = Table(
     "products_categories_association",
@@ -114,15 +116,13 @@ class Product(db.Model):
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     seller: Mapped[Seller] = db.relationship("Seller", back_populates="products")
-
+    reservations: Mapped[List[ProductReservation]] = db.relationship("ProductReservation", back_populates="product")
     categories: Mapped[List[ProductCategory]] = db.relationship(
         ProductCategory, secondary=products_categories_association_table, back_populates="products"
     )
-
     keywords: Mapped[List[Keyword]] = db.relationship(
         Keyword, secondary=products_keywords_association_table, back_populates="products"
     )
-
     history: Mapped[List[ProductHistory]] = db.relationship(
         ProductHistory, back_populates="product"
     )

@@ -23,7 +23,7 @@ def validate_product(product_guid: str):
             return abort(404)
         return product
     except ValueError:
-        return redirect(url_for('home.index_view'))
+        return redirect(url_for('products.index_view'))
 
 
 @carts.route('', methods=['GET'])
@@ -35,6 +35,7 @@ def index_view():
 
     # TODO: add pagination
     cart = get_cart_by_buyer(buyer_id)  # should use "get_cart_or_create"?
+    products = get_cart_products(cart)
     return render_template(
         'carts/index.html',
         cart=cart,

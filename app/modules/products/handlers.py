@@ -105,6 +105,8 @@ def update_product(
 def delete_product(product: Product):
     product.sequence += 1
     product.deleted_at = db.func.now()
+    for reservation in product.reservations:
+        reservation.deleted_at = db.func.now()
 
     db.session.commit()
     return product

@@ -35,7 +35,7 @@ class ProductReservation(db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
-    product: Mapped[Product] = db.relationship("Product")
+    product: Mapped[Product] = db.relationship("Product", back_populates="reservations")
     cart: Mapped["Cart"] = db.relationship("Cart", back_populates="reservations")
     history: Mapped[List["ProductReservationHistory"]] = db.relationship("ProductReservationHistory",
                                                                          back_populates="product_reservation")
