@@ -45,7 +45,7 @@ def index_view():
             return render_template(
                 'carts/index.html',
                 cart=cart,
-                reservations=cart.reservations if cart else [],
+                reservations=cart.get_active_reservations() if cart else [],
                 section='your_cart'
             )
         # update quantity
@@ -53,7 +53,7 @@ def index_view():
         return render_template(
             'carts/index.html',
             cart=cart,
-            reservations=cart.reservations if cart else [],
+            reservations=cart.get_active_reservations() if cart else [],
             section='your_cart'
         )
 
@@ -62,6 +62,6 @@ def index_view():
     return render_template(
         'carts/index.html',
         cart=cart,
-        reservations=cart.reservations if cart else [],
+        reservations=cart.get_active_reservations() if cart else [],
         section='your_cart'
     )

@@ -82,5 +82,8 @@ class Cart(db.Model):
     buyer: Mapped[Buyer] = db.relationship("Buyer", back_populates="carts")
     reservations: Mapped[List[ProductReservation]] = db.relationship("ProductReservation", back_populates="cart")
 
+    def get_active_reservations(self) -> List[ProductReservation]:
+        return [r for r in self.reservations if r.deleted_at is None]
+
     def __repr__(self):
         return f"<Cart id={self.id} user_id={self.user_id} created_at={self.created_at} updated_at={self.updated_at}>"
