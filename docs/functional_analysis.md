@@ -131,13 +131,31 @@ _Do we need to store the booked amount?_
 
 ## Orders
 
+The orders are divided into `buyers orders` and `sellers orders`.
+
+The `buyers orders` belong to the buyers' carts,
+one cart has one `buyers order`.
+
+The `sellers orders` belong to the sellers,
+one `sellers order` has n sellers' products.
+
 When the user buys the cart:
 
-- A new order is created
+- A new `buyers order` is created
 - The user has to have a card number
 - The product has to have a sufficient amount
-- The booked amount is more probable to be sellable:
-  that amount is reserved and the order has to be complete in a timeout
+
+Up until now, no product amount has been decreased or reservation deleted.  
+that `product`'s amount is locked: 
+sellers cannot remove it and no new orders can be created.  
+The order has to be completed in a timeout.
+
+- The user makes the payment
+- The `buyers order` is finalized
+- The `cart` is finalized (so the `reservation` are no more accessible)
+- The `product` amount is decreased
+- For each seller whose product is in the order, a new `sellers order` is
+  created.
 
 When the user wants to complete the order,
 it has to check if the real amount has not changed.
@@ -149,9 +167,12 @@ The cart related to the order will not be shown, only its products.
 
 ## Shipments
 
-When the order is completed:
+The sellers have to ship the products.
+A sellers can choose multiple `buyers orders` to include in one `shipment`.
 
-- A new shipment is created
+When a seller creates a shipment:
+
+- The `buyers orders` are finalized
 
 The shipment has four states:
 
@@ -169,34 +190,31 @@ the seller and the products can be shown.
 The sellers have the sold orders list, with options to change the shipment state
 the buyer and the products can be shown.
 
-> ## States
-> - Cart
-    >
-- created (from one product)
->   - finalized
-> - Order
-    >
-- created (from cart)
->   - finalized
-> - Shipment
-    >
-- created (from order)
->   - accepted
->   - shipped
->   - in delivery
->   - delivered
-      >
-- accepted
->     - rejected
->     - returned
->
-> If the shipment is not delivered, the order must be refunded.
-> When the shipment is delivered, the order is resolved.
->
-> If the product is damaged,
-> or the user is not satisfied, the order can be refunded.
->
-> _We will not implement the final three states of the shipment._
+## States
+
+- Cart
+    - created (from one product)
+    - finalized
+- Order
+    - created (from cart)
+    - finalized
+- Shipment
+    - created (from order)
+    - accepted
+    - shipped
+    - in delivery
+    - delivered
+        - accepted
+        - rejected
+        - returned
+
+If the shipment is not delivered, the order must be refunded.
+When the shipment is delivered, the order is resolved.
+
+If the product is damaged,
+or the user is not satisfied, the order can be refunded.
+
+_We will not implement the final three states of the shipment._
 
 # Reviews
 
