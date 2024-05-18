@@ -4,11 +4,11 @@
 
 {% macro row(name, path, icon, selected=False) -%}
     <a href="{{ path }}"
-            {%- if selected -%}
+        {%- if selected -%}
        class="flex items-center space-x-4 rounded-md px-2 py-3 bg-gray-100 text-blue-600"
-            {%- else -%}
+        {%- else -%}
        class="flex items-center space-x-4 rounded-md px-2 py-3 hover:bg-gray-100 hover:text-blue-600"
-            {%- endif -%}
+        {%- endif -%}
     >
         <box-icon name="{{ icon }}" size="sm"></box-icon>
         <span>{{ name }}</span>
@@ -20,12 +20,15 @@
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='global.css') }}">
+        <link rel="shortcut icon" type="image/icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+        {# FIXME #}
+        <style> [x-cloak] { display: none !important; } </style>
     {% endblock %}
 </head>
 <body>
@@ -151,7 +154,7 @@
         </aside>
 
         <!-- main content page -->
-        <div class="grow">
+        <div class="grow" x-cloak>
             {% block content %}
             {% endblock %}
         </div>

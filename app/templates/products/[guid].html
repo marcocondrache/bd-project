@@ -86,7 +86,7 @@
                                 Delete
                             </button>
 
-                            <div x-show="confirmDelete"
+                            <div x-show="confirmDelete" x-cloak
                                  class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
                                 <div class="bg-white p-4 rounded-lg shadow-lg">
                                     <p class="mb-4">Are you sure you want to delete this product?</p>
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                     {% else %}
-                        <div x-show="showWarning"
+                        <div x-show="showWarning" x-cloak
                              class="absolute inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
                             <!-- ran out of stock -->
                             <div class="bg-white p-4 rounded-lg shadow-lg" x-show="stock <= 0">
@@ -159,7 +159,6 @@
                             </div>
                         </div>
                     {% endif %}
-                    </div>
                 </div>
             </div>
         </div>
