@@ -1,5 +1,5 @@
-{% macro product_card(product) -%}
-    <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+{% macro product_card(product, current_user) -%}
+    <a href="{{ url_for('products.product_view', product_guid=product.guid) }}" class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
         {% if product.image %}
             <img class="p-8 rounded-t-lg" src="#" alt="product image"/>
         {% else %}
@@ -39,20 +39,28 @@
                     <span class="text-3xl font-bold">{{ product.price }}</span>
                     <span class="text font-medium">{{ product.currency }}</span>
                 </div>
-                <a href="{{ url_for('products.product_view', product_guid=product.guid) }}"
-                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center shadow-md">
-                    View details
-                </a>
+                {% if not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id %}
+                    <form method="post" action="{{ url_for('carts.index_view') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="product_guid" value="{{ product.guid }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit"
+                                class="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300
+                                text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center shadow-md">
+                            Add to cart
+                        </button>
+                    </form>
+                {% endif %}
             </div>
         </div>
-    </div>
+    </a>
 {%- endmacro %}
 
-{% macro products_list(products) -%}
+{% macro products_list(products, current_user) -%}
     <div class="overflow-auto flex-grow p-4 shadow-inner">
-        <div class="flex flex-wrap justify-center gap-4">
+        <div class="flex flex-wrap gap-4">
             {% for p in products %}
-                {{ product_card(p) }}
+                {{ product_card(p, current_user) }}
             {% endfor %}
         </div>
     </div>

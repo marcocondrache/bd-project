@@ -53,7 +53,8 @@ def product_view(product_guid: str):
 
     product_reservation, sequence_failed = get_product_reservation(current_user.buyers[0].id, product)
     return render_template(
-        'products/[guid].html', product=product,
+        'products/[guid].html',
+        product=product,
         product_categories=[c.name for c in product.categories],
         categories=[c.name for c in get_all_product_categories()],
         product_reservation=product_reservation,
@@ -150,7 +151,7 @@ def shop_products():
     if current_user.sellers:
         seller_id = current_user.sellers[0].id
 
-    filters = [Product.owner_seller_id != seller_id]
+    filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
     if search.validate():
         query_key = search.search.data

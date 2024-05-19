@@ -130,7 +130,8 @@ class Product(db.Model):
     def __repr__(self):
         return (f"<Product guid={self.guid} owner_seller_id={self.owner_seller_id} name={self.name} "
                 f"description={self.description} brand={self.brand} is_second_hand={self.is_second_hand} "
-                f"sequence={self.sequence} price={self.price} currency={self.currency} stock={self.stock}>")
+                f"sequence={self.sequence} price={self.price} currency={self.currency} stock={self.stock}>"
+                f"created_at={self.created_at} updated_at={self.updated_at} deleted_at={self.deleted_at}>")
 
     def to_json(self):
         return {

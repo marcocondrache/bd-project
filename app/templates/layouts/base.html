@@ -110,7 +110,7 @@
                 </div>
                 <div class="relative w-full">
                     <div x-show="altHold" x-cloak
-                         class="absolute top-0 start-0 bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
+                         class="absolute top-1/2 mr-1.5 transform -translate-y-1/2 end-0 z-20 bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
                          @keydown.window.alt.f.prevent="document.querySelector('input[name=search]').focus()"
                     >
                         F
@@ -130,7 +130,7 @@
         </form>
 
         <!-- button profile -->
-        <div class="flex gap-4 items-center">
+        <div class="relative flex gap-4 items-center">
             {% if not current_user.sellers %}
                 <a href="{{ url_for('sellers.register_view') }}"
                    class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
@@ -138,7 +138,8 @@
                 </a>
             {% endif %}
             <div x-show="altHold" x-cloak
-                 class="bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
+                 class="absolute end-0 top-1/2 transform -translate-y-1/2
+                 bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
                  @keydown.window.alt.w.prevent="profileOpen = !profileOpen"
             >
                 W

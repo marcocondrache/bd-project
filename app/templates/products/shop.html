@@ -1,5 +1,7 @@
 {% extends 'layouts/base.html' %}
-{% import 'macros/products.html' as product %}
+{% from 'macros/products.html' import products_list %}
+{% import 'macros/pagination.html' as pagination %}
+
 
 {% block title %}Kepler Shop{% endblock %}
 
@@ -10,10 +12,9 @@
             <span>No products have been found</span>
         </div>
     {% else %}
-        <div class="grid grid-cols-3 gap-4 p-4">
-            {% for p in page.items %}
-                {{ product.product_card(p) }}
-            {% endfor %}
+        <div class="flex flex-col h-[calc(100vh-4rem)]">
+            {{ products_list(page.items, current_user) }}
+            {{ pagination.render_pagination(page) }}
         </div>
     {% endif %}
 {% endblock %}

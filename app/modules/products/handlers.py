@@ -14,21 +14,15 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
-def get_all_products(page: int = 1, per_page: int = 20, filters=None) -> QueryPagination:
-    query = Product.query
-    if filters:
-        query = query.filter(and_(*filters))
+def get_all_products(page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
+    query = Product.query.filter(*filters).order_by(Product.name)
     return query.paginate(page=page, per_page=per_page)
 
 
 def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
-    query = Product.query.join(Product.keywords).filter(Product.deleted_at is None)
-
-    if query_key:
-        query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
-
-    query = query.filter(*filters)
-    query = query.order_by(Product.name)
+    query = (Product.query.join(Product.keywords)
+             .filter(Keyword.key.ilike(f'%{query_key}%'))
+             .filter(and_(*filters)).order_by(Product.name))
     return query.paginate(page=page, per_page=per_page)
 
 
