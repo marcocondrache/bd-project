@@ -90,16 +90,17 @@
 
 
 				<!-- Edit Profile and Logout Buttons should be in the same row and occupation the whole row -->
-				<div class="flex justify-center space-x-4" x-show="!profileEditMode">
-					<button @click="profileEditMode = true"
+				<form class="flex justify-center space-x-4" x-show="!profileEditMode" action="{{ url_for('auth.logout') }}"                      method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+					<button @click="profileEditMode = true" type="button"
 					        class="rounded-md bg-indigo-500 text-white text-xs font-semibold py-2 px-4 my-2 flex justify-center items-center">
 						Edit Profile
 					</button>
-					<a href="{{ url_for('auth.logout') }}"
+					<button type="submit"
 					        class="rounded-md bg-red-500 text-white text-xs font-semibold py-2 px-4 my-2 flex justify-center items-center">
 						Logout
-					</a>
-				</div>
+					</button>
+				</form>
 
 				<div class="flex justify-center space-x-4" x-show="profileEditMode">
 					<button @click="await editUser()"

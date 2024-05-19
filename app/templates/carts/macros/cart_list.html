@@ -1,4 +1,4 @@
-{% from 'macros/cart_item_editor.html' import cart_item_editor %}
+{% from 'carts/macros/reservation_editor.html' import reservation_editor %}
 
 {% macro cart_item(reservation) %}
     <div class="w-full flex flex-row bg-white border border-gray-200 rounded-lg">
@@ -43,7 +43,7 @@
                     <span class="text-3xl font-bold">{{ reservation.product.price }}</span>
                     <span class="text font-medium mr-4">{{ reservation.product.currency }}</span>
                 </div>
-                {{ cart_item_editor(reservation) }}
+                {{ reservation_editor(reservation) }}
             </div>
         </div>
     </div>

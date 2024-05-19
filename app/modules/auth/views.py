@@ -55,10 +55,8 @@ def signup():
     return render_template("auth/signup.html")
 
 
-@auth.route("/logout", methods=["GET"])
-@csrf.exempt
+@auth.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("auth.login"))
-
