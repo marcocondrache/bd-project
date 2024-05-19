@@ -128,8 +128,11 @@ def create_view():
         stock = int(request.form.get('stock'))
         if price < 0 or stock < 0:
             flash('Price and stock must be positive numbers')
-            return render_template('products/create.html', categories=[c.name for c in categories],
-                                   section='your_products')
+            return render_template(
+                'products/create.html',
+                categories=[c.name for c in categories],
+                section='your_products'
+            )
 
         categories = request.form.getlist('categories')
         description = request.form.get('description')

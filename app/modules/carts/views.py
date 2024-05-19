@@ -36,9 +36,10 @@ def index_view():
 
     if request.method == 'POST':
         product_guid = request.form.get('product_guid')
+        quantity = int(request.form.get('quantity'))
+
         product = validate_product(product_guid)
 
-        quantity = int(request.form.get('quantity'))
         # delete product from cart
         if quantity < 1:
             remove_from_cart(buyer_id, product)

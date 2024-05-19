@@ -1,7 +1,7 @@
 {% from 'macros/cart_item_editor.html' import cart_item_editor %}
 
 {% macro cart_item(reservation) %}
-    <div class="w-full flex flex-row bg-white border border-gray-200 rounded-lg shadow">
+    <div class="w-full flex flex-row bg-white border border-gray-200 rounded-lg">
         {% if reservation.product.image %}
             <img class="p-8 rounded-t-lg" src="#" alt="product image"/>
         {% else %}

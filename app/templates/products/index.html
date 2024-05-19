@@ -19,7 +19,7 @@
         </div>
     {% else %}
         <div class="flex flex-col h-[calc(100vh-4rem)]">
-            <div class="text-2xl font-semibold m-4 flex items-center justify-between">
+            <div class="text-2xl font-semibold px-4 flex items-center justify-between border-b h-20">
                 Your products
                 <a
                     @keydown.window="if (event.key === 'n') window.location.href = `{{ url_for('products.create_view') }}`;"
@@ -28,11 +28,11 @@
                     flex justify-center items-center gap-2 shadow-lg transition-colors duration-250"
                     href="{{ url_for('products.create_view') }}">
                     <box-icon name='plus' color='white'></box-icon>
-                    Add a new product!
+                    Add a new product
                 </a>
             </div>
 
-            {{ products_list(paginated_products.items) }}
+            {{ products_list(paginated_products.items, current_user) }}
             {{ pagination.render_pagination(paginated_products) }}
         </div>
     {% endif %}
