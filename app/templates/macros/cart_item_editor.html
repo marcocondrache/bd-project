@@ -1,10 +1,8 @@
 {% macro cart_item_editor(product_reservation) %}
     <div class="flex flex-row items-center px-4" x-data='{
-                confirmDelete: false,
-                reservedQuantity: {{ product_reservation.quantity }},
-                quantity: {{ product_reservation.quantity }},
-                stock: {{ product_reservation.product.stock }},
-                showWarning: false,
+        reservedQuantity: {{ product_reservation.quantity }},
+        selectedQuantity: {{ product_reservation.quantity }},
+        stock: {{ product_reservation.product.stock }},
     }'>
         <div class="flex gap-4 justify-end">
 
@@ -12,25 +10,24 @@
             <form method="post" class="flex gap-2 items-center">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="product_guid" value="{{ product_reservation.product.guid }}">
-                <input type="hidden" name="quantity" x-model="quantity">
 
                 <button type="submit"
                         class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 mr-2 rounded"
-                        x-show="quantity !== reservedQuantity"
+                        x-show="selectedQuantity !== reservedQuantity"
                 >
                     <box-icon name="check" size="xs" color="white"></box-icon>
                 </button>
 
                 <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
-                        @click="quantity = Math.max(1, quantity - 1)"
+                        @click="selectedQuantity = Math.max(1, selectedQuantity - 1)"
                 >
                     <box-icon name="minus" size="xs" color="white"></box-icon>
                 </button>
-                <input type="number" class="w-8 text-center" x-model="quantity"
+                <input type="number" class="w-8 text-center" name="selectedQuantity" x-model="selectedQuantity"
                        x-bind:max="stock" x-bind:min="1"
                 >
                 <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
-                        @click="quantity = Math.min(stock, quantity + 1)"
+                        @click="selectedQuantity = Math.min(stock, selectedQuantity + 1)"
                 >
                     <box-icon name="plus" size="xs" color="white"></box-icon>
                 </button>
@@ -38,7 +35,7 @@
 
 
             <!-- Remove item from cart -->
-            <form method="post">
+            <form method="post" action="{{ url_for('carts.index_view') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="product_guid" value="{{ product_reservation.product.guid }}">
                 <input type="hidden" name="quantity" value="0">

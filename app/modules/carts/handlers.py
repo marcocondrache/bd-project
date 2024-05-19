@@ -1,3 +1,5 @@
+from flask_sqlalchemy.pagination import QueryPagination
+
 from app.modules.carts.models import CartStatus, Cart, ProductReservation
 from app.modules.products.models import Product
 from extensions import db
@@ -15,10 +17,8 @@ def get_cart_or_create(buyer_id: int) -> Cart | None:
     return cart
 
 
-def get_cart_products(cart: Cart) -> list[Product]:
-    if not cart:
-        return []
-    return [r.product for r in cart.reservations if r.deleted_at is None]
+def get_reservation_by_cart(cart: Cart, page: int = 1, per_page: int = 20) -> QueryPagination:
+    return ProductReservation.query.filter_by(cart=cart, deleted_at=None).paginate(page=page, per_page=per_page)
 
 
 def get_product_reservation(buyer_id: int, product: Product) -> (ProductReservation | None, bool):

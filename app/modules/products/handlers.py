@@ -28,11 +28,11 @@ def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, fil
         query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
 
     query = query.filter(*filters)
-    query = query.order_by(Product.name.desc())
+    query = query.order_by(Product.name)
     return query.paginate(page=page, per_page=per_page)
 
 
-def get_product_by_guid(guid: UUID):
+def get_product_by_guid(guid: UUID) -> Product | None:
     return Product.query.filter_by(guid=guid, deleted_at=None).first()
 
 

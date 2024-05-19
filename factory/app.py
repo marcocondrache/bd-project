@@ -14,19 +14,20 @@ class Base(Flask):
 
         for blueprint in modules:
             try:
-                module = import_module('app.modules.%s' % blueprint)
+                module = import_module(f'app.modules.{blueprint}')
                 self.register_blueprint(getattr(module, blueprint))
             except Exception as e:
-                print(e)
-                self.logger.error('Error registering %s' % blueprint)
+                self.logger.error(f'Error registering {blueprint}: {e}')
 
     def configure_error_handlers(self):
         @self.errorhandler(500)
         def internal_error(e):
+            self.logger.error(e.description)
             return render_template("http/500.html", reason=e.description), 500
 
         @self.errorhandler(404)
         def not_found(e):
+            self.logger.error(e.description)
             return render_template("http/404.html", reason=e.description), 404
 
         @self.errorhandler(CSRFError)
@@ -43,7 +44,7 @@ class Base(Flask):
 
             # load additional kwargs
             try:
-                init_kwargs = import_string('%s_init_kwargs' % extension)()
+                init_kwargs = import_string(f'{extension}_init_kwargs')()
             except ImportError:
                 init_kwargs = dict()
             init(self, **init_kwargs)

@@ -19,6 +19,9 @@ class Prod(object):
     DB_NAME = os.getenv('DB_NAME', 'kepler_db')
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "isolation_level": "READ COMMITTED"
+    }
 
     BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts"]
     EXTENSIONS = [
