@@ -33,7 +33,7 @@
                     flex justify-center items-center gap-2 shadow-lg transition-colors duration-250 relative"
                     href="{{ url_for('products.create_view') }}">
                     <div x-show="altHold" x-cloak
-                         class="absolute top-1/2 ml-4 transform -translate-y-1/2 start-0 z-20
+                         class="absolute top-1/2 ml-4 transform -translate-y-1/2 start-0 z-10
                          bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
                          @keydown.window.alt.n="window.location.href = `{{ url_for('products.create_view') }}`;"
                     >
