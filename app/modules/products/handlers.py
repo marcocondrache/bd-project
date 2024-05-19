@@ -14,6 +14,10 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
+def get_product_by_guid(guid: UUID) -> Product | None:
+    return Product.query.filter_by(guid=guid, deleted_at=None).first()
+
+
 def get_all_products(page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
     query = Product.query.filter(*filters).order_by(Product.name)
     return query.paginate(page=page, per_page=per_page)
@@ -26,11 +30,10 @@ def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, fil
     return query.paginate(page=page, per_page=per_page)
 
 
-def get_product_by_guid(guid: UUID) -> Product | None:
-    return Product.query.filter_by(guid=guid, deleted_at=None).first()
-
-
-def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int = 1, per_page: int = 10):
+def get_seller_products(
+    seller_id: int, show_sold_out: bool = False,
+    page: int = 1, per_page: int = 10
+) -> QueryPagination:
     query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.name)
 
     if not show_sold_out:
@@ -39,9 +42,10 @@ def get_seller_products(seller_id: int, show_sold_out: bool = False, page: int =
     return query.paginate(page=page, per_page=per_page)
 
 
-def create_seller_product(seller_id: int, name: str, price: float, stock: int, categories: list,
-                          description: str = None,
-                          brand: str = None, is_second_hand: bool = False):
+def create_product(
+    seller_id: int, name: str, price: float, stock: int, categories: list,
+    description: str = None, brand: str = None, is_second_hand: bool = False
+) -> Product | None:
     seller = Seller.query.filter_by(id=seller_id).first()
     if not seller:
         return None
@@ -68,8 +72,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
     # add keywords if not exists
     keywords = [k.lower() for k in (
         name.split(separators) +
-        description.split(separators) if description else [] +
-                                                          brand.split(separators) if brand else []
+        description.split(separators) if description else [] + brand.split(separators) if brand else []
     ) if len(k) > 2]
     for keyword_key in keywords:
         keyword = Keyword.query.filter_by(key=keyword_key).first()
@@ -86,7 +89,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
 
 
 def update_product(
-        product: Product, price: float, stock: int, categories: list, description: str
+    product: Product, price: float, stock: int, categories: list, description: str
 ):
     product.price = price
     product.stock = stock

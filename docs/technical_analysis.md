@@ -150,7 +150,7 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_quantity`, the user can
+- If the product is not locked by a non-zero `locked_stock`, the user can
   update the product.
 - The user can update the price, quantity, categories, description.
 - _The product entity is updated._
@@ -171,7 +171,7 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_quantity`, the user can
+- If the product is not locked by a non-zero `locked_stock`, the user can
   delete the product.
 - The user must confirm the deletion.
 - _Deleted_at is set to the current timestamp._
@@ -299,11 +299,11 @@ The user can do the following actions:
     - If the user accepts the new amount, it's responsibility of the Frontend
       to create a new `products reservation` and retry to create the order.
 - Also for each product in the cart,
-  if any of the product is locked by a non-zero `locked_quantity`,
+  if any of the product is locked by a non-zero `locked_stock`,
   the process is aborted.
 - _A new `buyer_order` entity is created, with status "created"_
 - for each product in the cart:
-    - _The `locked_quantity` is increased by the `reservation` quantity._
+    - _The `locked_stock` is increased by the `reservation` quantity._
 - The timeout for the user to complete the order is started.
 
 ### Complete a buyer order

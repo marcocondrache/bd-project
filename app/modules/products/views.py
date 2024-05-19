@@ -7,33 +7,47 @@ from app.modules.carts.handlers import get_product_reservation
 from app.modules.products import products
 from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
-    create_seller_product, get_seller_products,
+    create_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_products_filtered, get_all_products
 )
 from app.modules.products.models import Product
-from extensions import csrf
+from app.modules.utils import seller_required
 
 
-def validate_product(product_guid: str, check_owner=False):
+def validate_product(product_guid: str, allow_write=False) -> Product | None:
+    """
+    Get a product by its guid.
+    If the guid is not a valid UUID, throw a 400 error.
+    If the product does not exist, throw a 404 error.
+    For the edit and delete:
+        If the user is not the owner of the product, throw a 403 error.
+        If the product is reserved, flash a message and return None.
+    :param product_guid: the guid of the product
+    :param allow_write: check also for users write permissions
+    :return: the product or None if it needs to be redirected
+    """
+
     try:
         product_guid = UUID(product_guid)
         product = get_product_by_guid(product_guid)
         if not product:
-            return abort(404)
-        if check_owner and (not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id):
-            return abort(403)
+            abort(404)
+        if allow_write:
+            if not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id:
+                abort(403)
+            if product.locked_stock > 0:
+                flash('Product is reserved, cannot edit')
+                return None
         return product
     except ValueError:
-        return redirect(url_for('products.index_view'))
+        abort(400)
 
 
 @products.route('', methods=['GET'])
 @login_required
+@seller_required
 def index_view():
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
-
     page = request.args.get('page', 1, type=int)
 
     seller_products_pagination = get_seller_products(
@@ -50,6 +64,8 @@ def index_view():
 @login_required
 def product_view(product_guid: str):
     product = validate_product(product_guid)
+    if not product:
+        return redirect(url_for('products.index_view'))
 
     product_reservation, sequence_failed = get_product_reservation(current_user.buyers[0].id, product)
     return render_template(
@@ -66,44 +82,47 @@ def product_view(product_guid: str):
 
 @products.route('/<product_guid>/delete', methods=['POST'])
 @login_required
+@seller_required
 def product_delete_view(product_guid: str):
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
+    product = validate_product(product_guid, allow_write=True)
+    if product:
+        delete_product(product)
+    else:
+        flash('An order is open for this product, all operations are temporarily disabled')
 
-    product = validate_product(product_guid, check_owner=True)
-
-    delete_product(product)
     return redirect(url_for('products.index_view'))
 
 
 @products.route('/<product_guid>/edit', methods=['POST', 'GET'])
 @login_required
+@seller_required
 def product_edit_view(product_guid: str):
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
+    categories = get_all_product_categories()
+    product = validate_product(product_guid, allow_write=True)
 
-    product = validate_product(product_guid, check_owner=True)
+    if not product:
+        flash('An order is open for this product, all operations are temporarily disabled')
+        return redirect(url_for('products.product_view', product_guid=product_guid))
 
     if request.method == 'POST':
-        price = float(request.form.get('price'))
-        stock = int(request.form.get('stock'))
-        form_categories = request.form.getlist('categories')
-        description = request.form.get('description')
+        new_price = float(request.form.get('price'))
+        new_stock = int(request.form.get('stock'))
+        new_categories = request.form.getlist('categories')
+        new_description = request.form.get('description')
 
-        if price < 0 or stock < 0:
+        if new_price < 0 or new_stock < 0:
             flash('Price and stock must be positive numbers')
             return render_template(
                 'products/edit.html',
                 product=product,
-                categories=[c.name for c in get_all_product_categories()],
+                categories=[c.name for c in categories],
                 product_categories=[c.name for c in product.categories],
                 section='your_products'
             )
 
-        update_product(product, price, stock, form_categories, description)
+        update_product(product, new_price, new_stock, new_categories, new_description)
         return redirect(url_for('products.product_view', product_guid=product_guid))
 
-    categories = get_all_product_categories()
     return render_template(
         'products/edit.html',
         product=product,
@@ -115,11 +134,8 @@ def product_edit_view(product_guid: str):
 
 @products.route('/create', methods=['GET', 'POST'])
 @login_required
-@csrf.exempt
+@seller_required
 def create_view():
-    if not current_user.sellers:
-        return redirect(url_for('home.index_view'))
-
     categories = get_all_product_categories()
     if request.method == 'POST':
         seller_id = current_user.sellers[0].id
@@ -139,10 +155,14 @@ def create_view():
         brand = request.form.get('brand')
         is_second_hand = request.form.get('is_second_hand') == 'on'
 
-        create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
+        create_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index_view'))
 
-    return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
+    return render_template(
+        'products/create.html',
+        categories=[c.name for c in categories],
+        section='your_products'
+    )
 
 
 @products.route('/shop', methods=['GET'])

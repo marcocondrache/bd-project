@@ -109,6 +109,7 @@ class Product(db.Model):
     price: Mapped[float] = mapped_column("current_price", db.Float, nullable=False)
     currency: Mapped[str] = mapped_column("current_currency", db.String(3), nullable=False)
     stock: Mapped[int] = mapped_column("current_stock", db.Integer, nullable=False)
+    locked_stock: Mapped[int] = mapped_column("current_locked_stock", db.Integer, nullable=False, default=0)
     created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at: Mapped[str] = mapped_column(
         db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now()
