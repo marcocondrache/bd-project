@@ -18,10 +18,13 @@ def get_cart_or_create(buyer_id: int) -> Cart | None:
 
 
 def get_reservation_by_cart(cart: Cart, page: int = 1, per_page: int = 20) -> QueryPagination:
-    return ProductReservation.query.filter_by(cart=cart, deleted_at=None).paginate(page=page, per_page=per_page)
+    return (ProductReservation.query
+            .filter_by(cart=cart, deleted_at=None)
+            .order_by(ProductReservation.created_at)
+            .paginate(page=page, per_page=per_page))
 
 
-def get_product_reservation(buyer_id: int, product: Product) -> (ProductReservation | None, bool):
+def get_reservation_by_product(buyer_id: int, product: Product) -> (ProductReservation | None, bool):
     cart = get_cart_by_buyer(buyer_id)
     if not cart:
         return None, False
