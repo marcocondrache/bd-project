@@ -30,6 +30,11 @@ class Base(Flask):
             self.logger.error(e.description)
             return render_template("http/404.html", reason=e.description), 404
 
+        @self.errorhandler(403)
+        def forbidden(e):
+            self.logger.error(e.description)
+            return render_template("index.html"), 403
+
         @self.errorhandler(CSRFError)
         def handle_csrf_error(e):
             self.logger.error(e.description)

@@ -13,9 +13,11 @@ from extensions import Base
 if TYPE_CHECKING:
     from app.modules.sellers.models import Seller
     from app.modules.carts.models import ProductReservation
+    from app.modules.orders.models import OrderedProduct
 else:
     Seller = "Seller"
     ProductReservation = "ProductReservation"
+    OrderedProducts = "OrderedProducts"
 
 products_categories_association_table = Table(
     "products_categories_association",
@@ -126,6 +128,9 @@ class Product(db.Model):
     )
     history: Mapped[List[ProductHistory]] = db.relationship(
         ProductHistory, back_populates="product"
+    )
+    ordered_products: Mapped[List[OrderedProduct]] = db.relationship(
+        "OrderedProducts", back_populates="product"
     )
 
     def __repr__(self):

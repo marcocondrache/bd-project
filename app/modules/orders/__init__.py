@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-orders = Blueprint('orders', __name__)
+orders = Blueprint('orders', __name__, url_prefix='/orders')
 
-# from app.modules.orders import views
+from app.modules.orders import views

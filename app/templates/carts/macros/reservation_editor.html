@@ -24,7 +24,8 @@
                 >
                     <box-icon name="minus" size="xs" color="white"></box-icon>
                 </button>
-                <input type="number" class="w-8 text-center" name="quantity" x-model="quantity"
+                {# FIXME p-0 border-0 in global.css? #}
+                <input type="number" class="w-8 p-0 border-0 text-center" name="quantity" x-model="quantity"
                        x-bind:max="stock" x-bind:min="1"
                     {% if product_reservation.product.stock == 0 %} disabled {% endif %}
 

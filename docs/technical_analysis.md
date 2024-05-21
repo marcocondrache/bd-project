@@ -291,6 +291,7 @@ The user can do the following actions:
 **Flow**:
 
 - The user finalizes the "active" cart.
+- If the user already has a "created" order, the process is aborted.
 - for each product in the cart:
     - **check sequence**: _If the `products reservation` sequence is different
       from the `product` sequence, the `products reservation` is deleted._

@@ -6,9 +6,11 @@ from extensions import db
 if TYPE_CHECKING:
     from app.modules.users.models import User
     from app.modules.products.models import Product
+    from app.modules.orders.models import SellerOrder
 else:
     User = "User"
     Product = "Product"
+    SellerOrder = "SellerOrder"
 
 
 class Seller(db.Model):
@@ -21,6 +23,7 @@ class Seller(db.Model):
 
     user: Mapped[User] = db.relationship("User", back_populates="sellers")
     products: Mapped[List[Product]] = db.relationship("Product", back_populates="seller")
+    orders: Mapped[List[SellerOrder]] = db.relationship("OrderedProducts", back_populates="seller")
 
     def __repr__(self):
         return f"<Seller user={self.user.email} iban={self.iban} show_soldout_products={self.show_soldout_products}>"

@@ -9,11 +9,7 @@ from app.modules.products.handlers import (
     get_product_by_guid
 )
 from app.modules.products.models import Product
-
-
-def authorize_buyer():
-    if not current_user.buyers:
-        return redirect(url_for('home.index_view'))
+from app.modules.utils import buyer_required
 
 
 def validate_product(product_guid: str) -> Product:
@@ -29,9 +25,8 @@ def validate_product(product_guid: str) -> Product:
 
 @carts.route('', methods=['GET', 'POST'])
 @login_required
+@buyer_required
 def index_view():
-    authorize_buyer()
-
     buyer_id = current_user.buyers[0].id
 
     if request.method == 'POST':
