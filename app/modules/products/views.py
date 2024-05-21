@@ -3,7 +3,7 @@ from uuid import UUID
 from flask import request, render_template, url_for, redirect, abort, flash
 from flask_login import login_required, current_user
 
-from app.modules.carts.handlers import get_product_reservation
+from app.modules.carts.handlers import get_reservation_by_product
 from app.modules.products import products
 from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
@@ -67,7 +67,7 @@ def product_view(product_guid: str):
     if not product:
         return redirect(url_for('products.index_view'))
 
-    product_reservation, sequence_failed = get_product_reservation(current_user.buyers[0].id, product)
+    product_reservation, sequence_failed = get_reservation_by_product(current_user.buyers[0].id, product)
     return render_template(
         'products/[guid].html',
         product=product,

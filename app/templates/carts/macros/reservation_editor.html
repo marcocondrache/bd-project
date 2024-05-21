@@ -20,14 +20,18 @@
 
                 <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
                         @click="quantity = Math.max(1, quantity - 1)"
+                    {% if product_reservation.product.stock == 0 %} disabled {% endif %}
                 >
                     <box-icon name="minus" size="xs" color="white"></box-icon>
                 </button>
                 <input type="number" class="w-8 text-center" name="quantity" x-model="quantity"
                        x-bind:max="stock" x-bind:min="1"
+                    {% if product_reservation.product.stock == 0 %} disabled {% endif %}
+
                 >
                 <button class="bg-gray-400 hover:bg-gray-500 rounded px-1.5" type="button"
                         @click="quantity = Math.min(stock, quantity + 1)"
+                    {% if product_reservation.product.stock == 0 %} disabled {% endif %}
                 >
                     <box-icon name="plus" size="xs" color="white"></box-icon>
                 </button>
