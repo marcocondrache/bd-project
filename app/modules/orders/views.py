@@ -19,8 +19,7 @@ def index_view():
     paginated_orders = get_buyer_orders_by_buyer(buyer_id)
     return render_template(
         'orders/index.html',
-        paginated_orders=paginated_orders,
-        section='your_orders'
+        paginated_orders=paginated_orders
     )
 
 
@@ -33,8 +32,7 @@ def seller_orders_view():
     paginated_orders = get_seller_orders_by_seller(seller_id)
     return render_template(
         'orders/seller_orders.html',
-        paginated_orders=paginated_orders,
-        section='seller_orders'
+        paginated_orders=paginated_orders
     )
 
 

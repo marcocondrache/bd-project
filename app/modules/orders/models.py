@@ -39,15 +39,15 @@ class BuyerOrder(db.Model):
     )
     deleted_at: Mapped[datetime] = mapped_column(db.DateTime, nullable=True)
 
-    cart: Mapped[Cart] = db.relationship("Cart", back_populates="order")
-    seller_orders: Mapped[List["SellerOrder"]] = db.relationship("SellersOrder", back_populates="buyer_order")
+    cart: Mapped[Cart] = db.relationship("Cart", back_populates="buyer_order")
+    seller_orders: Mapped[List["SellerOrder"]] = db.relationship("SellerOrder", back_populates="buyer_order")
 
     def __repr__(self):
-        return (f"<BuyersOrder guid={self.guid} status={self.status} cart_id={self.cart_id} "
+        return (f"<BuyerOrder guid={self.guid} status={self.status} cart_id={self.cart_id} "
                 f"created_at={self.created_at} updated_at={self.updated_at}>")
 
 
-class SellersOrderStatus(Enum):
+class SellerOrderStatus(Enum):
     CREATED = "created"
     COMPLETED = "completed"
 
@@ -59,8 +59,8 @@ class SellerOrder(db.Model):
     buyer_order_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("buyers_orders.id"), nullable=False)
     seller_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("sellers.id"), nullable=False)
     guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
-    status: Mapped[SellersOrderStatus] = mapped_column(
-        "current_status", db.Enum(SellersOrderStatus), nullable=False, default=SellersOrderStatus.CREATED
+    status: Mapped[SellerOrderStatus] = mapped_column(
+        "current_status", db.Enum(SellerOrderStatus), nullable=False, default=SellerOrderStatus.CREATED
     )
     # TODO when shipment is implemented
     # shipment_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("shipments.id"), nullable=False)
@@ -70,14 +70,14 @@ class SellerOrder(db.Model):
         db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now()
     )
 
-    buyer_order: Mapped[BuyerOrder] = db.relationship("BuyersOrder", back_populates="seller_orders")
+    buyer_order: Mapped[BuyerOrder] = db.relationship("BuyerOrder", back_populates="seller_orders")
     seller: Mapped[Seller] = db.relationship("Seller", back_populates="orders")
     ordered_products: Mapped[List["OrderedProduct"]] = db.relationship(
-        "OrderedProducts", back_populates="sellers_order"
+        "OrderedProduct", back_populates="seller_order"
     )
 
     def __repr__(self):
-        return (f"<SellersOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "
+        return (f"<SellerOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "
                 f"created_at={self.created_at} updated_at={self.updated_at}>")
 
 
@@ -90,8 +90,8 @@ class OrderedProduct(db.Model):
     quantity: Mapped[int] = mapped_column(db.Integer, nullable=False)
 
     product: Mapped[Product] = db.relationship("Product", back_populates="ordered_products")
-    sellers_order: Mapped[SellerOrder] = db.relationship("SellersOrder", back_populates="products")
+    seller_order: Mapped[SellerOrder] = db.relationship("SellerOrder", back_populates="ordered_products")
 
     def __repr__(self):
-        return (f"<OrderedProducts id={self.id} sellers_order_id={self.sellers_order_id} product_id={self.product_id} "
+        return (f"<OrderedProduct id={self.id} sellers_order_id={self.sellers_order_id} product_id={self.product_id} "
                 f"quantity={self.quantity}>")

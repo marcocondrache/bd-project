@@ -2,9 +2,9 @@
 {% from 'layouts/macros/profile.html' import profile_card %}
 {% import 'macros/category.html' as category %}
 
-{% macro row(name, path, icon, shortcut, selected=False) -%}
+{% macro row(name, path, icon, shortcut) -%}
     <a href="{{ path }}"
-        {%- if selected -%}
+        {%- if request.path == path -%}
        class="flex items-center justify-between rounded-md p-3 bg-gray-100 text-blue-600"
         {%- else -%}
        class="flex items-center justify-between rounded-md p-3 hover:bg-gray-100 hover:text-blue-600"
@@ -167,13 +167,14 @@
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="-translate-x-full"
         >
-            {{ row("Dashboard", url_for("home.index_view"), "home", "D", section == "dashboard") }}
-            {{ row("Shop", url_for("products.shop_products"), "store", "S", section == "shop") }}
+            {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
+            {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
             {% if current_user.sellers %}
-                {{ row("Your products", url_for("products.index_view"), "collection", "P", section == "your_products") }}
+                {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
             {% endif %}
             {% if current_user.buyers %}
-                {{ row("Your cart", url_for("carts.index_view"), "cart", "C", section == "your_cart") }}
+                {{ row("Your cart", url_for("carts.index_view"), "cart", "C") }}
+
             {% endif %}
         </aside>
 

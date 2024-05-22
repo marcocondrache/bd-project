@@ -55,8 +55,7 @@ def index_view():
     )
     return render_template(
         'products/index.html',
-        paginated_products=seller_products_pagination,
-        section='your_products'
+        paginated_products=seller_products_pagination
     )
 
 
@@ -75,8 +74,7 @@ def product_view(product_guid: str):
         categories=[c.name for c in get_all_product_categories()],
         product_reservation=product_reservation,
         sequence_failed=sequence_failed,
-        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
-        section='your_products'
+        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id
     )
 
 
@@ -127,8 +125,7 @@ def product_edit_view(product_guid: str):
         'products/edit.html',
         product=product,
         categories=[c.name for c in categories],
-        product_categories=[c.name for c in product.categories],
-        section='your_products'
+        product_categories=[c.name for c in product.categories]
     )
 
 
@@ -160,8 +157,7 @@ def create_view():
 
     return render_template(
         'products/create.html',
-        categories=[c.name for c in categories],
-        section='your_products'
+        categories=[c.name for c in categories]
     )
 
 
@@ -180,7 +176,13 @@ def shop_products():
         query_key = search.search.data
 
         page = get_products_filtered(query_key, search.page.data, filters=filters)
-        return render_template('products/shop.html', page=page, section='shop')
+        return render_template(
+            'products/shop.html',
+            page=page
+        )
 
     page = get_all_products(filters=filters)
-    return render_template('products/shop.html', page=page, section='shop')
+    return render_template(
+        'products/shop.html',
+        page=page
+    )

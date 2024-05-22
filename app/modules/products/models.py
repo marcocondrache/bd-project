@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 else:
     Seller = "Seller"
     ProductReservation = "ProductReservation"
-    OrderedProducts = "OrderedProducts"
+    OrderedProduct = "OrderedProduct"
 
 products_categories_association_table = Table(
     "products_categories_association",
@@ -130,7 +130,7 @@ class Product(db.Model):
         ProductHistory, back_populates="product"
     )
     ordered_products: Mapped[List[OrderedProduct]] = db.relationship(
-        "OrderedProducts", back_populates="product"
+        "OrderedProduct", back_populates="product"
     )
 
     def __repr__(self):

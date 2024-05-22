@@ -52,6 +52,5 @@ def index_view():
     return render_template(
         'carts/index.html',
         cart=cart,
-        paginated_reservations=reservations,
-        section='your_cart'
+        paginated_reservations=reservations
     )
