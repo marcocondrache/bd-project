@@ -13,12 +13,14 @@
         <div class="flex items-center gap-4">
             <box-icon name="{{ icon }}" size="sm"></box-icon>
             <span>{{ name }}</span></div>
+        {%- if shortcut -%}
         <div x-show="altHold" x-cloak
              class="bg-gray-200 rounded-md h-full aspect-square flex items-center justify-center text-xs text-gray-500"
              @keydown.window.alt.{{ shortcut }}.prevent="window.location.href = '{{ path }}'"
         >
             {{ shortcut }}
         </div>
+        {%- endif -%}
     </a>
 {%- endmacro %}
 
@@ -169,12 +171,15 @@
         >
             {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
             {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
+
             {% if current_user.sellers %}
                 {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
+                {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
             {% endif %}
-            {% if current_user.buyers %}
-                {{ row("Your cart", url_for("carts.index_view"), "cart", "C") }}
 
+            {% if current_user.buyers %}
+                {{ row("Cart", url_for("carts.index_view"), "cart", "C") }}
+                {{ row("Orders", url_for("orders.index_view"), "task", "O") }}
             {% endif %}
         </aside>
 

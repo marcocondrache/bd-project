@@ -11,7 +11,8 @@ from extensions import db
 
 def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
     return (BuyerOrder.query
-            .filter_by(cart__owner_buyer_id=buyer_id, deleted_at=None)
+            .join(BuyerOrder.cart)
+            .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
             .order_by(BuyerOrder.created_at)
             .paginate(page=page, per_page=per_page))
 

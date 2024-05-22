@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import render_template, url_for, redirect, abort, flash
+from flask import render_template, url_for, redirect, abort, flash, request
 from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_cart_by_buyer
@@ -16,7 +16,8 @@ from app.modules.utils import buyer_required, seller_required
 def index_view():
     buyer_id = current_user.buyers[0].id
 
-    paginated_orders = get_buyer_orders_by_buyer(buyer_id)
+    page = request.args.get('page', 1, type=int)
+    paginated_orders = get_buyer_orders_by_buyer(buyer_id, page)
     return render_template(
         'orders/index.html',
         paginated_orders=paginated_orders
@@ -29,7 +30,8 @@ def index_view():
 def seller_orders_view():
     seller_id = current_user.sellers[0].id
 
-    paginated_orders = get_seller_orders_by_seller(seller_id)
+    page = request.args.get('page', 1, type=int)
+    paginated_orders = get_seller_orders_by_seller(seller_id, page)
     return render_template(
         'orders/seller_orders.html',
         paginated_orders=paginated_orders
@@ -43,8 +45,8 @@ def create_order_view():
     buyer_id = current_user.buyers[0].id
 
     cart = get_cart_by_buyer(buyer_id)
-
     (order, invalid_reservations, error_reason) = create_buyer_order(cart)
+
     if error_reason == OrderCreationErrorReason.ALREADY_CREATED:
         flash("Order already created", "danger")
         return redirect(url_for('carts.index_view'))
@@ -72,6 +74,7 @@ def complete_order_view(order_guid: UUID):
         abort(404)
 
     (buyer_order, seller_orders) = complete_buyer_order(buyer_order)
+
     if not buyer_order:
         flash("Order already completed", "danger")
         return redirect(url_for('carts.index_view'))
