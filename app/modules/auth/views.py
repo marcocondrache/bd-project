@@ -28,7 +28,6 @@ def login():
 
 
 @auth.route("/signup", methods=["GET", "POST"])
-@csrf.exempt
 def signup():
     if request.method == "POST":
         email = request.form.get('email')
@@ -56,7 +55,7 @@ def signup():
     return render_template("auth/signup.html")
 
 
-@auth.route("/logout", methods=["GET"])
+@auth.route("/logout", methods=["POST"])
 @login_required
 def logout():
     logout_user()

@@ -14,25 +14,19 @@ def get_all_product_categories():
     return ProductCategory.query.all()
 
 
-def get_all_products(page: int = 1, per_page: int = 20, filters=None) -> QueryPagination:
-    query = Product.query
-    if filters:
-        query = query.filter(and_(*filters))
+def get_all_products(page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
+    query = Product.query.filter(*filters).order_by(Product.name)
     return query.paginate(page=page, per_page=per_page)
 
 
 def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
-    query = Product.query.join(Product.keywords).filter(Product.deleted_at is None)
-
-    if query_key:
-        query = query.filter(Keyword.key.ilike(f'%{query_key}%'))
-
-    query = query.filter(*filters)
-    query = query.order_by(Product.name.desc())
+    query = (Product.query.join(Product.keywords)
+             .filter(Keyword.key.ilike(f'%{query_key}%'))
+             .filter(and_(*filters)).order_by(Product.name))
     return query.paginate(page=page, per_page=per_page)
 
 
-def get_product_by_guid(guid: UUID):
+def get_product_by_guid(guid: UUID) -> Product | None:
     return Product.query.filter_by(guid=guid, deleted_at=None).first()
 
 
@@ -72,7 +66,7 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
         product.categories.append(category)
 
     # add keywords if not exists
-    keywords = [k for k in (
+    keywords = [k.lower() for k in (
         name.split(separators) +
         description.split(separators) if description else [] +
                                                           brand.split(separators) if brand else []
@@ -94,12 +88,10 @@ def create_seller_product(seller_id: int, name: str, price: float, stock: int, c
 def update_product(
         product: Product, price: float, stock: int, categories: list, description: str
 ):
-    if price != product.price:
-        product.price = price
-    if stock != product.stock:
-        product.stock = stock
-    if description != product.description:
-        product.description = description
+    product.price = price
+    product.stock = stock
+    product.description = description
+
     for category_name in categories:
         category = ProductCategory.query.filter_by(name=category_name).first()
         if category is None:
@@ -117,6 +109,8 @@ def update_product(
 def delete_product(product: Product):
     product.sequence += 1
     product.deleted_at = db.func.now()
+    for reservation in product.reservations:
+        reservation.deleted_at = db.func.now()
 
     db.session.commit()
     return product

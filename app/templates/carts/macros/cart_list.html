@@ -1,0 +1,60 @@
+{% from 'carts/macros/reservation_editor.html' import reservation_editor %}
+
+{% macro cart_item(reservation) %}
+    <div class="w-full flex flex-row bg-white border border-gray-200 rounded-lg">
+        {% if reservation.product.image %}
+            <img class="p-8 rounded-t-lg" src="#" alt="product image"/>
+        {% else %}
+            <div class="flex flex-col justify-center items-center h-16 m-12">
+                <box-icon name="image-alt" size="lg"></box-icon>
+            </div>
+        {% endif %}
+        <div class="pb-5 flex flex-row justify-between space-x-4 w-full">
+            <div class="flex flex-col justify-center">
+                <div>
+                    <h3 class="text-xl font-semibold tracking-tight text-gray-900">{{ reservation.product.name }}</h3>
+                    <span class="text-xs text-gray-700 -mt-4">By {{ reservation.product.brand }}</span>
+                </div>
+                <div class="flex items-center mt-2.5 mb-4 gap-x-2">
+                    {% if reservation.product.stock > 0 %}
+                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        In stock
+                    </span>
+                    {% else %}
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        Sold out
+                    </span>
+                    {% endif %}
+                    {% if reservation.product.is_second_hand %}
+                        <span
+                            class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        Second hand
+                    </span>
+                    {% else %}
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded shadow-md">
+                        New
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex flex-col items-end justify-between p-4">
+                <div>
+                    <span class="text-3xl font-bold">{{ reservation.product.price }}</span>
+                    <span class="text font-medium mr-4">{{ reservation.product.currency }}</span>
+                </div>
+                {{ reservation_editor(reservation) }}
+            </div>
+        </div>
+        {# TODO needs to be warned if product is invalid: is the stock is 0, is the sequence changed etc. #}
+    </div>
+{%- endmacro %}
+
+{% macro cart_list(products) -%}
+    <div class="overflow-auto flex-grow p-4 shadow-inner">
+        <div class="flex flex-wrap justify-center gap-4">
+            {% for p in products %}
+                {{ cart_item(p) }}
+            {% endfor %}
+        </div>
+    </div>
+{%- endmacro %}

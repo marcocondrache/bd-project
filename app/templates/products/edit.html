@@ -1,9 +1,23 @@
 {% extends 'layouts/base.html' %}
-{% import 'products/macros/category.html' as category %}
+{% from 'macros/forms.html' import categories_field %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
+
+    {%  with errors = get_flashed_messages(with_categories=True) %}
+        {% if errors %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-4 mt-4 relative" role="alert">
+                <strong class="font-bold">There was an error!</strong>
+                <ul class="list-disc list-inside">
+                    {% for error in errors %}
+                        <li>{{ error[1] }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <div x-data='{
         name: "{{ product.name }}",
         description: "{{ product.description }}" || "No description available",
@@ -33,7 +47,7 @@
                 >
                     <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
 
-                    {{ category.categories_field(categories, product_categories) }}
+                    {{ categories_field(categories, product_categories) }}
 
                     <div class="my-2">
                         <label for="description" class="text-sm font-semibold">Description</label>
@@ -59,6 +73,9 @@
                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
                     </div>
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                     <div class="flex gap-4">
                         <a href="{{ url_for("products.product_view", product_guid=product.guid) }}"
                            class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"

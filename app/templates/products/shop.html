@@ -1,19 +1,21 @@
 {% extends 'layouts/base.html' %}
-{% import 'products/macros/product_card.html' as product %}
+{% from 'products/macros/product_list.html' import products_list %}
+{% import 'macros/pagination.html' as pagination %}
+{% from 'macros/error_message.html' import error_message %}
 
 {% block title %}Kepler Shop{% endblock %}
 
 {% block content %}
-    {% if page.items|length == 0 %}
-        <div class="flex flex-col justify-center items-center h-full w-full space-y-2">
-            <box-icon name="store" size="lg" color="grey"></box-icon>
-            <span>No products have been found</span>
-        </div>
-    {% else %}
-        <div class="grid grid-cols-3 gap-4 p-4">
-            {% for p in page.items %}
-                {{ product.card(p) }}
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div class="flex flex-col h-[calc(100vh-4rem)]">
+        {{ error_message() }}
+        {% if page.items|length == 0 %}
+            <div class="flex flex-col justify-center items-center h-full w-full space-y-2">
+                <box-icon name="store" size="lg" color="grey"></box-icon>
+                <span>No products have been found</span>
+            </div>
+        {% else %}
+            {{ products_list(page.items, current_user) }}
+            {{ pagination.render_pagination(page) }}
+        {% endif %}
+    </div>
 {% endblock %}

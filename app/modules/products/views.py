@@ -1,8 +1,9 @@
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort
+from flask import request, render_template, url_for, redirect, abort, flash
 from flask_login import login_required, current_user
 
+from app.modules.carts.handlers import get_reservation_by_product
 from app.modules.products import products
 from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
@@ -50,10 +51,14 @@ def index_view():
 def product_view(product_guid: str):
     product = validate_product(product_guid)
 
+    product_reservation, sequence_failed = get_reservation_by_product(current_user.buyers[0].id, product)
     return render_template(
-        'products/[guid].html', product=product,
+        'products/[guid].html',
+        product=product,
         product_categories=[c.name for c in product.categories],
         categories=[c.name for c in get_all_product_categories()],
+        product_reservation=product_reservation,
+        sequence_failed=sequence_failed,
         is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
         section='your_products'
     )
@@ -82,11 +87,21 @@ def product_edit_view(product_guid: str):
     if request.method == 'POST':
         price = float(request.form.get('price'))
         stock = int(request.form.get('stock'))
-        categories = request.form.getlist('categories')
+        form_categories = request.form.getlist('categories')
         description = request.form.get('description')
 
-        update_product(product, price, stock, categories, description)
-        return redirect(url_for('products.index_view'))
+        if price < 0 or stock < 0:
+            flash('Price and stock must be positive numbers')
+            return render_template(
+                'products/edit.html',
+                product=product,
+                categories=[c.name for c in get_all_product_categories()],
+                product_categories=[c.name for c in product.categories],
+                section='your_products'
+            )
+
+        update_product(product, price, stock, form_categories, description)
+        return redirect(url_for('products.product_view', product_guid=product_guid))
 
     categories = get_all_product_categories()
     return render_template(
@@ -105,11 +120,20 @@ def create_view():
     if not current_user.sellers:
         return redirect(url_for('home.index_view'))
 
+    categories = get_all_product_categories()
     if request.method == 'POST':
         seller_id = current_user.sellers[0].id
         name = request.form.get('name')
         price = float(request.form.get('price'))
         stock = int(request.form.get('stock'))
+        if price < 0 or stock < 0:
+            flash('Price and stock must be positive numbers')
+            return render_template(
+                'products/create.html',
+                categories=[c.name for c in categories],
+                section='your_products'
+            )
+
         categories = request.form.getlist('categories')
         description = request.form.get('description')
         brand = request.form.get('brand')
@@ -118,7 +142,6 @@ def create_view():
         create_seller_product(seller_id, name, price, stock, categories, description, brand, is_second_hand)
         return redirect(url_for('products.index_view'))
 
-    categories = get_all_product_categories()
     return render_template('products/create.html', categories=[c.name for c in categories], section='your_products')
 
 
@@ -131,7 +154,7 @@ def shop_products():
     if current_user.sellers:
         seller_id = current_user.sellers[0].id
 
-    filters = [Product.owner_seller_id != seller_id]
+    filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
     if search.validate():
         query_key = search.search.data

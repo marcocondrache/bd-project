@@ -256,7 +256,10 @@ The user can search for keywords:
 - amount range
 
 > when creating a product  
+> 
 > separators = new char[] { ' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n' }
+> 
 > string[] keys = text.split(separators).filter(word => word.length > 3)
+> 
 > insert into keywords (key, reference_count) values (key, 1) on conflict (key)
 > do update set reference_count = reference_count + 1

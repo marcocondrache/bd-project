@@ -1,12 +1,14 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from extensions import db
 
 if TYPE_CHECKING:
     from app.modules.users.models import User
+    from app.modules.carts.models import Cart
 else:
     User = "User"
+    Cart = "Cart"
 
 
 class Buyer(db.Model):
@@ -18,6 +20,7 @@ class Buyer(db.Model):
     user_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     user: Mapped[User] = db.relationship("User", back_populates="buyers")
+    carts: Mapped[List[Cart]] = db.relationship("Cart", back_populates="buyer")
 
     def __repr__(self):
         return (f"<Buyer user={self.user.email} destination_address={self.destination_address} "

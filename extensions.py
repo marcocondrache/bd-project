@@ -20,5 +20,6 @@ migrate = Migrate()
 csrf = CSRFProtect()
 cors = CORS()
 
+
 def migrate_init_kwargs():
     return {"db": db}

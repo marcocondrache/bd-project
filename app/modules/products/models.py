@@ -12,8 +12,10 @@ from extensions import Base
 
 if TYPE_CHECKING:
     from app.modules.sellers.models import Seller
+    from app.modules.carts.models import ProductReservation
 else:
     Seller = "Seller"
+    ProductReservation = "ProductReservation"
 
 products_categories_association_table = Table(
     "products_categories_association",
@@ -65,6 +67,12 @@ class Keyword(db.Model):
     def __repr__(self):
         return f"<Keyword key={self.key} reference_count={self.reference_count}>"
 
+    def to_json(self):
+        return {
+            "key": self.key,
+            "reference_count": self.reference_count,
+        }
+
 
 class ProductHistory(db.Model):
     __tablename__ = "product_history"
@@ -108,15 +116,13 @@ class Product(db.Model):
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     seller: Mapped[Seller] = db.relationship("Seller", back_populates="products")
-
+    reservations: Mapped[List[ProductReservation]] = db.relationship("ProductReservation", back_populates="product")
     categories: Mapped[List[ProductCategory]] = db.relationship(
         ProductCategory, secondary=products_categories_association_table, back_populates="products"
     )
-
     keywords: Mapped[List[Keyword]] = db.relationship(
         Keyword, secondary=products_keywords_association_table, back_populates="products"
     )
-
     history: Mapped[List[ProductHistory]] = db.relationship(
         ProductHistory, back_populates="product"
     )
@@ -124,4 +130,24 @@ class Product(db.Model):
     def __repr__(self):
         return (f"<Product guid={self.guid} owner_seller_id={self.owner_seller_id} name={self.name} "
                 f"description={self.description} brand={self.brand} is_second_hand={self.is_second_hand} "
-                f"sequence={self.sequence} price={self.price} currency={self.currency} stock={self.stock}>")
+                f"sequence={self.sequence} price={self.price} currency={self.currency} stock={self.stock}>"
+                f"created_at={self.created_at} updated_at={self.updated_at} deleted_at={self.deleted_at}>")
+
+    def to_json(self):
+        return {
+            "guid": self.guid,
+            "owner_seller_id": self.owner_seller_id,
+            "name": self.name,
+            "description": self.description,
+            "brand": self.brand,
+            "is_second_hand": self.is_second_hand,
+            "sequence": self.sequence,
+            "price": self.price,
+            "currency": self.currency,
+            "stock": self.stock,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "deleted_at": self.deleted_at,
+            "categories": [c.to_json() for c in self.categories],
+            "keywords": [k.key for k in self.keywords],
+        }
