@@ -1,4 +1,4 @@
-{% macro render_pagination(pagination) %}
+{% macro pagination(pagination) %}
     <div class="min-h-20 pb-4 flex justify-center items-end space-x-2 relative">
         {% if pagination.has_prev %}
             <a href="{{ url_for('products.index_view', page=pagination.prev_num) }}"

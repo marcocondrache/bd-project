@@ -22,6 +22,9 @@ class BuyersOrderStatus(Enum):
     CREATED = "created"
     COMPLETED = "completed"
 
+    def __str__(self):
+        return self.value.capitalize()
+
 
 class BuyerOrder(db.Model):
     __tablename__ = "buyers_orders"
@@ -39,12 +42,12 @@ class BuyerOrder(db.Model):
     )
     deleted_at: Mapped[datetime] = mapped_column(db.DateTime, nullable=True)
 
-    cart: Mapped[Cart] = db.relationship("Cart", back_populates="buyer_order")
+    cart: Mapped[Cart] = db.relationship("Cart", back_populates="buyer_orders")
     seller_orders: Mapped[List["SellerOrder"]] = db.relationship("SellerOrder", back_populates="buyer_order")
 
     def __repr__(self):
         return (f"<BuyerOrder guid={self.guid} status={self.status} cart_id={self.cart_id} "
-                f"created_at={self.created_at} updated_at={self.updated_at}>")
+                f"created_at={self.created_at} updated_at={self.updated_at} deleted_at={self.deleted_at}>")
 
 
 class SellerOrderStatus(Enum):

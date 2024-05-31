@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% import 'macros/pagination.html' as pagination %}
+{% from 'macros/pagination.html' import pagination %}
 {% from 'products/macros/product_list.html' import products_list %}
 
 {% block title %}Kepler Shop{% endblock %}
@@ -45,7 +45,7 @@
             </div>
 
             {{ products_list(paginated_products.items, current_user) }}
-            {{ pagination.render_pagination(paginated_products) }}
+            {{ pagination(paginated_products) }}
         </div>
     {% endif %}
 {% endblock %}

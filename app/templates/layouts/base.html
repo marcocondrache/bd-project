@@ -42,6 +42,7 @@
     {% endblock %}
 </head>
 <body>
+{% block body %}
 <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout"
       @keydown.window.alt="altHold = true" @keyup.window.alt="altHold = false"
 >
@@ -245,4 +246,5 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 </body>
+{% endblock %}
 </html>

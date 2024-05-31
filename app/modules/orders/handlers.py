@@ -48,49 +48,55 @@ def create_buyer_order(cart: Cart) -> (
     if BuyerOrder.query.filter_by(cart=cart).first():
         return None, None, OrderCreationErrorReason.ALREADY_CREATED
 
+    reservations = [r for r in cart.reservations if r.deleted_at is None]
+
     # check invalid products
     invalid_reservations = [
-        r for r in cart.reservations if r.product.sequence != r.product_sequence
+        r for r in reservations if r.product.sequence != r.product_sequence
     ]
     if invalid_reservations:
         return None, invalid_reservations, OrderCreationErrorReason.INVALID_PRODUCTS
 
     # check locked products
+    # TODO: check if r.product.stock - r.locked.stock >= r.quantity (?)
     locked_reservations = [
-        r for r in cart.reservations if r.product.locked_stock > 0
+        r for r in reservations if r.product.locked_stock > 0
     ]
     if locked_reservations:
         return None, locked_reservations, OrderCreationErrorReason.LOCKED_PRODUCTS
 
     # lock products
-    for r in cart.reservations:
+    for r in reservations:
         r.product.locked_stock += r.quantity
 
     # create order
     buyer_order = BuyerOrder(cart=cart)
     db.session.add(buyer_order)
     db.session.commit()
-    return buyer_order
+    return buyer_order, None, None
+
+# FIXME: Needs to unlock products if timeout
 
 
 def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[SellerOrder] | None):
     # check order create less than 2 minutes ago
-    if (buyer_order.created_at - db.func.now()).total_seconds() > 120:
-        buyer_order.deleted_at = db.func.now()
-        return None, None
+    # if (buyer_order.created_at - db.func.now()).total_seconds() > 120:
+    #     buyer_order.deleted_at = db.func.now()
+    #     return None, None
 
     buyer_order.status = BuyersOrderStatus.COMPLETED
+    buyer_order.cart.status = CartStatus.FINALIZED
 
-    cart = buyer_order.cart
-    cart.status = CartStatus.FINALIZED
+    reservations = [r for r in buyer_order.cart.reservations if r.deleted_at is None]
 
-    # unlock products
-    for r in cart.reservations:
+    # unlock products and update stock
+    for r in reservations:
         r.product.locked_stock -= r.quantity
+        r.product.stock -= r.quantity
 
     # create seller orders
     seller_orders = []
-    for r in cart.reservations:
+    for r in reservations:
         ordered_product = OrderedProduct(product=r.product, quantity=r.quantity)
 
         # find seller order
@@ -101,7 +107,7 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
                 break
 
         if not seller_order:
-            seller_order = SellerOrder(buyer_order=buyer_order)
+            seller_order = SellerOrder(buyer_order=buyer_order, seller_id=r.product.owner_seller_id)
             db.session.add(seller_order)
             seller_orders.append(seller_order)
 

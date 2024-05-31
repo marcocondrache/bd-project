@@ -5,8 +5,10 @@ from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_cart_by_buyer
 from app.modules.orders import orders
-from app.modules.orders.handlers import create_buyer_order, OrderCreationErrorReason, get_buyer_order_by_guid, \
+from app.modules.orders.handlers import (
+    create_buyer_order, OrderCreationErrorReason, get_buyer_order_by_guid,
     complete_buyer_order, get_buyer_orders_by_buyer, get_seller_orders_by_seller
+)
 from app.modules.utils import buyer_required, seller_required
 
 
@@ -24,7 +26,7 @@ def index_view():
     )
 
 
-@orders.route('/yours', methods=['GET'])
+@orders.route('/incoming', methods=['GET'])
 @login_required
 @seller_required
 def seller_orders_view():
@@ -38,7 +40,7 @@ def seller_orders_view():
     )
 
 
-@orders.route('/create', methods=['POST'])
+@orders.route('/create', methods=['GET'])
 @login_required
 @buyer_required
 def create_order_view():
@@ -59,13 +61,10 @@ def create_order_view():
         flash("An order is already in progress for this products. Please try again later.", "danger")
         return redirect(url_for('carts.index_view'))
 
-    return render_template(
-        'orders/complete_order.html',
-        order=order,
-    )
+    return redirect(url_for('orders.complete_order_view', order_guid=order.guid))
 
 
-@orders.route('/<uuid:order_guid>/complete', methods=['POST'])
+@orders.route('/<uuid:order_guid>/complete', methods=['POST', 'GET'])
 @login_required
 @buyer_required
 def complete_order_view(order_guid: UUID):
@@ -73,10 +72,16 @@ def complete_order_view(order_guid: UUID):
     if not buyer_order:
         abort(404)
 
-    (buyer_order, seller_orders) = complete_buyer_order(buyer_order)
+    if request.method == 'POST':
+        (buyer_order, seller_orders) = complete_buyer_order(buyer_order)
 
-    if not buyer_order:
-        flash("Order already completed", "danger")
-        return redirect(url_for('carts.index_view'))
+        if not buyer_order:
+            flash("Order already completed", "danger")
+            return redirect(url_for('carts.index_view'))
 
-    return redirect(url_for('home.index_view'))
+        return redirect(url_for('home.index_view'))
+
+    return render_template(
+        'orders/complete_order.html',
+        order=buyer_order,
+    )
