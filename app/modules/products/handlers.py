@@ -5,6 +5,7 @@ from sqlalchemy import and_
 
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
+from app.modules.shared.handlers import clean_locks
 from extensions import db
 
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
@@ -91,7 +92,7 @@ def create_product(
 def update_product(
     product: Product, price: float, stock: int, categories: list, description: str
 ):
-    # TODO clean locks
+    clean_locks()
 
     product.price = price
     product.stock = stock
@@ -112,7 +113,7 @@ def update_product(
 
 
 def delete_product(product: Product):
-    # TODO clean locks
+    clean_locks()
 
     product.sequence += 1
     product.deleted_at = db.func.now()

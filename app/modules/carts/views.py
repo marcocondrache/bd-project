@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort, flash
+from flask import request, render_template, abort, flash
 from flask_login import login_required, current_user
 
 from app.modules.carts import carts
@@ -9,7 +9,7 @@ from app.modules.products.handlers import (
     get_product_by_guid
 )
 from app.modules.products.models import Product
-from app.modules.utils import buyer_required
+from app.modules.shared.utils import buyer_required
 
 
 def validate_product(product_guid: str) -> Product:

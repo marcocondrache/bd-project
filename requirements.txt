@@ -12,3 +12,4 @@ werkzeug
 wtforms
 alembic
 email-validator
+pytz

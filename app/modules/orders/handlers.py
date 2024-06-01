@@ -1,20 +1,24 @@
+from datetime import timedelta, datetime
 from enum import Enum
 from typing import List
 from uuid import UUID
 
+import pytz
 from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.carts.models import Cart, ProductReservation, CartStatus
 from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct
+from app.modules.shared.consts import timeout
 from extensions import db
 
 
 def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
-    # TODO: clean locks
+    from app.modules.shared.handlers import clean_locks
+    clean_locks()
     return (BuyerOrder.query
             .join(BuyerOrder.cart)
             .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
-            .order_by(BuyerOrder.created_at)
+            .order_by(BuyerOrder.created_at.desc())
             .paginate(page=page, per_page=per_page))
 
 
@@ -33,7 +37,7 @@ def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: in
     return (OrderedProduct.query
             .filter_by(product_id=product_id)
             .order_by(OrderedProduct.created_at)
-            .paginate(page=page, per_page=per_page))
+            .paginate(page=page, per_page=per_page) )
 
 
 class OrderCreationErrorReason(Enum):
@@ -45,10 +49,11 @@ class OrderCreationErrorReason(Enum):
 def create_buyer_order(cart: Cart) -> (
     BuyerOrder | None, List[ProductReservation] | None, OrderCreationErrorReason | None
 ):
-    # TODO: clean locks
+    from app.modules.shared.handlers import clean_locks
+    clean_locks()
 
     # check already created order
-    if BuyerOrder.query.filter_by(cart=cart).first():
+    if BuyerOrder.query.filter_by(cart=cart, deleted_at=None).first():
         return None, None, OrderCreationErrorReason.ALREADY_CREATED
 
     reservations = [r for r in cart.reservations if r.deleted_at is None]
@@ -57,11 +62,11 @@ def create_buyer_order(cart: Cart) -> (
     invalid_reservations = [
         r for r in reservations if r.product.sequence != r.product_sequence
     ]
+    # TODO: delete invalid reservations
     if invalid_reservations:
         return None, invalid_reservations, OrderCreationErrorReason.INVALID_PRODUCTS
 
     # check locked products
-    # TODO: check if r.product.stock - r.locked.stock >= r.quantity (?)
     locked_reservations = [
         r for r in reservations if r.product.locked_stock > 0
     ]
@@ -80,7 +85,12 @@ def create_buyer_order(cart: Cart) -> (
 
 
 def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[SellerOrder] | None):
-    # TODO check timeout
+    if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=timeout):
+        for r in buyer_order.cart.reservations:
+            r.product.locked_stock -= r.quantity
+        buyer_order.deleted_at = db.func.now()
+        db.session.commit()
+        return None, None
 
     buyer_order.status = BuyersOrderStatus.COMPLETED
     buyer_order.cart.status = CartStatus.FINALIZED

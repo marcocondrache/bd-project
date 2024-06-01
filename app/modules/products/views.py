@@ -12,7 +12,7 @@ from app.modules.products.handlers import (
     get_product_by_guid, get_products_filtered, get_all_products
 )
 from app.modules.products.models import Product
-from app.modules.utils import seller_required
+from app.modules.shared.utils import seller_required
 
 
 def validate_product(product_guid: str, allow_write=False) -> Product | None:

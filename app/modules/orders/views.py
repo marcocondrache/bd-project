@@ -9,7 +9,7 @@ from app.modules.orders.handlers import (
     create_buyer_order, OrderCreationErrorReason, get_buyer_order_by_guid,
     complete_buyer_order, get_buyer_orders_by_buyer, get_seller_orders_by_seller
 )
-from app.modules.utils import buyer_required, seller_required
+from app.modules.shared.utils import buyer_required, seller_required
 
 
 @orders.route('', methods=['GET'])
@@ -76,7 +76,7 @@ def complete_order_view(order_guid: UUID):
         (buyer_order, seller_orders) = complete_buyer_order(buyer_order)
 
         if not buyer_order:
-            flash("Order already completed", "danger")
+            flash("Order expired", "danger")
             return redirect(url_for('carts.index_view'))
 
         return redirect(url_for('home.index_view'))

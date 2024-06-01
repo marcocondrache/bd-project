@@ -20,7 +20,7 @@ class Prod(object):
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "isolation_level": "READ COMMITTED"
+        "isolation_level": "READ COMMITTED"  # TODO change to REPEATABLE READ
     }
 
     BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts", "orders"]
