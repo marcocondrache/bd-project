@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% from 'macros/pagination.html' import pagination %}
+{% from 'orders/macros/seller_orders_list.html' import orders_list %}
 {% from 'macros/error_message.html' import error_message %}
 
 {% block title %}Kepler Shop{% endblock %}
@@ -16,9 +17,7 @@
                 <span>You don't have any incoming order yet</span>
             </div>
         {% else %}
-            <div>
-                Just deez
-            </div>
+            {{ orders_list(paginated_orders.items, current_user) }}
             {{ pagination(paginated_orders) }}
         {% endif %}
     </div>

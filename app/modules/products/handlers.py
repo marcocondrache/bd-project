@@ -5,7 +5,8 @@ from sqlalchemy import and_
 
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
-from app.modules.shared.handlers import clean_locks
+from app.modules.shared.consts import page_size
+from app.modules.shared.handlers import clean_expired_orders
 from extensions import db
 
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
@@ -19,12 +20,12 @@ def get_product_by_guid(guid: UUID) -> Product | None:
     return Product.query.filter_by(guid=guid, deleted_at=None).first()
 
 
-def get_all_products(page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
+def get_all_products(page: int = 1, per_page: int = page_size, filters=()) -> QueryPagination:
     query = Product.query.filter(*filters).order_by(Product.name)
     return query.paginate(page=page, per_page=per_page)
 
 
-def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, filters=()) -> QueryPagination:
+def get_products_filtered(query_key: str, page: int = 1, per_page: int = page_size, filters=()) -> QueryPagination:
     query = (Product.query.join(Product.keywords)
              .filter(Keyword.key.ilike(f'%{query_key}%'))
              .filter(and_(*filters)).order_by(Product.name))
@@ -33,7 +34,7 @@ def get_products_filtered(query_key: str, page: int = 1, per_page: int = 20, fil
 
 def get_seller_products(
     seller_id: int, show_sold_out: bool = False,
-    page: int = 1, per_page: int = 10
+    page: int = 1, per_page: int = page_size
 ) -> QueryPagination:
     query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.name)
 
@@ -92,7 +93,7 @@ def create_product(
 def update_product(
     product: Product, price: float, stock: int, categories: list, description: str
 ):
-    clean_locks()
+    clean_expired_orders()
 
     product.price = price
     product.stock = stock
@@ -113,7 +114,7 @@ def update_product(
 
 
 def delete_product(product: Product):
-    clean_locks()
+    clean_expired_orders()
 
     product.sequence += 1
     product.deleted_at = db.func.now()

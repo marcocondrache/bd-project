@@ -1,15 +1,18 @@
 from app.modules.orders.models import BuyerOrder, BuyersOrderStatus
-from app.modules.shared.consts import timeout
+from app.modules.shared.consts import created_orders_ttl
 from extensions import db
 
 
-def clean_locks() -> None:
+def clean_expired_orders() -> None:
     """ remove the buyer orders with status "created" whose creation time is older than timeout and unlock the
     products"""
-    invalid_locks = (BuyerOrder.query
-                     .filter_by(status=BuyersOrderStatus.CREATED, deleted_at=None)
-                     .filter(BuyerOrder.created_at < db.func.now() - db.func.make_interval(0, 0, 0, 0, 0, 0, timeout))
-                     .all())
+    invalid_locks = (
+        BuyerOrder.query
+        .filter_by(status=BuyersOrderStatus.CREATED, deleted_at=None)
+        .filter(
+            BuyerOrder.created_at < db.func.now() - db.func.make_interval(0, 0, 0, 0, 0, 0, created_orders_ttl))
+        .all()
+    )
 
     for order in invalid_locks:
         # unlock products
@@ -19,4 +22,5 @@ def clean_locks() -> None:
         # delete order
         order.deleted_at = db.func.now()
 
-    db.session.commit()
+    if invalid_locks:
+        db.session.commit()

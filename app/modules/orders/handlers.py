@@ -8,13 +8,13 @@ from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.carts.models import Cart, ProductReservation, CartStatus
 from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct
-from app.modules.shared.consts import timeout
+from app.modules.shared.consts import created_orders_ttl, page_size
 from extensions import db
 
 
-def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
-    from app.modules.shared.handlers import clean_locks
-    clean_locks()
+def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+    from app.modules.shared.handlers import clean_expired_orders
+    clean_expired_orders()
     return (BuyerOrder.query
             .join(BuyerOrder.cart)
             .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
@@ -26,18 +26,18 @@ def get_buyer_order_by_guid(guid: UUID) -> BuyerOrder | None:
     return BuyerOrder.query.filter_by(guid=guid).first()
 
 
-def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
+def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
     return (SellerOrder.query
             .filter_by(seller_id=seller_id)
-            .order_by(SellerOrder.created_at)
+            .order_by(SellerOrder.created_at.desc())
             .paginate(page=page, per_page=per_page))
 
 
-def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
+def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
     return (OrderedProduct.query
             .filter_by(product_id=product_id)
             .order_by(OrderedProduct.created_at)
-            .paginate(page=page, per_page=per_page) )
+            .paginate(page=page, per_page=per_page))
 
 
 class OrderCreationErrorReason(Enum):
@@ -49,8 +49,8 @@ class OrderCreationErrorReason(Enum):
 def create_buyer_order(cart: Cart) -> (
     BuyerOrder | None, List[ProductReservation] | None, OrderCreationErrorReason | None
 ):
-    from app.modules.shared.handlers import clean_locks
-    clean_locks()
+    from app.modules.shared.handlers import clean_expired_orders
+    clean_expired_orders()
 
     # check already created order
     if BuyerOrder.query.filter_by(cart=cart, deleted_at=None).first():
@@ -85,7 +85,7 @@ def create_buyer_order(cart: Cart) -> (
 
 
 def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[SellerOrder] | None):
-    if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=timeout):
+    if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=created_orders_ttl):
         for r in buyer_order.cart.reservations:
             r.product.locked_stock -= r.quantity
         buyer_order.deleted_at = db.func.now()

@@ -54,6 +54,9 @@ class SellerOrderStatus(Enum):
     CREATED = "created"
     COMPLETED = "completed"
 
+    def __str__(self):
+        return self.value.capitalize()
+
 
 class SellerOrder(db.Model):
     __tablename__ = "sellers_orders"
@@ -66,7 +69,7 @@ class SellerOrder(db.Model):
         "current_status", db.Enum(SellerOrderStatus), nullable=False, default=SellerOrderStatus.CREATED
     )
     # TODO when shipment is implemented
-    # shipment_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("shipments.id"), nullable=False)
+    # shipment_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("shipments.id"), nullable=True)
 
     created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at: Mapped[str] = mapped_column(

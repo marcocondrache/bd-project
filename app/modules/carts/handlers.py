@@ -2,6 +2,7 @@ from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.carts.models import CartStatus, Cart, ProductReservation
 from app.modules.products.models import Product
+from app.modules.shared.consts import page_size
 from extensions import db
 
 
@@ -17,7 +18,7 @@ def get_cart_or_create(buyer_id: int) -> Cart | None:
     return cart
 
 
-def get_reservation_by_cart(cart: Cart, page: int = 1, per_page: int = 20) -> QueryPagination:
+def get_reservation_by_cart(cart: Cart, page: int = 1, per_page: int = page_size) -> QueryPagination:
     return (ProductReservation.query
             .filter_by(cart=cart, deleted_at=None)
             .order_by(ProductReservation.created_at)
