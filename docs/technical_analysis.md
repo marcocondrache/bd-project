@@ -150,7 +150,12 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_stock`, the user can
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+  - `deleted_at` is set to the current timestamp.
+  - For each product in the `buyer_order` cart:
+    - The `locked_stock` is decreased by the `reservation` quantity.
+- If the product is locked by a non-zero `locked_stock`, the user **cannot**
   update the product.
 - The user can update the price, quantity, categories, description.
 - _The product entity is updated._
@@ -171,12 +176,17 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_stock`, the user can
-  delete the product.
 - The user must confirm the deletion.
-- _Deleted_at is set to the current timestamp._
-- _The product sequence is incremented._
-- _The history is triggered._
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+  - `deleted_at` is set to the current timestamp.
+  - For each product in the `buyer_order` cart:
+    - The `locked_stock` is decreased by the `reservation` quantity.
+- If the product is locked by a non-zero `locked_stock`, the user **cannot**
+  delete the product.
+- `deleted_at` is set to the current timestamp.
+- The product sequence is incremented.
+- The history is triggered.
 
 > The product's `product_reservation` becomes invalid
 
@@ -234,7 +244,7 @@ The user can do the following actions:
 
 - The user can modify the quantity of the products in the cart.
 - _The products' reservation is updated._
-- **check sequence**: _If the `products reservation` sequence is different from
+- **Check sequence**: _If the `products reservation` sequence is different from
   the `product` sequence, the `products reservation` is deleted and the new
   `product` is returned._
     - If the new stock is enough, a new `products reservation` is automatically
@@ -258,8 +268,6 @@ The user can do the following actions:
 - The user can remove products from the cart.
 - _`deleted_at` is set to the current timestamp._
 
-> Note: the carts cannot be deleted, only the products in it.
-
 ### Get the cart
 
 **Input**: (buyer_guid*)
@@ -280,8 +288,6 @@ The user can do the following actions:
 
 ### Create a buyer order
 
-> TODO
-
 **Input**: (buyer_guid*)
 
 **Output**: Order
@@ -290,26 +296,28 @@ The user can do the following actions:
 
 **Flow**:
 
-- The user finalizes the "active" cart.
+- The user create an order for the "active" cart.
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+  - `deleted_at` is set to the current timestamp.
+  - For each product in the `buyer_order` cart:
+      - _The `locked_stock` is decreased by the `reservation` quantity._
+- For each product in the cart, if any of the product is locked by a non-zero
+  `locked_stock`, the process is aborted.
 - If the user already has a "created" order, the process is aborted.
-- for each product in the cart:
-    - **check sequence**: _If the `products reservation` sequence is different
-      from the `product` sequence, the `products reservation` is deleted._
-    - Every product for which the check sequence failed is returned.
-    - The user, for each product, can accept the new amount or leave it.
-    - If the user accepts the new amount, it's responsibility of the Frontend
-      to create a new `products reservation` and retry to create the order.
-- Also for each product in the cart,
-  if any of the product is locked by a non-zero `locked_stock`,
-  the process is aborted.
+- **Check sequence**: for each `products reservation` in the cart whose sequence
+    is different from the `product` sequence:
+    - `deleted_at` is set to the current timestamp.
+- Every product for which the check sequence failed is returned.
+  - The user, for each product, can accept the new amount or leave it.
+  - If the user accepts the new amount, it's responsibility of the Frontend
+    to create a new `products reservation` and retry to create the order.
 - _A new `buyer_order` entity is created, with status "created"_
 - for each product in the cart:
     - _The `locked_stock` is increased by the `reservation` quantity._
 - The timeout for the user to complete the order is started.
 
 ### Complete a buyer order
-
-> TODO
 
 **Input**: (order_guid*)
 
@@ -320,13 +328,18 @@ The user can do the following actions:
 **Flow**:
 
 - The user completes the order, i.e., pays for the products.
+- If the timeout was reached:
+  - `deleted_at` is set to the current timestamp.
+  - for each product in the `buyer_order` cart:
+      - _The `locked_stock` is decreased by the `reservation` quantity._
 - _The `buyer_order` entity is updated to "finalized"_
 - _The `cart` entity is updated to "finalized"_
 - _The `product` amount and locked amount is decreased_
-- For each seller,
-    - _A new `seller_order` entity with the sellers' products present in the
-      cart
-      is created, with status "created"_
+- For each product in the `buyer_order` cart:
+  - _The `locked_stock` is decreased by the `reservation` quantity._
+- For each seller:
+    - _A new `seller_order` entity with the sellers' products present in the 
+      cart is created, with status "created"_
 
 ### Get the buyers' orders
 
