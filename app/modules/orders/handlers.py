@@ -10,6 +10,7 @@ from extensions import db
 
 
 def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = 20) -> QueryPagination:
+    # TODO: clean locks
     return (BuyerOrder.query
             .join(BuyerOrder.cart)
             .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
@@ -44,6 +45,8 @@ class OrderCreationErrorReason(Enum):
 def create_buyer_order(cart: Cart) -> (
     BuyerOrder | None, List[ProductReservation] | None, OrderCreationErrorReason | None
 ):
+    # TODO: clean locks
+
     # check already created order
     if BuyerOrder.query.filter_by(cart=cart).first():
         return None, None, OrderCreationErrorReason.ALREADY_CREATED
@@ -75,14 +78,9 @@ def create_buyer_order(cart: Cart) -> (
     db.session.commit()
     return buyer_order, None, None
 
-# FIXME: Needs to unlock products if timeout
-
 
 def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[SellerOrder] | None):
-    # check order create less than 2 minutes ago
-    # if (buyer_order.created_at - db.func.now()).total_seconds() > 120:
-    #     buyer_order.deleted_at = db.func.now()
-    #     return None, None
+    # TODO check timeout
 
     buyer_order.status = BuyersOrderStatus.COMPLETED
     buyer_order.cart.status = CartStatus.FINALIZED
