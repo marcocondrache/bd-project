@@ -13,8 +13,6 @@ from extensions import db
 
 
 def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
-    from app.modules.shared.handlers import clean_expired_orders
-    clean_expired_orders()
     return (BuyerOrder.query
             .join(BuyerOrder.cart)
             .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
@@ -49,9 +47,6 @@ class OrderCreationErrorReason(Enum):
 def create_buyer_order(cart: Cart) -> (
     BuyerOrder | None, List[ProductReservation] | None, OrderCreationErrorReason | None
 ):
-    from app.modules.shared.handlers import clean_expired_orders
-    clean_expired_orders()
-
     # check already created order
     if BuyerOrder.query.filter_by(cart=cart, deleted_at=None).first():
         return None, None, OrderCreationErrorReason.ALREADY_CREATED
@@ -62,8 +57,10 @@ def create_buyer_order(cart: Cart) -> (
     invalid_reservations = [
         r for r in reservations if r.product.sequence != r.product_sequence
     ]
-    # TODO: delete invalid reservations
     if invalid_reservations:
+        for r in invalid_reservations:
+            r.deleted_at = db.func.now()
+            # TODO: should create a new reservation?
         return None, invalid_reservations, OrderCreationErrorReason.INVALID_PRODUCTS
 
     # check locked products

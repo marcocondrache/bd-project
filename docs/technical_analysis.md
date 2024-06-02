@@ -371,8 +371,6 @@ The user can do the following actions:
 
 ### Get the sellers' orders
 
-> TODO
-
 **Input**: (seller_guid*)
 
 **Output**: List of orders

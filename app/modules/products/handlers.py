@@ -93,8 +93,6 @@ def create_product(
 def update_product(
     product: Product, price: float, stock: int, categories: list, description: str
 ):
-    clean_expired_orders()
-
     product.price = price
     product.stock = stock
     product.description = description
@@ -114,8 +112,6 @@ def update_product(
 
 
 def delete_product(product: Product):
-    clean_expired_orders()
-
     product.sequence += 1
     product.deleted_at = db.func.now()
     for reservation in product.reservations:

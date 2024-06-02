@@ -43,7 +43,7 @@ def index_view():
         else:
             cart, product = update_cart(buyer_id, product, quantity)
             if product:
-                flash(f"Someone bought this product of the seller changed it. Please try again", 'danger')
+                flash(f"Someone bought this product or the seller changed it. Please try again", 'danger')
 
     page = request.args.get('page', 1, type=int)
 

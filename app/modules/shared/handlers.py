@@ -3,7 +3,7 @@ from app.modules.shared.consts import created_orders_ttl
 from extensions import db
 
 
-def clean_expired_orders() -> None:
+def clean_expired_orders() -> bool:
     """ remove the buyer orders with status "created" whose creation time is older than timeout and unlock the
     products"""
     invalid_locks = (
@@ -24,3 +24,5 @@ def clean_expired_orders() -> None:
 
     if invalid_locks:
         db.session.commit()
+
+    return bool(invalid_locks)

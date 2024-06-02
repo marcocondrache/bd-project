@@ -18,6 +18,10 @@ from app.modules.shared.utils import buyer_required, seller_required
 def index_view():
     buyer_id = current_user.buyers[0].id
 
+    from app.modules.shared.handlers import clean_expired_orders
+    if clean_expired_orders():
+        flash("Some orders expired", "warning")
+
     page = request.args.get('page', 1, type=int)
     paginated_orders = get_buyer_orders_by_buyer(buyer_id, page)
     return render_template(
@@ -46,6 +50,9 @@ def seller_orders_view():
 def create_order_view():
     buyer_id = current_user.buyers[0].id
 
+    from app.modules.shared.handlers import clean_expired_orders
+    clean_expired_orders()
+
     cart = get_cart_by_buyer(buyer_id)
     (order, invalid_reservations, error_reason) = create_buyer_order(cart)
 
@@ -54,7 +61,7 @@ def create_order_view():
         return redirect(url_for('carts.index_view'))
 
     if error_reason == OrderCreationErrorReason.INVALID_PRODUCTS:
-        flash("Invalid products in cart", "danger")
+        flash(f"Someone products has been bought or the seller changed it. Please try again", 'danger')
         return redirect(url_for('carts.index_view'))
 
     if error_reason == OrderCreationErrorReason.LOCKED_PRODUCTS:

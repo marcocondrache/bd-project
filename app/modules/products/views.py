@@ -12,6 +12,7 @@ from app.modules.products.handlers import (
     get_product_by_guid, get_products_filtered, get_all_products
 )
 from app.modules.products.models import Product
+from app.modules.shared.handlers import clean_expired_orders
 from app.modules.shared.utils import seller_required
 
 
@@ -22,10 +23,10 @@ def validate_product(product_guid: str, allow_write=False) -> Product | None:
     If the product does not exist, throw a 404 error.
     For the edit and delete:
         If the user is not the owner of the product, throw a 403 error.
-        If the product is reserved, flash a message and return None.
+        If the product is locked, return None.
     :param product_guid: the guid of the product
     :param allow_write: check also for users write permissions
-    :return: the product or None if it needs to be redirected
+    :return: the product or None only if the product is locked
     """
 
     try:
@@ -37,7 +38,6 @@ def validate_product(product_guid: str, allow_write=False) -> Product | None:
             if not current_user.sellers or product.owner_seller_id != current_user.sellers[0].id:
                 abort(403)
             if product.locked_stock > 0:
-                flash('Product is reserved, cannot edit')
                 return None
         return product
     except ValueError:
@@ -82,12 +82,14 @@ def product_view(product_guid: str):
 @login_required
 @seller_required
 def product_delete_view(product_guid: str):
-    product = validate_product(product_guid, allow_write=True)
-    if product:
-        delete_product(product)
-    else:
-        flash('An order is open for this product, all operations are temporarily disabled')
+    clean_expired_orders()
 
+    product = validate_product(product_guid, allow_write=True)
+    if not product:
+        flash('An order is open for this product, all operations are temporarily disabled')
+        return redirect(request.referrer or url_for('products.index_view'))
+
+    delete_product(product)
     return redirect(url_for('products.index_view'))
 
 
@@ -95,6 +97,8 @@ def product_delete_view(product_guid: str):
 @login_required
 @seller_required
 def product_edit_view(product_guid: str):
+    clean_expired_orders()
+
     categories = get_all_product_categories()
     product = validate_product(product_guid, allow_write=True)
 

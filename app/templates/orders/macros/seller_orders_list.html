@@ -6,7 +6,8 @@
         {% set ns.currency = ordered_product.product.currency %}
     {% endfor %}
 
-    <div class="w-full p-4 flex flex-row justify-between items-end space-x-4 w-full bg-white border border-gray-200 rounded-lg">
+    <div
+        class="w-full p-4 flex flex-row justify-between items-end space-x-4 w-full bg-white border border-gray-200 rounded-lg">
         <div class="flex flex-col justify-center space-y-2">
             <h3 class="text-xl font-semibold tracking-tight text-gray-900">
                 {{ order.created_at.strftime('%Y %m %d %H:%M') }}
@@ -19,25 +20,30 @@
         <div class="flex flex-col items-end justify-between space-y-4">
             <div class="flex items-center gap-2">
 
+
+                {% if order.status.__str__() == "Created" %}
                 <span
-                    {% if order.status.__str__() == "Created" %}
-                        class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-md"
-                    {% else %}
-                        class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-md"
-                    {% endif %}
+                    class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-md"
                 >
-                {{ order.status }}
+                    New!
                 </span>
+                {% else %}
+                <span
+                    class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-lg shadow-md"
+                >
+                    Completed
+                </span>
+                {% endif %}
             </div>
             <div class="text-lg font-bold">
-                {{ reservations|length }} product{{ 's' if reservations|length > 1 else '' }}
+                {{ order.ordered_products|length }} product{{ 's' if order.ordered_products|length > 1 else '' }}
             </div>
         </div>
     </div>
 {%- endmacro %}
 
 {% macro orders_list(orders, current_user) -%}
-    <div class="overflow-auto flex-grow p-4 shadow-inner">
+    <div class="overflow-auto flex-grow p-4">
         <div class="flex flex-wrap gap-4">
             {% for p in orders %}
                 {{ order_card(p, current_user) }}
