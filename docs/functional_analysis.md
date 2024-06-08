@@ -40,8 +40,6 @@ New set: session (instances of users or "anonymous")
 _We do not require an anonymous session,
 but it can be highlighted in the report_
 
-> One table, Sessions
-
 ## Users
 
 Creation process.
@@ -49,15 +47,11 @@ The user declares himself as a seller or not.
 If is a seller, the IBAN is required.
 If is a buyer, the card number is required.
 
-> Two tables, Buyers and Sellers, with a common table Users
-
 A user has a profile which contains variable information
 such as address (street, city...), card number, etc.
 
 The users (either buyer or seller) have permissions.
 This can be identified as buyer permissions and seller permissions
-
-> Two tables, PermissionsBuyer and PermissionsSeller
 
 ## Products
 
@@ -97,8 +91,6 @@ The user should decide.
 
 _We do not need to implement this, we can default it out_
 
-> One table, Products
-
 ## Carts
 
 The buyer instantiates the cart as soon
@@ -124,10 +116,6 @@ the user can either accept the remaining amount or cancel the order.
 When the user buys, the real amount will be decreased.
 
 _Do we need to store the booked amount?_
-
-> Transaction in READ_COMMITTED isolation level
->
-> One table, Carts
 
 ## Orders
 

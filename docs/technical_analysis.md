@@ -363,7 +363,32 @@ The user can do the following actions:
     - The `locked_stock` is decreased by the `reservation` quantity.
 - All the `buyer_order` entities both with status "created"
   (even though they exist for a limited time) and "finalized"
-  containing the cart's `products` are returned.
+  containing the cart's `products` are returned. The following information needs to be shown:
+    - `status`
+    - number of `products`
+    - `total price`
+    - eventual `completion date`
+
+### Get the buyers' order
+
+**Input**: (order_guid*)
+
+**Output**: Buyer Order
+
+**From**: orders page
+
+**Flow**:
+
+- The user clicks on an order in the orders' list.
+- The `buyer_order` entity is returned.
+- The following information needs to be shown:
+    - `status`
+    - `total price`
+    - eventual `completion date`
+    - list of `products`, for each product:
+      - `name`
+      - `price` (open question: what if the price changes after the order?)
+      - `quantity`
 
 ## Seller Order
 
@@ -375,13 +400,46 @@ The user can do the following actions:
 
 **Output**: List of orders
 
-**From**: orders' page
+**From**: incoming orders page
 
 **Flow**:
 
 - The user enters the orders' page.
 - All the `sellers_order` entities both with statuses "created" and "finalized"
   containing the seller's products and the ordered amounts are returned.
+- The following information needs to be shown:
+    - `status`
+    - number of `products`
+    - `total price`
+    - `creation date`
+    - eventual `completion date`
+    - buyer's `destination address`
+
+### Get the sellers' order
+
+**Input**: (order_guid*)
+
+**Output**: Seller Order
+
+**From**: incoming orders page
+
+**Flow**:
+
+- The user clicks on an order in the incoming orders list.
+- The `seller_order` entity is returned.
+- The following information needs to be shown:
+    - `status`
+    - `total price`
+    - `creation date`
+    - eventual `completion date`
+    - buyer's information
+        - `given name`
+        - `family name`
+        - `destination address`
+    - list of `products`, for each product:
+        - `name`
+        - `price` (open question: what if the price changes after the order?)
+        - `quantity`
 
 ## Shipment
 
