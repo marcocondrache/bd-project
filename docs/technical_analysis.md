@@ -150,16 +150,21 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_quantity`, the user can
-  update the product.
 - The user can update the price, quantity, categories, description.
-- _The product entity is updated._
-- _The product sequence is incremented._ (for the product reservation)
-- If the categories do not exist, _new category entities are created._
-- _New product-category associations are created._
-- _The history is triggered._
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+    - `deleted_at` is set to the current timestamp.
+    - For each product in the `buyer_order` cart:
+        - The `locked_stock` is decreased by the `reservation` quantity.
+- **Checks locks**: if the product is locked by a non-zero `locked_stock`, the
+  user **cannot** update the product.
+- The product entity is updated.
+- The product `sequence` is incremented.
+- If the categories do not exist, new `category` entities are created.
+- New product-category `associations` are created.
+- The history is triggered.
 
-> The product's `product_reservation` becomes invalid
+> As a result, the product's `product_reservation` becomes invalid
 
 ### Delete product
 
@@ -171,14 +176,19 @@ The user can do the following actions:
 
 **Flow**:
 
-- If the product is not locked by a non-zero `locked_quantity`, the user can
-  delete the product.
 - The user must confirm the deletion.
-- _Deleted_at is set to the current timestamp._
-- _The product sequence is incremented._
-- _The history is triggered._
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+    - `deleted_at` is set to the current timestamp.
+    - For each product in the `buyer_order` cart:
+        - The `locked_stock` is decreased by the `reservation` quantity.
+- **Checks locks**: if the product is locked by a non-zero `locked_stock`, the
+  user **cannot** delete the product.
+- `deleted_at` is set to the current timestamp.
+- The product sequence is incremented.
+- The history is triggered.
 
-> The product's `product_reservation` becomes invalid
+> As a result, the product's `product_reservation` becomes invalid
 
 ### Search for products
 
@@ -213,11 +223,11 @@ The user can do the following actions:
 **Flow**:
 
 - The user adds a product to its cart, specifying the quantity.
-- _A new `cart` entity is created, with status "active"_
-- _A new `products reservation` is created with the same sequence as
-  the `product`._
+- A new `cart` entity is created, with status "active"
+- A new `products reservation` is created with the same sequence as
+  the `product`.
 
-### Update a cart (add more products)
+### Update a cart (add more products/modify existing products)
 
 **Input**: (buyer_guid*, product_guid*, quantity*)
 
@@ -228,22 +238,22 @@ The user can do the following actions:
 **Flow**:
 
 - The user can add products from the cart, specifying the quantity.
-- _A new `products reservation` to the only "active"
-  `cart` is created with the same sequence as the `product`._
+- A new `products reservation` to the only "active" `cart` is created with the
+  same sequence as the `product`.
 
 
 - The user can modify the quantity of the products in the cart.
-- _The products' reservation is updated._
-- **check sequence**: _If the `products reservation` sequence is different from
+- **Check sequence**: If the `products reservation` sequence is different from
   the `product` sequence, the `products reservation` is deleted and the new
-  `product` is returned._
+  `product` is returned.
     - If the new stock is enough, a new `products reservation` is automatically
       created with the same sequence as the `product`.
     - If the new stock is enough and the user chooses to accept the new amount,
-      _a new `products reservation` is created with the same sequence as the
-      `product`._
+      a new `products reservation` is created with the same sequence as the
+      `product`.
     - If the product is sold out, the user is notified.
-- _The history is triggered._
+- The `products reservation` is updated.
+- The history is triggered.
 
 ### Delete from cart (remove products)
 
@@ -256,9 +266,7 @@ The user can do the following actions:
 **Flow**:
 
 - The user can remove products from the cart.
-- _`deleted_at` is set to the current timestamp._
-
-> Note: the carts cannot be deleted, only the products in it.
+- `deleted_at` is set to the current timestamp.
 
 ### Get the cart
 
@@ -271,8 +279,8 @@ The user can do the following actions:
 **Flow**:
 
 - The user enters the cart page.
-- _Only the buyer's `cart` entity with status "active" containing all the
-  product reservations, is returned._
+- Only the buyer's `cart` entity with status "active" containing all the
+  product reservations, is returned.
 
 ## Buyer Order
 
@@ -280,69 +288,107 @@ The user can do the following actions:
 
 ### Create a buyer order
 
-> TODO
-
 **Input**: (buyer_guid*)
 
-**Output**: Order
+**Output**: Buyer Order
 
 **From**: cart page
 
 **Flow**:
 
-- The user finalizes the "active" cart.
-- for each product in the cart:
-    - **check sequence**: _If the `products reservation` sequence is different
-      from the `product` sequence, the `products reservation` is deleted._
-    - Every product for which the check sequence failed is returned.
+- The user create an order for the "active" cart.
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+    - `deleted_at` is set to the current timestamp.
+    - For each product in the `buyer_order` cart:
+        - The `locked_stock` is decreased by the `reservation` quantity.
+- **Checks locks**: for each product in the cart, if any of the product is
+  locked by a non-zero `locked_stock`, the process is aborted.
+  > TODO: evaluate abort only if
+  `product` stock - `locked_stock` < `reservation` quantity
+- If the user already has a "created" order, the process is aborted.
+- **Check sequence**: for each `products reservation` in the cart whose sequence
+  is different from the `product` sequence:
+    - `deleted_at` is set to the current timestamp.
+- Every product for which the check sequence failed is returned.
     - The user, for each product, can accept the new amount or leave it.
     - If the user accepts the new amount, it's responsibility of the Frontend
       to create a new `products reservation` and retry to create the order.
-- Also for each product in the cart,
-  if any of the product is locked by a non-zero `locked_quantity`,
-  the process is aborted.
-- _A new `buyer_order` entity is created, with status "created"_
+- A new `buyer_order` entity is created, with status "created"
 - for each product in the cart:
-    - _The `locked_quantity` is increased by the `reservation` quantity._
+    - The `locked_stock` is increased by the `reservation` quantity.
 - The timeout for the user to complete the order is started.
+- The user is redirected to the order page.
 
 ### Complete a buyer order
 
-> TODO
-
 **Input**: (order_guid*)
 
-**Output**: Order
+**Output**: Buyer Order
 
 **From**: order page
 
 **Flow**:
 
 - The user completes the order, i.e., pays for the products.
-- _The `buyer_order` entity is updated to "finalized"_
-- _The `cart` entity is updated to "finalized"_
-- _The `product` amount and locked amount is decreased_
-- For each seller,
-    - _A new `seller_order` entity with the sellers' products present in the
-      cart
-      is created, with status "created"_
+- If the timeout was reached:
+    - `deleted_at` is set to the current timestamp.
+    - for each product in the `buyer_order` cart:
+        - The `locked_stock` is decreased by the `reservation` quantity.
+- The `buyer_order` entity is updated to "finalized"
+- The `cart` entity is updated to "finalized"
+- The `product` amount and locked amount is decreased
+- For each product in the `buyer_order` cart:
+    - The `locked_stock` is decreased by the `reservation` quantity.
+- For each seller:
+    - A new `seller_order` entity with the sellers' products present in the
+      cart is created, with status "created"
+- The user is redirected to the home page.
 
 ### Get the buyers' orders
 
-> TODO
-
 **Input**: (buyer_guid*)
 
-**Output**: List of orders
+**Output**: List of Buyer Orders
 
 **From**: orders' page
 
 **Flow**:
 
 - The user enters the orders' page.
-- _All the `buyer_order` entities both with status "created"
+- **Clean locks**: for each `buyer_order` with status "created", whose creation
+  date is older than the timeout:
+  - `deleted_at` is set to the current timestamp.
+  - For each product in the `buyer_order` cart:
+    - The `locked_stock` is decreased by the `reservation` quantity.
+- All the `buyer_order` entities both with status "created"
   (even though they exist for a limited time) and "finalized"
-  containing the cart's `products` are returned._
+  containing the cart's `products` are returned. The following information needs to be shown:
+    - `status`
+    - number of `products`
+    - `total price`
+    - eventual `completion date`
+
+### Get the buyers' order
+
+**Input**: (order_guid*)
+
+**Output**: Buyer Order
+
+**From**: orders page
+
+**Flow**:
+
+- The user clicks on an order in the orders' list.
+- The `buyer_order` entity is returned.
+- The following information needs to be shown:
+    - `status`
+    - `total price`
+    - eventual `completion date`
+    - list of `products`, for each product:
+      - `name`
+      - `price` (open question: what if the price changes after the order?)
+      - `quantity`
 
 ## Seller Order
 
@@ -350,19 +396,50 @@ The user can do the following actions:
 
 ### Get the sellers' orders
 
-> TODO
-
 **Input**: (seller_guid*)
 
 **Output**: List of orders
 
-**From**: orders' page
+**From**: incoming orders page
 
 **Flow**:
 
 - The user enters the orders' page.
-- _All the `sellers_order` entities both with statuses "created" and "finalized"
-  containing the seller's products and the ordered amounts are returned._
+- All the `sellers_order` entities both with statuses "created" and "finalized"
+  containing the seller's products and the ordered amounts are returned.
+- The following information needs to be shown:
+    - `status`
+    - number of `products`
+    - `total price`
+    - `creation date`
+    - eventual `completion date`
+    - buyer's `destination address`
+
+### Get the sellers' order
+
+**Input**: (order_guid*)
+
+**Output**: Seller Order
+
+**From**: incoming orders page
+
+**Flow**:
+
+- The user clicks on an order in the incoming orders list.
+- The `seller_order` entity is returned.
+- The following information needs to be shown:
+    - `status`
+    - `total price`
+    - `creation date`
+    - eventual `completion date`
+    - buyer's information
+        - `given name`
+        - `family name`
+        - `destination address`
+    - list of `products`, for each product:
+        - `name`
+        - `price` (open question: what if the price changes after the order?)
+        - `quantity`
 
 ## Shipment
 
@@ -381,8 +458,8 @@ The user can do the following actions:
 **Flow**:
 
 - The user creates a shipment, selecting the orders to include.
-- _A new `shipment` entity is created, with status "created"_
-- _The `sellers_order` is linked to the `shipment`_
+- A new `shipment` entity is created, with status "created"
+- The `sellers_order` is linked to the `shipment`
 
 ### Progress the shipment
 
@@ -401,7 +478,7 @@ The user can do the following actions:
     - shipped
     - in delivery
     - delivered
-- _The `shipment` entity is updated to the new status._
+- The `shipment` entity is updated to the new status.
 
 ## Reviews
 

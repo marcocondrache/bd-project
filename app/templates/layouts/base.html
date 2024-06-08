@@ -2,9 +2,9 @@
 {% from 'layouts/macros/profile.html' import profile_card %}
 {% import 'macros/category.html' as category %}
 
-{% macro row(name, path, icon, shortcut, selected=False) -%}
+{% macro row(name, path, icon, shortcut) -%}
     <a href="{{ path }}"
-        {%- if selected -%}
+        {%- if request.path == path -%}
        class="flex items-center justify-between rounded-md p-3 bg-gray-100 text-blue-600"
         {%- else -%}
        class="flex items-center justify-between rounded-md p-3 hover:bg-gray-100 hover:text-blue-600"
@@ -13,12 +13,14 @@
         <div class="flex items-center gap-4">
             <box-icon name="{{ icon }}" size="sm"></box-icon>
             <span>{{ name }}</span></div>
+        {%- if shortcut -%}
         <div x-show="altHold" x-cloak
              class="bg-gray-200 rounded-md h-full aspect-square flex items-center justify-center text-xs text-gray-500"
              @keydown.window.alt.{{ shortcut }}.prevent="window.location.href = '{{ path }}'"
         >
             {{ shortcut }}
         </div>
+        {%- endif -%}
     </a>
 {%- endmacro %}
 
@@ -40,6 +42,7 @@
     {% endblock %}
 </head>
 <body>
+{% block body %}
 <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout"
       @keydown.window.alt="altHold = true" @keyup.window.alt="altHold = false"
 >
@@ -167,13 +170,17 @@
                x-transition:leave-start="translate-x-0"
                x-transition:leave-end="-translate-x-full"
         >
-            {{ row("Dashboard", url_for("home.index_view"), "home", "D", section == "dashboard") }}
-            {{ row("Shop", url_for("products.shop_products"), "store", "S", section == "shop") }}
+            {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
+            {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
+
             {% if current_user.sellers %}
-                {{ row("Your products", url_for("products.index_view"), "collection", "P", section == "your_products") }}
+                {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
+                {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
             {% endif %}
+
             {% if current_user.buyers %}
-                {{ row("Your cart", url_for("carts.index_view"), "cart", "C", section == "your_cart") }}
+                {{ row("Cart", url_for("carts.index_view"), "cart", "C") }}
+                {{ row("Orders", url_for("orders.index_view"), "task", "O") }}
             {% endif %}
         </aside>
 
@@ -239,4 +246,5 @@
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 </body>
+{% endblock %}
 </html>

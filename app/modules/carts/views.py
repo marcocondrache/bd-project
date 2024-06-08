@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort, flash
+from flask import request, render_template, abort, flash
 from flask_login import login_required, current_user
 
 from app.modules.carts import carts
@@ -9,11 +9,7 @@ from app.modules.products.handlers import (
     get_product_by_guid
 )
 from app.modules.products.models import Product
-
-
-def authorize_buyer():
-    if not current_user.buyers:
-        return redirect(url_for('home.index_view'))
+from app.modules.shared.utils import buyer_required
 
 
 def validate_product(product_guid: str) -> Product:
@@ -29,9 +25,8 @@ def validate_product(product_guid: str) -> Product:
 
 @carts.route('', methods=['GET', 'POST'])
 @login_required
+@buyer_required
 def index_view():
-    authorize_buyer()
-
     buyer_id = current_user.buyers[0].id
 
     if request.method == 'POST':
@@ -48,7 +43,7 @@ def index_view():
         else:
             cart, product = update_cart(buyer_id, product, quantity)
             if product:
-                flash(f"Someone bought this product of the seller changed it. Please try again", 'danger')
+                flash(f"Someone bought this product or the seller changed it. Please try again", 'danger')
 
     page = request.args.get('page', 1, type=int)
 
@@ -57,6 +52,5 @@ def index_view():
     return render_template(
         'carts/index.html',
         cart=cart,
-        paginated_reservations=reservations,
-        section='your_cart'
+        paginated_reservations=reservations
     )

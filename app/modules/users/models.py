@@ -29,6 +29,8 @@ class User(UserMixin, db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
+    # TODO: uselist=False, glhf w/ that
+    #  https://docs.sqlalchemy.org/en/20/orm/relationship_api.html#sqlalchemy.orm.relationship.params.uselist
     buyers: Mapped[List[Buyer]] = db.relationship("Buyer", back_populates="user")
     sellers: Mapped[List[Seller]] = db.relationship("Seller", back_populates="user")
 

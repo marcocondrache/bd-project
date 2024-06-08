@@ -10,8 +10,10 @@ from extensions import db
 
 if TYPE_CHECKING:
     from app.modules.buyers.models import Buyer
+    from app.modules.orders.models import BuyerOrder
 else:
     Buyer = "Buyer"
+    BuyerOrder = "BuyerOrder"
 
 
 class CartStatus(Enum):
@@ -81,6 +83,7 @@ class Cart(db.Model):
 
     buyer: Mapped[Buyer] = db.relationship("Buyer", back_populates="carts")
     reservations: Mapped[List[ProductReservation]] = db.relationship("ProductReservation", back_populates="cart")
+    buyer_orders: Mapped[List[BuyerOrder]] = db.relationship("BuyerOrder", back_populates="cart")
 
     def __repr__(self):
         return f"<Cart id={self.id} user_id={self.user_id} created_at={self.created_at} updated_at={self.updated_at}>"
