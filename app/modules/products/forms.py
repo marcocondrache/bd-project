@@ -12,5 +12,3 @@ class SearchForm(FlaskForm):
     page = IntegerField('Page', validators=[validators.Optional()], default=1)
     search = SearchField('Search', validators=[validators.DataRequired()],
                          render_kw={"placeholder": "Search products..."})
-
-    category = FieldList(StringField('', validators=[validators.Optional()]), default=[])
