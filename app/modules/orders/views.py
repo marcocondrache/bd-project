@@ -92,3 +92,17 @@ def complete_order_view(order_guid: UUID):
         'orders/complete_order.html',
         order=buyer_order,
     )
+
+
+@orders.route('/orders/<uuid:order_guid>/details', methods=['GET'])
+@login_required
+@buyer_required
+def order_details_view(order_guid: UUID):
+    buyer_order = get_buyer_order_by_guid(order_guid)
+    if not buyer_order:
+        abort(404)
+
+    return render_template(
+        'orders/buyer_order_info.html',
+        order=buyer_order,
+    )

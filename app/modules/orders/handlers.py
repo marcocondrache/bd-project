@@ -74,8 +74,11 @@ def create_buyer_order(cart: Cart) -> (
     for r in reservations:
         r.product.locked_stock += r.quantity
 
+    total_currency = reservations[0].product.currency
+    total_price = sum([r.product.price * r.quantity for r in reservations])
+
     # create order
-    buyer_order = BuyerOrder(cart=cart)
+    buyer_order = BuyerOrder(cart=cart, total_price=total_price, total_currency=total_currency)
     db.session.add(buyer_order)
     db.session.commit()
     return buyer_order, None, None

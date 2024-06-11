@@ -1,0 +1,95 @@
+{% extends 'layouts/base.html' %}
+{% from 'macros/pagination.html' import pagination %}
+{% from 'macros/error_message.html' import error_message %}
+
+{% block title %}Kepler Shop{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col h-[calc(100vh-4rem)]">
+        <div class="text-2xl font-semibold px-4 flex items-center border-b min-h-20">
+            <!-- put a back button here -->
+            <a href="{{ url_for('orders.index_view') }}" class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+            </a>
+            <span class="pl-2">Order details</span>
+        </div>
+        {{ error_message() }}
+
+
+        <div class="p-4 m-4 flex flex-row justify-between items-start bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col justify-between items-start gap-2 w-full">
+                <span class="text-base font-semibold">Shipping info</span>
+                <span>{{ current_user.given_name }} {{ current_user.family_name }}</span>
+                <span>{{ current_user.buyers[0].destination_address }}</span>
+            </div>
+            <div class="flex flex-col justify-between items-center gap-2 w-full">
+                <span class="text-base font-semibold">Payment info</span>
+                <span>Card n. ends with {{ current_user.buyers[0].card_number[:4] }}</span>
+            </div>
+            <div class="flex flex-col justify-between items-end gap-2 w-full">
+                <span class="text-base font-semibold">Total</span>
+                <span>{{ order.total_price }} {{ order.total_currency }}</span>
+            </div>
+        </div>
+
+        <div class="p-4 m-4 flex flex-col justify-between items-start space-x-4 bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-semibold">Order details</span>
+                    <div class="flex flex-col gap-2">
+                        <span>Order code: <span class="font-semibold">{{ order.guid }}</span></span>
+                        <span>Order status: <span class="font-semibold">{{ order.status }}</span></span>
+                        <span>Order date: <span class="font-semibold">{{ order.created_at.strftime('%Y %m %d %H:%M') }}</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 m-4 flex flex-col justify-between items-start bg-white border border-gray-200 rounded-lg">
+            <span class="text-lg font-semibold">Products</span>
+
+            <div class="flex flex-col gap-2 w-full">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 mt-2">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                Name
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Quantity
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Price
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Total
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reservation in order.cart.reservations %}
+                            <tr class="bg-white border-b bg-gray-100">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                    {{ reservation.product.name }}
+                                </th>
+                                <td class="px-6 py-4">
+                                    {{ reservation.quantity }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ reservation.product.price }} {{ reservation.product.currency }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ reservation.product.price * reservation.quantity }} {{ reservation.product.currency }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
