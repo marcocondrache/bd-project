@@ -175,7 +175,7 @@
 
             {% if current_user.sellers %}
                 {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
-                {{ row("Incoming orders", "orders", "spreadsheet", "I") }}
+                {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
             {% endif %}
 
             {% if current_user.buyers %}
