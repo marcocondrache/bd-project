@@ -1,0 +1,11 @@
+{
+  "name": "kepler-shop",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tailwindcss": "^3.4.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
