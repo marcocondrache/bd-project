@@ -9,6 +9,9 @@ class Base(Flask):
     def configure(self, config):
         self.config.from_object(config)
 
+        self.jinja_env.trim_blocks = True
+        self.jinja_env.lstrip_blocks = True
+
     def configure_modules(self):
         modules = self.config.get('BLUEPRINTS', [])
 
@@ -58,7 +61,3 @@ class Base(Flask):
         self.configure_modules()
         self.configure_extensions()
         self.configure_error_handlers()
-
-        # TODO: find a better place for this
-        self.jinja_env.trim_blocks = True
-        self.jinja_env.lstrip_blocks = True

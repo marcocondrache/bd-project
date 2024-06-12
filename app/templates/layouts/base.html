@@ -4,22 +4,22 @@
 
 {% macro row(name, path, icon, shortcut) -%}
     <a href="{{ path }}"
-        {%- if request.path == path -%}
+            {%- if request.path == path -%}
        class="flex items-center justify-between rounded-md p-3 bg-gray-100 text-blue-600"
-        {%- else -%}
+            {%- else -%}
        class="flex items-center justify-between rounded-md p-3 hover:bg-gray-100 hover:text-blue-600"
-        {%- endif -%}
+            {%- endif -%}
     >
         <div class="flex items-center gap-4">
             <box-icon name="{{ icon }}" size="sm"></box-icon>
             <span>{{ name }}</span></div>
         {%- if shortcut -%}
-        <div x-show="altHold" x-cloak
-             class="bg-gray-200 rounded-md h-full aspect-square flex items-center justify-center text-xs text-gray-500"
-             @keydown.window.alt.{{ shortcut }}.prevent="window.location.href = '{{ path }}'"
-        >
-            {{ shortcut }}
-        </div>
+            <div x-show="altHold" x-cloak
+                 class="bg-gray-200 rounded-md h-full aspect-square flex items-center justify-center text-xs text-gray-500"
+                 @keydown.window.alt.{{ shortcut }}.prevent="window.location.href = '{{ path }}'"
+            >
+                {{ shortcut }}
+            </div>
         {%- endif -%}
     </a>
 {%- endmacro %}
@@ -29,222 +29,174 @@
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='global.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/global.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/output.css') }}">
         <link rel="shortcut icon" type="image/icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-        {# FIXME #}
-        <style> [x-cloak] { display: none !important; } </style>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
     {% endblock %}
 </head>
 <body>
 {% block body %}
-<main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout"
-      @keydown.window.alt="altHold = true" @keyup.window.alt="altHold = false"
->
-    <!-- header page -->
-    <header class="h-16 flex w-full gap-4 items-center justify-between bg-white px-4 border-b-2 border-gray-200 min-w-96">
-        <!-- logo -->
-        <div class="flex items-center gap-4 pl-1">
-            <button type="button" @click="asideOpen = !asideOpen">
-                <box-icon name="menu" class="flex items-center"></box-icon>
-            </button>
-            <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">
-                Kepler Shop
-            </a>
-        </div>
-
-
-        <form method="get" class="flex items-center w-1/2 mx-auto" action="{{ url_for('products.shop_products') }}">
-            <div class="flex grow relative"
-                 x-id="['filters-dropdown']"
-                 x-data="{
-                    open: false,
-                    toggle() {
-                        if (this.open) return this.close()
-
-                        this.$refs.filtersButton.focus()
-                        this.open = true
-                    },
-                    close(focusAfter) {
-                        this.open = false
-                        focusAfter && focusAfter.focus()
-                    }
-                }">
-                {{ search.search.label(class="sr-only") }}
-                <button x-ref="filtersButton" @click="toggle()"
-                        class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100"
-                        type="button">Filters
-                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 10 6">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="m1 1 4 4 4-4"></path>
-                    </svg>
+    <main class="min-h-screen w-screen flex flex-col bg-gray-100 text-gray-700" x-data="layout"
+          @keydown.window.alt="altHold = true" @keyup.window.alt="altHold = false"
+    >
+        <!-- header page -->
+        <header class="h-16 flex w-full gap-4 items-center justify-between bg-white px-4 border-b-2 border-gray-200 min-w-96">
+            <!-- logo -->
+            <div class="flex items-center gap-4 pl-1">
+                <button type="button" @click="asideOpen = !asideOpen">
+                    <box-icon name="menu" class="flex items-center"></box-icon>
                 </button>
-                <div x-ref="filtersPanel"
-                     x-show="open"
-                     x-transition.origin.top
-                     @click.outside="close($refs.filtersButton)"
-                     :id="$id('filters-dropdown')"
-                     style="display: none;"
-                     class="z-10 top-12 left-0 absolute bg-white rounded-lg shadow p-3">
-                    <div class="mb-2">Categories</div>
-                    <div x-data="{
-                        badgeClick(guid) {
-                            const url = new URL(window.location.href);
-                            const ct = url.searchParams.getAll('category');
+                <a href="{{ url_for('home.index_view') }}" class="text-xl font-semibold rounded-lg px-2 py-1">
+                    Kepler Shop
+                </a>
+            </div>
 
-                            if (ct.includes(guid))
-                                url.searchParams.delete('category', guid);
-                             else
-                                url.searchParams.append('category', guid);
 
-                             history.pushState(null, document.title, url.toString());
-                        }
-                    }">
-                        {% set selected = request.args.getlist('category') %}
-                        {% for c in categories %}
-                            {{ category.badge(c.guid, c.name, c.guid in selected) }}
-                        {% endfor %}
-                    </div>
-                </div>
+            <form class="flex items-center w-1/2 mx-auto" method="get" action="{{ url_for('products.shop_products') }}">
+                <input name="category" type="hidden" value="{{ search.category.data }}"/>
+
+                {# FIXME: brands data split strings in single chars #}
+
+                {{ search.search.label(class="sr-only") }}
                 <div class="relative w-full">
-                    <div x-show="altHold" x-cloak
-                         class="absolute top-1/2 mr-1.5 transform -translate-y-1/2 end-0 z-20 bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
-                         @keydown.window.alt.f.prevent="document.querySelector('input[name=search]').focus()"
-                    >
-                        F
-                    </div>
-                    {{ search.search(class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500") }}
-                    <button type="submit"
-                            class="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 20 20">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
                         </svg>
-                        <span class="sr-only">Search</span>
-                    </button>
+                    </div>
+                    {{ search.search(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5") }}
                 </div>
-            </div>
-        </form>
+                <button type="submit"
+                        class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"></path>
+                    </svg>
+                    <span class="sr-only">Search</span>
+                </button>
+            </form>
 
-        <!-- button profile -->
-        <div class="relative flex gap-4 items-center">
-            {% if not current_user.sellers %}
-                <a href="{{ url_for('sellers.register_view') }}"
-                   class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
-                    Become a seller!
-                </a>
-            {% endif %}
-            <div x-show="altHold" x-cloak
-                 class="absolute end-0 top-1/2 transform -translate-y-1/2
+
+            <!-- button profile -->
+            <div class="relative flex gap-4 items-center">
+                {% if not current_user.sellers %}
+                    <a href="{{ url_for('sellers.register_view') }}"
+                       class="rounded-md bg-gray-200 hover:bg-gray-300 transition-colors duration-250 h-10 text-xs font-semibold p-2 flex items-center justify-center">
+                        Become a seller!
+                    </a>
+                {% endif %}
+                <div x-show="altHold" x-cloak
+                     class="absolute end-0 top-1/2 transform -translate-y-1/2
                  bg-gray-200 rounded-md h-6 aspect-square flex items-center justify-center text-xs text-gray-500"
-                 @keydown.window.alt.w.prevent="profileOpen = !profileOpen"
-            >
-                W
+                     @keydown.window.alt.w.prevent="profileOpen = !profileOpen"
+                >
+                    W
+                </div>
+                <button type="button" @click="profileOpen = true"
+                        class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
+                    Hello, {{ current_user.given_name }}
+                </button>
             </div>
-            <button type="button" @click="profileOpen = true"
-                    class="rounded-lg px-2 py-1 max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
-                Hello, {{ current_user.given_name }}
-            </button>
-        </div>
 
-        <!-- profile card -->
-        {{ profile_card(current_user) }}
-    </header>
+            <!-- profile card -->
+            {{ profile_card(current_user) }}
+        </header>
 
-    <div class="flex grow">
-        <!-- aside -->
-        <aside class="flex min-w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
-               x-cloak
-               x-show="asideOpen"
-               x-transition:enter="transition ease-out duration-300 transform"
-               x-transition:enter-start="-translate-x-full"
-               x-transition:enter-end="translate-x-0"
-               x-transition:leave="transition ease-in duration-300 transform"
-               x-transition:leave-start="translate-x-0"
-               x-transition:leave-end="-translate-x-full"
-        >
-            {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
-            {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
-
-            {% if current_user.sellers %}
-                {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
-                {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
-            {% endif %}
-
-            {% if current_user.buyers %}
-                {{ row("Cart", url_for("carts.index_view"), "cart", "C") }}
-                {{ row("Orders", url_for("orders.index_view"), "task", "O") }}
-            {% endif %}
-        </aside>
-
-        <!-- main content page -->
-        <div class="grow" x-cloak>
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
-</main>
-
-<script>
-    async function editUser() {
-        console.log("edit user", JSON.stringify(this.profile))
-
-        const response = await fetch('/users', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'
-
-            },
-            body: JSON.stringify(this.profile)
-        });
-
-        if (response.ok) {
-            this.originalProfile = this.profile;
-            this.profileEditMode = false;
-        } else {
-            alert("Failed to update user"); // TODO find the will to do
-        }
-    }
-
-    document.addEventListener("alpine:init", () => {
-        Alpine.data("layout", () => ({
-            altHold: false,
-
-            profileOpen: false,
-            asideOpen: true,
-            linkShown: false,
-            profileEditMode: false,
-            editUser,
-            profile: {
-                destination_address: "{{ current_user.buyers[0].destination_address }}",
-                card_number: "{{ current_user.buyers[0].card_number }}",
+        <div class="flex grow">
+            <!-- aside -->
+            <aside class="flex min-w-64 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2"
+                   x-cloak
+                   x-show="asideOpen"
+                   x-transition:enter="transition ease-out duration-300 transform"
+                   x-transition:enter-start="-translate-x-full"
+                   x-transition:enter-end="translate-x-0"
+                   x-transition:leave="transition ease-in duration-300 transform"
+                   x-transition:leave-start="translate-x-0"
+                   x-transition:leave-end="-translate-x-full"
+            >
+                {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
+                {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
 
                 {% if current_user.sellers %}
-                    iban: "{{ current_user.sellers[0].iban }}",
-                    show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                    {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
+                    {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
                 {% endif %}
-            },
-            originalProfile: {
-                destination_address: "{{ current_user.buyers[0].destination_address }}",
-                card_number: "{{ current_user.buyers[0].card_number }}",
 
-                {% if current_user.sellers %}
-                    iban: "{{ current_user.sellers[0].iban }}",
-                    show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                {% if current_user.buyers %}
+                    {{ row("Cart", url_for("carts.index_view"), "cart", "C") }}
+                    {{ row("Orders", url_for("orders.index_view"), "task", "O") }}
                 {% endif %}
+            </aside>
+
+            <!-- main content page -->
+            <div class="grow" x-cloak>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function editUser() {
+            console.log("edit user", JSON.stringify(this.profile))
+
+            const response = await fetch('/users', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+
+                },
+                body: JSON.stringify(this.profile)
+            });
+
+            if (response.ok) {
+                this.originalProfile = this.profile;
+                this.profileEditMode = false;
+            } else {
+                alert("Failed to update user"); // TODO find the will to do
             }
-        }));
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-</body>
+        }
+
+        document.addEventListener("alpine:init", () => {
+            Alpine.data("layout", () => ({
+                altHold: false,
+
+                profileOpen: false,
+                asideOpen: true,
+                linkShown: false,
+                profileEditMode: false,
+                editUser,
+                profile: {
+                    destination_address: "{{ current_user.buyers[0].destination_address }}",
+                    card_number: "{{ current_user.buyers[0].card_number }}",
+
+                    {% if current_user.sellers %}
+                        iban: "{{ current_user.sellers[0].iban }}",
+                        show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                    {% endif %}
+                },
+                originalProfile: {
+                    destination_address: "{{ current_user.buyers[0].destination_address }}",
+                    card_number: "{{ current_user.buyers[0].card_number }}",
+
+                    {% if current_user.sellers %}
+                        iban: "{{ current_user.sellers[0].iban }}",
+                        show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                    {% endif %}
+                }
+            }));
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    </body>
 {% endblock %}
 </html>

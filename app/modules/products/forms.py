@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import validators
-from wtforms.fields.list import FieldList
+from wtforms.fields.choices import SelectField, SelectMultipleField
 from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import StringField, SearchField
 
@@ -10,7 +10,8 @@ class SearchForm(FlaskForm):
         csrf = False
 
     page = IntegerField('Page', validators=[validators.Optional()], default=1)
-    search = SearchField('Search', validators=[validators.DataRequired()],
+    search = SearchField('Search', validators=[validators.Optional()],
                          render_kw={"placeholder": "Search products..."})
 
-    category = FieldList(StringField('', validators=[validators.Optional()]), default=[])
+    category = SelectField(u'Category', validators=[validators.Optional()], choices=[('all', "All categories")])
+    brands = SelectMultipleField(u'Brands', validators=[validators.Optional()], choices=[])
