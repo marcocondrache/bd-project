@@ -19,3 +19,5 @@ build/
 .env
 
 db-data/
+
+node_modules/

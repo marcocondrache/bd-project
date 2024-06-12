@@ -36,6 +36,9 @@ class BuyerOrder(db.Model):
         "current_status", db.Enum(BuyersOrderStatus), nullable=False, default=BuyersOrderStatus.CREATED
     )
 
+    total_price: Mapped[float] = mapped_column(db.Float, nullable=False)
+    total_currency: Mapped[str] = mapped_column(db.String(3), nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at: Mapped[datetime] = mapped_column(
         db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now()
