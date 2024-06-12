@@ -12,6 +12,10 @@ from extensions import db
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
 
 
+def get_all_product_brands():
+    return db.session.query(Product.brand).distinct().all()
+
+
 def get_all_product_categories():
     return ProductCategory.query.all()
 
@@ -33,8 +37,8 @@ def get_products_filtered(query_key: str, page: int = 1, per_page: int = page_si
 
 
 def get_seller_products(
-    seller_id: int, show_sold_out: bool = False,
-    page: int = 1, per_page: int = page_size
+        seller_id: int, show_sold_out: bool = False,
+        page: int = 1, per_page: int = page_size
 ) -> QueryPagination:
     query = Product.query.filter_by(owner_seller_id=seller_id, deleted_at=None).order_by(Product.name)
 
@@ -45,8 +49,8 @@ def get_seller_products(
 
 
 def create_product(
-    seller_id: int, name: str, price: float, stock: int, categories: list,
-    description: str = None, brand: str = None, is_second_hand: bool = False
+        seller_id: int, name: str, price: float, stock: int, categories: list,
+        description: str = None, brand: str = None, is_second_hand: bool = False
 ) -> Product | None:
     seller = Seller.query.filter_by(id=seller_id).first()
     if not seller:
@@ -91,7 +95,7 @@ def create_product(
 
 
 def update_product(
-    product: Product, price: float, stock: int, categories: list, description: str
+        product: Product, price: float, stock: int, categories: list, description: str
 ):
     product.price = price
     product.stock = stock

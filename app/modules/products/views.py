@@ -1,6 +1,7 @@
+import logging
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort, flash
+from flask import request, render_template, url_for, redirect, abort, flash, current_app
 from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_reservation_by_product
@@ -9,7 +10,7 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_filtered, get_all_products
+    get_product_by_guid, get_products_filtered, get_all_products, get_all_product_brands
 )
 from app.modules.products.models import Product
 from app.modules.shared.handlers import clean_expired_orders
@@ -170,6 +171,8 @@ def create_view():
 def shop_products():
     search = SearchForm(request.args)
 
+    current_app.logger.info(search.data)
+
     seller_id = None
     if current_user.sellers:
         seller_id = current_user.sellers[0].id
@@ -179,14 +182,16 @@ def shop_products():
     if search.validate():
         query_key = search.search.data
 
+        # TODO: Add filters on category and brands
+
         page = get_products_filtered(query_key, search.page.data, filters=filters)
         return render_template(
             'products/shop.html',
-            page=page
+            page=page,
         )
 
     page = get_all_products(filters=filters)
     return render_template(
         'products/shop.html',
-        page=page
+        page=page,
     )

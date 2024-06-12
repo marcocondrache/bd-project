@@ -29,18 +29,14 @@
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='global.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/global.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/output.css') }}">
         <link rel="shortcut icon" type="image/icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
-        {# FIXME #}
-        <style> [x-cloak] {
-            display: none !important;
-        } </style>
     {% endblock %}
 </head>
 <body>
@@ -62,6 +58,10 @@
 
 
             <form class="flex items-center w-1/2 mx-auto" method="get" action="{{ url_for('products.shop_products') }}">
+                <input name="category" type="hidden" value="{{ search.category.data }}"/>
+
+                {# FIXME: brands data split strings in single chars #}
+
                 {{ search.search.label(class="sr-only") }}
                 <div class="relative w-full">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
