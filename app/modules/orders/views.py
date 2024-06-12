@@ -7,7 +7,8 @@ from app.modules.carts.handlers import get_cart_by_buyer
 from app.modules.orders import orders
 from app.modules.orders.handlers import (
     create_buyer_order, OrderCreationErrorReason, get_buyer_order_by_guid,
-    complete_buyer_order, get_buyer_orders_by_buyer, get_seller_orders_by_seller
+    complete_buyer_order, get_buyer_orders_by_buyer, get_seller_orders_by_seller,
+    get_seller_order_by_guid
 )
 from app.modules.shared.utils import buyer_required, seller_required
 
@@ -75,7 +76,7 @@ def create_order_view():
 @login_required
 @buyer_required
 def complete_order_view(order_guid: UUID):
-    buyer_order = get_buyer_order_by_guid(order_guid)
+    buyer_order = get_buyer_order_by_guid(order_guid, current_user.buyers[0].id)
     if not buyer_order:
         abort(404)
 
@@ -94,7 +95,7 @@ def complete_order_view(order_guid: UUID):
     )
 
 
-@orders.route('/orders/<uuid:order_guid>/details', methods=['GET'])
+@orders.route('/<uuid:order_guid>/details', methods=['GET'])
 @login_required
 @buyer_required
 def order_details_view(order_guid: UUID):
@@ -105,4 +106,18 @@ def order_details_view(order_guid: UUID):
     return render_template(
         'orders/buyer_order_info.html',
         order=buyer_order,
+    )
+
+
+@orders.route('/incoming/<uuid:seller_order_guid>/details', methods=['GET'])
+@login_required
+@seller_required
+def seller_order_details_view(seller_order_guid: UUID):
+    seller_order = get_seller_order_by_guid(seller_order_guid, current_user.sellers[0].id)
+    if not seller_order:
+        abort(404)
+
+    return render_template(
+        'orders/seller_order_info.html',
+        order=seller_order,
     )

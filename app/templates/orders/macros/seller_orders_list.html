@@ -5,7 +5,7 @@
         {% set ns.total = ns.total + (product.quantity * product.product.price) %}
     {% endfor %}
 
-    <tr class="bg-white border-b bg-gray-100">
+    <tr class="bg-white border-b">
         <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
             <label>
                 <input type="checkbox" name="order_guid" value="{{ order.guid }}"
@@ -14,7 +14,7 @@
             </label>
         </td>
         <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-            <a href="{{ url_for('orders.order_details_view', order_guid=order.guid) }}">
+            <a href="{{ url_for('orders.seller_order_details_view', seller_order_guid=order.guid) }}">
                 {{ order.guid }}
             </a>
         </td>

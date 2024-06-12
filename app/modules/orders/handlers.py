@@ -20,8 +20,24 @@ def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = page
             .paginate(page=page, per_page=per_page))
 
 
-def get_buyer_order_by_guid(guid: UUID) -> BuyerOrder | None:
-    return BuyerOrder.query.filter_by(guid=guid).first()
+def get_buyer_order_by_guid(guid: UUID, buyer_id: int) -> BuyerOrder | None:
+    """
+    Get buyer order by guid
+    :param buyer_id: the buyer id
+    :param guid: the guid of the buyer order
+    :return: the buyer order
+    """
+    return BuyerOrder.query.filter_by(guid=guid, cart__owner_buyer_id=buyer_id).first()
+
+
+def get_seller_order_by_guid(guid: UUID, seller_id: int) -> SellerOrder | None:
+    """
+    Get seller order by guid and seller_id
+    :param guid: the guid of the seller order
+    :param seller_id: the seller id
+    :return: the seller order
+    """
+    return SellerOrder.query.filter_by(guid=guid, seller_id=seller_id).first()
 
 
 def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
