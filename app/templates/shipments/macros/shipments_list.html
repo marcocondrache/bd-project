@@ -1,3 +1,5 @@
+{%  from 'shipments/macros/shipment_status_chip.html' import shipment_status_chip %}
+
 {% macro shipment_card(shipment, current_user) -%}
     <tr class="bg-white border-b">
         <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -14,8 +16,11 @@
         </td>
         <td class="px-6 py-4">
             <div class="flex items gap-2">
-                {{ shipment.current_status.__str__() }}
+                {{ shipment_status_chip(shipment.current_status) }}
             </div>
+        </td>
+        <td class="px-6 py-4">
+            {{ shipment.orders|length }}
         </td>
     </tr>
 {%- endmacro %}
@@ -35,6 +40,9 @@
                         </th>
                         <th scope="col" class="px-6 py-3">
                             Status
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Orders count
                         </th>
                     </tr>
                     </thead>

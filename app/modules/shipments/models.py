@@ -20,13 +20,13 @@ class ShipmentStatus(enum.Enum):
     Represents the status of a shipment.
     """
 
-    ACCEPTED = "accepted"
-    SHIPPED = "shipped"
-    IN_DELIVERY = "in_delivery"
-    DELIVERED = "delivered"
+    ACCEPTED = "ACCEPTED"
+    SHIPPED = "SHIPPED"
+    IN_DELIVERY = "IN_DELIVERY"
+    DELIVERED = "DELIVERED"
 
     def __str__(self):
-        return self.value.capitalize()
+        return self.value
 
 
 class Shipment(db.Model):
