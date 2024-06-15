@@ -9,10 +9,20 @@ from flask_sqlalchemy.pagination import QueryPagination
 from app.modules.carts.models import Cart, ProductReservation, CartStatus
 from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct
 from app.modules.shared.consts import created_orders_ttl, page_size
+from app.modules.shipments.handlers import create_shipment
+from app.modules.shipments.models import Shipment
 from extensions import db
 
 
 def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+    """
+    Get buyer orders by buyer id.
+    :param buyer_id: the id of the buyer
+    :param page: the page number to retrieve
+    :param per_page: the number of items per page
+    :return: the buyer orders
+    """
+
     return (BuyerOrder.query
             .join(BuyerOrder.cart)
             .filter(Cart.owner_buyer_id == buyer_id, BuyerOrder.deleted_at.is_(None))
@@ -27,6 +37,7 @@ def get_buyer_order_by_guid(guid: UUID, buyer_id: int) -> BuyerOrder | None:
     :param guid: the guid of the buyer order
     :return: the buyer order
     """
+
     return BuyerOrder.query.filter_by(guid=guid, cart__owner_buyer_id=buyer_id).first()
 
 
@@ -37,17 +48,34 @@ def get_seller_order_by_guid(guid: UUID, seller_id: int) -> SellerOrder | None:
     :param seller_id: the seller id
     :return: the seller order
     """
+
     return SellerOrder.query.filter_by(guid=guid, seller_id=seller_id).first()
 
 
 def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+    """
+    Get seller orders by seller id.
+    :param seller_id: the id of the seller
+    :param page: the page number to retrieve
+    :param per_page: the number of items per page
+    :return: the seller orders
+    """
+
     return (SellerOrder.query
-            .filter_by(seller_id=seller_id)
+            .filter_by(seller_id=seller_id, shipment=None)
             .order_by(SellerOrder.created_at.desc())
             .paginate(page=page, per_page=per_page))
 
 
 def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+    """
+    Get ordered products by product id.
+    :param product_id: the id of the product
+    :param page: the page number to retrieve
+    :param per_page: the number of items per page
+    :return: the ordered products
+    """
+
     return (OrderedProduct.query
             .filter_by(product_id=product_id)
             .order_by(OrderedProduct.created_at)
@@ -55,6 +83,10 @@ def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: in
 
 
 class OrderCreationErrorReason(Enum):
+    """
+    Represents the reason of an order creation error.
+    """
+
     INVALID_PRODUCTS = "invalid_products"
     LOCKED_PRODUCTS = "locked_products"
     ALREADY_CREATED = "already_created"
@@ -63,6 +95,12 @@ class OrderCreationErrorReason(Enum):
 def create_buyer_order(cart: Cart) -> (
     BuyerOrder | None, List[ProductReservation] | None, OrderCreationErrorReason | None
 ):
+    """
+    Create a buyer order from a cart. If the order is already created, return None.
+    :param cart: the cart
+    :return: the buyer order, the invalid reservations and the error reason
+    """
+
     # check already created order
     if BuyerOrder.query.filter_by(cart=cart, deleted_at=None).first():
         return None, None, OrderCreationErrorReason.ALREADY_CREATED
@@ -101,6 +139,12 @@ def create_buyer_order(cart: Cart) -> (
 
 
 def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[SellerOrder] | None):
+    """
+    Complete buyer order. If the order is expired, delete it.
+    :param buyer_order: the buyer order
+    :return: the buyer order and the seller orders
+    """
+
     if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=created_orders_ttl):
         for r in buyer_order.cart.reservations:
             r.product.locked_stock -= r.quantity
@@ -139,3 +183,16 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
 
     db.session.commit()
     return buyer_order, seller_orders
+
+
+def complete_seller_orders(seller_orders: List[UUID]) -> Shipment | None:
+    """
+    Complete seller orders
+    :param seller_orders: the list of seller orders
+    :return:
+    """
+
+    orders = SellerOrder.query.filter(SellerOrder.guid.in_(seller_orders)).all()
+    if not orders:
+        return None
+    return create_shipment(orders)

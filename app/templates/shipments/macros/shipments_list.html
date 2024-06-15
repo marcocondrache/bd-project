@@ -1,0 +1,50 @@
+{% macro shipment_card(shipment, current_user) -%}
+    <tr class="bg-white border-b">
+        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+{#
+            <a href="{{ url_for('shipments.shipment_details_view', shipment_guid=shipment.guid) }}">
+                {{ shipment.guid }}
+            </a>
+#}
+            {{ shipment.guid }}
+        </td>
+
+        <td class="px-6 py-4">
+            {{ shipment.created_at.strftime('%Y %m %d %H:%M') }}
+        </td>
+        <td class="px-6 py-4">
+            <div class="flex items gap-2">
+                {{ shipment.current_status.__str__() }}
+            </div>
+        </td>
+    </tr>
+{%- endmacro %}
+
+{% macro shipments_list(shipments, current_user) -%}
+    <div class="overflow-auto flex-grow p-4">
+        <div class="p-4 m-4 flex flex-col justify-between items-start bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col gap-2 w-full">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 mt-2">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            Code
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for p in shipments %}
+                        {{ shipment_card(p, current_user) }}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}

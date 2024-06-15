@@ -128,6 +128,7 @@
                 {% if current_user.sellers %}
                     {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
                     {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
+                    {{ row("Shipments", url_for("shipments.index_view"), "package", "T")}}
                 {% endif %}
 
                 {% if current_user.buyers %}
