@@ -45,6 +45,7 @@ class Shipment(db.Model):
     updated_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     orders: Mapped[List[SellerOrder]] = db.relationship("SellerOrder", back_populates="shipment")
+    history: Mapped[List["ShipmentHistory"]] = db.relationship("ShipmentHistory", back_populates="shipment")
 
     def __repr__(self):
         return f"<Shipment guid={self.guid} current_status={self.current_status}>"
@@ -54,3 +55,21 @@ class Shipment(db.Model):
             "guid": self.guid,
             "current_status": self.current_status,
         }
+
+
+class ShipmentHistory(db.Model):
+    """
+    Represents the history of a shipment. This table is used to store the history of a shipment.
+    """
+
+    __tablename__ = "shipment_history"
+
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    shipment_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("shipments.id"), nullable=False)
+    status: Mapped[ShipmentStatus] = db.Column(db.Enum(ShipmentStatus), nullable=False)
+    created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
+
+    shipment: Mapped[Shipment] = db.relationship("Shipment", back_populates="history")
+
+    def __repr__(self):
+        return f"<ShipmentHistory shipment_id={self.shipment_id} status={self.status}>"

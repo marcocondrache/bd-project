@@ -131,9 +131,18 @@ def order_details_view(order_guid: UUID):
     if not buyer_order:
         abort(404)
 
+    def map_history(history):
+        for h in history:
+            h.created_at = h.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            h.status = h.status.value
+        return history
+
+    shipment_history = {so.seller: map_history(so.shipment.history) for so in buyer_order.seller_orders if so.shipment}
+
     return render_template(
         'orders/buyer_order_info.html',
         order=buyer_order,
+        shipment_history=shipment_history,
     )
 
 

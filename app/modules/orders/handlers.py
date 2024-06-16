@@ -38,7 +38,7 @@ def get_buyer_order_by_guid(guid: UUID, buyer_id: int) -> BuyerOrder | None:
     :return: the buyer order
     """
 
-    return BuyerOrder.query.filter_by(guid=guid, cart__owner_buyer_id=buyer_id).first()
+    return BuyerOrder.query.filter(BuyerOrder.guid == guid and BuyerOrder.cart.owner_buyer_id == buyer_id).first()
 
 
 def get_seller_order_by_guid(guid: UUID, seller_id: int) -> SellerOrder | None:
