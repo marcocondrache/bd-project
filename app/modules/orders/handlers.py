@@ -185,14 +185,15 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
     return buyer_order, seller_orders
 
 
-def complete_seller_orders(seller_orders: List[UUID]) -> Shipment | None:
+def complete_seller_orders(seller_orders: List[UUID], seller_id: int) -> Shipment | None:
     """
     Complete seller orders
+    :param seller_id: the seller id
     :param seller_orders: the list of seller orders
     :return:
     """
 
-    orders = SellerOrder.query.filter(SellerOrder.guid.in_(seller_orders)).all()
+    orders = SellerOrder.query.filter(SellerOrder.guid.in_(seller_orders), SellerOrder.seller_id == seller_id).all()
     if not orders:
         return None
-    return create_shipment(orders)
+    return create_shipment(orders, seller_id)

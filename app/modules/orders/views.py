@@ -176,7 +176,7 @@ def complete_seller_order_view():
     """
 
     order_guids = request.json['order_guids']
-    seller_order = complete_seller_orders(order_guids)
+    seller_order = complete_seller_orders(order_guids, current_user.sellers[0].id)
     if not seller_order:
         flash("Some orders are not valid", "danger")
         return redirect(url_for('orders.seller_orders_view'))

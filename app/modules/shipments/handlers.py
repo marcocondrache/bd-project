@@ -8,16 +8,29 @@ from app.modules.shipments.models import Shipment, ShipmentStatus
 from extensions import db
 
 
-def create_shipment(seller_orders: List[SellerOrder]) -> Shipment:
+def get_shipment_by_uuid(shipment_uuid: str, seller_id: int) -> Shipment:
+    """
+    Get a shipment by its UUID.
+    :param seller_id: the id of the seller
+    :param shipment_uuid: the UUID of the shipment
+    :return: the requested shipment
+    """
+
+    return Shipment.query.filter_by(guid=shipment_uuid, seller_id=seller_id).first()
+
+
+def create_shipment(seller_orders: List[SellerOrder], seller_id: int) -> Shipment:
     """
     Create a shipment for the given seller orders.
-    :param seller_orders: the seller orders
+    :param seller_id: the id of the seller
+    :param seller_orders: the orders related to the given seller
     :return: the created shipment
     """
 
     shipment = Shipment()
     shipment.current_status = ShipmentStatus.ACCEPTED
     shipment.orders = seller_orders
+    shipment.seller_id = seller_id
     db.session.add(shipment)
 
     for seller_order in seller_orders:

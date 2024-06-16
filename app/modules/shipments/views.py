@@ -21,3 +21,19 @@ def index_view():
         'shipments/list.html',
         shipments=shipment_items,
     )
+
+
+@shipments.route("/<str:shipment_uuid>", methods=['GET'])
+def detail_view(shipment_uuid: str):
+    """
+    Shows the shipment detail view.
+    :param shipment_uuid: The shipment UUID.
+    :return: The shipment detail view.
+    """
+
+    shipment = get_shipment_by_uuid(shipment_uuid)
+
+    return render_template(
+        'shipments/details.html',
+        shipment=shipment,
+    )

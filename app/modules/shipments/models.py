@@ -11,8 +11,10 @@ import uuid
 
 if TYPE_CHECKING:
     from app.modules.orders.models import SellerOrder
+    from app.modules.sellers.models import Seller
 else:
     SellerOrder = "SellerOrder"
+    Seller = "Seller"
 
 
 class ShipmentStatus(enum.Enum):
@@ -40,12 +42,14 @@ class Shipment(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True)
     guid: Mapped[uuid.UUID] = db.Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     current_status: Mapped[ShipmentStatus] = db.Column(db.Enum(ShipmentStatus), nullable=False)
+    seller_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("sellers.id"), nullable=False)
 
     created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
     orders: Mapped[List[SellerOrder]] = db.relationship("SellerOrder", back_populates="shipment")
     history: Mapped[List["ShipmentHistory"]] = db.relationship("ShipmentHistory", back_populates="shipment")
+    seller: Mapped["Seller"] = db.relationship("Seller", back_populates="shipments")
 
     def __repr__(self):
         return f"<Shipment guid={self.guid} current_status={self.current_status}>"
