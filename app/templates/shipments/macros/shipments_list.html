@@ -3,12 +3,9 @@
 {% macro shipment_card(shipment, current_user) -%}
     <tr class="bg-white border-b">
         <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-{#
-            <a href="{{ url_for('shipments.shipment_details_view', shipment_guid=shipment.guid) }}">
+            <a href="{{ url_for('shipments.details_view', shipment_guid=shipment.guid) }}">
                 {{ shipment.guid }}
             </a>
-#}
-            {{ shipment.guid }}
         </td>
 
         <td class="px-6 py-4">

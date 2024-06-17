@@ -1,8 +1,11 @@
-from flask import render_template, request
+from flask import render_template, request, abort
 from flask_login import login_required, current_user
+from flask_wtf import FlaskForm
+
 from app.modules.shared.utils import seller_required
 from app.modules.shipments import shipments
-from app.modules.shipments.handlers import get_shipments_by_seller
+from app.modules.shipments.handlers import get_shipments_by_seller, get_shipment_by_uuid, update_shipment_status
+from app.modules.shipments.models import ShipmentStatus
 
 
 @shipments.route("", methods=['GET'])
@@ -23,17 +26,26 @@ def index_view():
     )
 
 
-@shipments.route("/<str:shipment_uuid>", methods=['GET'])
-def detail_view(shipment_uuid: str):
+@shipments.route("/<shipment_guid>", methods=['GET', 'POST'])
+@login_required
+@seller_required
+def details_view(shipment_guid: str):
     """
     Shows the shipment detail view.
-    :param shipment_uuid: The shipment UUID.
+    :param shipment_guid: The shipment UUID.
     :return: The shipment detail view.
     """
 
-    shipment = get_shipment_by_uuid(shipment_uuid)
+    form = FlaskForm()
+    shipment = get_shipment_by_uuid(shipment_guid, current_user.sellers[0].id)
+    if not shipment:
+        abort(404)
+
+    if request.method == 'POST':
+        shipment = update_shipment_status(shipment)
 
     return render_template(
         'shipments/details.html',
         shipment=shipment,
+        form=form,
     )

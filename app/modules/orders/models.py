@@ -109,6 +109,13 @@ class SellerOrder(db.Model):
 
     shipment: Mapped["Shipment"] = db.relationship("Shipment", back_populates="orders")
 
+    def total_price(self):
+        """
+        Calculates the total price of the order.
+        :return:
+        """
+        return sum([op.product.price * op.quantity for op in self.ordered_products])
+
     def __repr__(self):
         return (f"<SellerOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "
                 f"created_at={self.created_at} updated_at={self.updated_at}>")

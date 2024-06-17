@@ -100,24 +100,31 @@
         </div>
 
         <span class="text-lg font-semibold ml-4 my-2">Shipments</span>
-        <div class="overflow-auto flex-grow p-4 shadow-inner">
-            <div class="flex flex-wrap gap-4">
-                {% for seller, history in shipment_history|items %}
-                    <div class="p-4 m-4 flex flex-col items-start bg-white border border-gray-200 rounded-lg w-80 h-96">
-                        <div class="flex flex-col gap-2">
-                            <span class="text-base font-semibold">By {{ seller.user.given_name }} {{ seller.user.family_name }}</span>
-                        </div>
-                        {% if history != None and history|length > 0 %}
-                            {{ buyer_order_shipment_stepper(history) }}
-                        {% else %}
-                            <div class="flex flex-col justify-center items-center h-full w-full gap-2 w-80 h-96">
-                                <box-icon name="package" size="lg" color="grey"></box-icon>
-                                <span>The order has not been accepted yet</span>
+        {% if shipment_history|length > 0 %}
+            <div class="overflow-auto flex-grow p-4 shadow-inner">
+                <div class="flex flex-wrap gap-4">
+                    {% for seller, history in shipment_history|items %}
+                        <div class="p-4 m-4 flex flex-col items-start bg-white border border-gray-200 rounded-lg w-80 h-96">
+                            <div class="flex flex-col gap-2">
+                                <span class="text-base font-semibold">By {{ seller.user.given_name }} {{ seller.user.family_name }}</span>
                             </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                            {% if history != None and history|length > 0 %}
+                                {{ buyer_order_shipment_stepper(history) }}
+                            {% else %}
+                                <div class="flex flex-col justify-center items-center h-full w-full gap-2 w-80 h-96">
+                                    <box-icon name="package" size="lg" color="grey"></box-icon>
+                                    <span>The order has not been accepted yet</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
+        {% else %}
+            <div class="flex flex-col justify-center items-center h-full w-full gap-2">
+                <box-icon name="package" size="lg" color="grey"></box-icon>
+                <span>The order has not been accepted yet</span>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

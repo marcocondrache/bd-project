@@ -27,6 +27,15 @@ class ShipmentStatus(enum.Enum):
     IN_DELIVERY = "IN_DELIVERY"
     DELIVERED = "DELIVERED"
 
+    def get_next_status(self):
+        if self == ShipmentStatus.ACCEPTED:
+            return ShipmentStatus.SHIPPED
+        if self == ShipmentStatus.SHIPPED:
+            return ShipmentStatus.IN_DELIVERY
+        if self == ShipmentStatus.IN_DELIVERY:
+            return ShipmentStatus.DELIVERED
+        return None
+
     def __str__(self):
         return self.value
 

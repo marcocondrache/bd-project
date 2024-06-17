@@ -45,6 +45,21 @@ def create_shipment(seller_orders: List[SellerOrder], seller_id: int) -> Shipmen
     return shipment
 
 
+def update_shipment_status(shipment: Shipment) -> Shipment:
+    """
+    Update the status of a shipment.
+    :param shipment: the shipment to update
+    :return: the updated shipment
+    """
+
+    next_status = shipment.current_status.get_next_status()
+
+    shipment.current_status = next_status
+    db.session.add(shipment)
+    db.session.commit()
+    return shipment
+
+
 def get_shipments_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
     """
     Get shipments by seller id.

@@ -6,8 +6,7 @@
 {% block content %}
     <div class="flex flex-col h-[calc(100vh-4rem)]">
         <div class="text-2xl font-semibold px-4 flex items-center border-b min-h-20">
-            <!-- put a back button here -->
-            <a href="{{ url_for('orders.seller_orders_view') }}" class="flex items-center gap-2">
+            <a href="{{ url_for('shipments.index_view') }}" class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -18,5 +17,89 @@
         </div>
 
         {{ error_message() }}
+
+        <div class="p-4 m-4 flex flex-row justify-between items-start bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col justify-between items-start gap-2 w-full">
+                <span class="text-base font-semibold">Shipment info</span>
+                <span>Shipment ID: {{ shipment.guid }}</span>
+                <span>Created at: {{ shipment.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                <span>Included orders: {% if shipment.orders|length > 1 %}{{ shipment.orders|length }} orders {% else %}{{ shipment.orders|length }} order{% endif %}</span>
+            </div>
+        </div>
+
+        <div class="p-4 m-4 flex flex-col justify-between items-start space-x-4 bg-white border border-gray-200 rounded-lg">
+            <div class="flex flex-col gap-4 w-full">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-semibold">Orders</span>
+                    <div class="flex flex-col gap-2">
+                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 mt-2">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        Order code
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Date
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Total
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in shipment.orders %}
+                                    <tr class="bg-white border-b">
+                                        <td scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                            <a href="{{ url_for('orders.order_details_view', order_guid=order.guid) }}">
+                                                {{ order.guid }}
+                                            </a>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            {{ order.total_price() }} {{ order.ordered_products[0].product.currency }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    <div class="p-4 m-4 flex flex-col justify-between items-start bg-white border border-gray-200 rounded-lg">
+                        <span class="text-lg font-semibold">Shipment status</span>
+                        <div class="flex flex-col gap-2 w-full">
+                            <div class="flex flex-col gap-2">
+                                <ol class="ml-4 mt-4 mb-4 relative text-gray-500 border-s border-gray-200 dark:border-gray-700 dark:text-gray-400">
+                                    {% for status in shipment.history %}
+                                        <li class="mb-10 ms-6">
+                                            <span class="absolute flex items-center justify-center w-8 h-8 bg-green-200 rounded-full -start-4 ring-4 ring-white dark:ring-gray-900 dark:bg-green-900">
+                                                <svg class="w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5"/>
+                                                </svg>
+                                            </span>
+                                            <h3 class="font-medium leading-tight">{{ status.status|replace('_', ' ') }}</h3>
+                                            <span class="text-xs text-gray-400 dark:text-gray-500">At {{ status.created_at }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                        </div>
+                        {% if shipment.current_status|string != 'DELIVERED' %}
+                            <div class="flex flex-row justify-between items-center gap-4 w-full">
+                                <form action="{{ url_for('shipments.details_view', shipment_guid=shipment.guid) }}" method="post">
+                                    {{ form.csrf_token }}
+                                    <button
+                                            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                                            type="submit"
+                                    >
+                                        Advance shipment
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
