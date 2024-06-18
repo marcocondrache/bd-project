@@ -13,7 +13,8 @@ def generate(c):
 
 @task
 def populate(c):
-    migrate()
+    migrate(c)
+
     c.run('echo "This might take a while since a lot of data is created..."')
 
     engine = create_engine(Dev.SQLALCHEMY_DATABASE_URI)
