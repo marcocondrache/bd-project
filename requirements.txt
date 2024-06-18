@@ -13,3 +13,5 @@ wtforms
 alembic
 email-validator
 pytz
+faker
+faker-commerce

@@ -184,7 +184,7 @@ def shop_products():
 
         # TODO: Add filters on category and brands
 
-        page = get_products_filtered(query_key, search.page.data, filters=filters)
+        page = get_all_products(filters=filters)
         return render_template(
             'products/shop.html',
             page=page,
