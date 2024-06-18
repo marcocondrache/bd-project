@@ -58,7 +58,7 @@
 
 
             <form class="flex items-center w-1/2 mx-auto" method="get" action="{{ url_for('products.shop_products') }}">
-                <input name="category" type="hidden" value="{{ search.category.data }}"/>
+                <input name="category" type="hidden" value="{{ search.category.data or '' }}"/>
 
                 {# FIXME: brands data split strings in single chars #}
 

@@ -1,10 +1,26 @@
 import os
 
 from invoke import task
+from sqlalchemy import create_engine
+
+from config import Dev
+from factory.populate import Populate
 
 
 def generate(c):
     c.run("npx tailwindcss -i ./app/static/src/input.css -o ./app/static/dist/css/output.css --minify")
+
+
+@task
+def populate(c):
+    migrate()
+    c.run('echo "This might take a while since a lot of data is created..."')
+
+    engine = create_engine(Dev.SQLALCHEMY_DATABASE_URI)
+    populator = Populate(engine.connect())
+
+    populator.populate()
+    engine.dispose()
 
 
 @task
