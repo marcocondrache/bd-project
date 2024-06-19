@@ -35,7 +35,7 @@
             </div>
         {% else %}
             {{ cart_list(paginated_reservations.items) }}
-            {{ pagination(paginated_reservations) }}
+            {{ pagination(paginated_reservations, "carts.index_view") }}
         {% endif %}
     </div>
 {% endblock %}

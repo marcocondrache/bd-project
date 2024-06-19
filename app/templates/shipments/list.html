@@ -18,7 +18,7 @@
             </div>
         {% else %}
             {{ shipments_list(shipments.items, current_user) }}
-            {{ pagination(shipments) }}
+            {{ pagination(shipments, "shipments.seller_orders_view") }}
         {% endif %}
     </div>
 {% endblock %}
