@@ -1,7 +1,7 @@
 import logging
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort, flash, current_app
+from flask import request, render_template, url_for, redirect, abort, flash, current_app, g
 from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_reservation_by_product
@@ -12,8 +12,9 @@ from app.modules.products.handlers import (
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_products_filtered, get_all_products, get_all_product_brands
 )
-from app.modules.products.models import Product
+from app.modules.products.models import Product, ProductCategory
 from app.modules.shared.handlers import clean_expired_orders
+from app.modules.shared.proxy import current_search
 from app.modules.shared.utils import seller_required
 
 
@@ -169,9 +170,7 @@ def create_view():
 @products.route('/shop', methods=['GET'])
 @login_required
 def shop_products():
-    search = SearchForm(request.args)
-
-    current_app.logger.info(search.data)
+    current_app.logger.info(current_search.data)
 
     seller_id = None
     if current_user.sellers:
@@ -179,16 +178,30 @@ def shop_products():
 
     filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
-    if search.validate():
-        query_key = search.search.data
+    if current_search.validate():
+        current_app.logger.info('correct validation')
 
-        # TODO: Add filters on category and brands
+        query_key = current_search.search.data
+        category = current_search.category.data
+        brands = current_search.brands.data
 
-        page = get_all_products(filters=filters)
+        query = Product.query
+
+        # TODO: Add query by key
+
+        if category is not None and category != 'all':
+            query = query.join(Product.categories).filter(ProductCategory.guid == category)
+
+        if brands is not None and brands != []:
+            query = query.filter(Product.brand.in_(brands))
+
+        page = query.filter(*filters).paginate()
         return render_template(
             'products/shop.html',
             page=page,
         )
+    else:
+        current_app.logger.warn(current_search.errors)
 
     page = get_all_products(filters=filters)
     return render_template(
