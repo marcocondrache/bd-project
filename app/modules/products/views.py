@@ -184,6 +184,8 @@ def shop_products():
         query_key = current_search.search.data
         category = current_search.category.data
         brands = current_search.brands.data
+        price_min = current_search.price_min.data
+        price_max = current_search.price_max.data
 
         query = Product.query
 
@@ -194,6 +196,9 @@ def shop_products():
 
         if brands is not None and brands != []:
             query = query.filter(Product.brand.in_(brands))
+
+        if price_min is not None and price_max is not None:
+            query = query.filter(Product.price.between(price_min, price_max))
 
         page = query.filter(*filters).paginate()
         return render_template(
