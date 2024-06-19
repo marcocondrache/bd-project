@@ -29,8 +29,7 @@
 <head>
     {% block head %}
         <title>{% block title %}{% endblock %}</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/global.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/css/output.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dist/output.css') }}">
         <link rel="shortcut icon" type="image/icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <meta charset="UTF-8">
@@ -128,6 +127,7 @@
                 {% if current_user.sellers %}
                     {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
                     {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
+                    {{ row("Shipments", url_for("shipments.index_view"), "package", "T")}}
                 {% endif %}
 
                 {% if current_user.buyers %}

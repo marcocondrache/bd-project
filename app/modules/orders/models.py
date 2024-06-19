@@ -12,13 +12,21 @@ if TYPE_CHECKING:
     from app.modules.carts.models import Cart
     from app.modules.products.models import Product
     from app.modules.sellers.models import Seller
+    from app.modules.shipments.models import Shipment
 else:
     Cart = "Cart"
     Product = "Product"
     Seller = "Seller"
+    Shipment = "Shipment"
 
 
 class BuyersOrderStatus(Enum):
+    """
+    Represents the status of a buyer's order.
+    CREATED: The order has been created but not yet completed (not paid).
+    COMPLETED: The order has been completed (paid).
+    """
+
     CREATED = "created"
     COMPLETED = "completed"
 
@@ -27,6 +35,10 @@ class BuyersOrderStatus(Enum):
 
 
 class BuyerOrder(db.Model):
+    """
+    Represents an order made by a buyer.
+    """
+
     __tablename__ = "buyers_orders"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
@@ -54,6 +66,12 @@ class BuyerOrder(db.Model):
 
 
 class SellerOrderStatus(Enum):
+    """
+    Represents the status of a seller's order.
+    CREATED: The order has been created but not yet completed (not paid).
+    COMPLETED: The order has been completed (paid).
+    """
+
     CREATED = "created"
     COMPLETED = "completed"
 
@@ -62,6 +80,11 @@ class SellerOrderStatus(Enum):
 
 
 class SellerOrder(db.Model):
+    """
+    Represents the subset of a buyer's order that is handled by a single seller.
+    The order made by the buyer is split into multiple seller orders, one for each seller.
+    """
+
     __tablename__ = "sellers_orders"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
@@ -71,8 +94,7 @@ class SellerOrder(db.Model):
     status: Mapped[SellerOrderStatus] = mapped_column(
         "current_status", db.Enum(SellerOrderStatus), nullable=False, default=SellerOrderStatus.CREATED
     )
-    # TODO when shipment is implemented
-    # shipment_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("shipments.id"), nullable=True)
+    shipment_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("shipments.id"), nullable=True)
 
     created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
     updated_at: Mapped[str] = mapped_column(
@@ -85,12 +107,25 @@ class SellerOrder(db.Model):
         "OrderedProduct", back_populates="seller_order"
     )
 
+    shipment: Mapped["Shipment"] = db.relationship("Shipment", back_populates="orders")
+
+    def total_price(self):
+        """
+        Calculates the total price of the order.
+        :return:
+        """
+        return sum([op.product.price * op.quantity for op in self.ordered_products])
+
     def __repr__(self):
         return (f"<SellerOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "
                 f"created_at={self.created_at} updated_at={self.updated_at}>")
 
 
 class OrderedProduct(db.Model):
+    """
+    Represents a product that is part of a seller's order.
+    """
+
     __tablename__ = "ordered_products"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)

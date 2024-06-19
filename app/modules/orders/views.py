@@ -1,3 +1,4 @@
+from typing import List
 from uuid import UUID
 
 from flask import render_template, url_for, redirect, abort, flash, request
@@ -8,7 +9,7 @@ from app.modules.orders import orders
 from app.modules.orders.handlers import (
     create_buyer_order, OrderCreationErrorReason, get_buyer_order_by_guid,
     complete_buyer_order, get_buyer_orders_by_buyer, get_seller_orders_by_seller,
-    get_seller_order_by_guid
+    get_seller_order_by_guid, complete_seller_orders
 )
 from app.modules.shared.utils import buyer_required, seller_required
 
@@ -17,6 +18,11 @@ from app.modules.shared.utils import buyer_required, seller_required
 @login_required
 @buyer_required
 def index_view():
+    """
+    Shows the buyer orders. The user must be a buyer.
+    :return: The orders view.
+    """
+
     buyer_id = current_user.buyers[0].id
 
     from app.modules.shared.handlers import clean_expired_orders
@@ -35,6 +41,11 @@ def index_view():
 @login_required
 @seller_required
 def seller_orders_view():
+    """
+    Shows the seller orders. The user must be a seller.
+    :return: The seller orders view.
+    """
+
     seller_id = current_user.sellers[0].id
 
     page = request.args.get('page', 1, type=int)
@@ -49,6 +60,11 @@ def seller_orders_view():
 @login_required
 @buyer_required
 def create_order_view():
+    """
+    Creates an order. The user must be a buyer.
+    :return: A redirect to the order view.
+    """
+
     buyer_id = current_user.buyers[0].id
 
     from app.modules.shared.handlers import clean_expired_orders
@@ -76,6 +92,12 @@ def create_order_view():
 @login_required
 @buyer_required
 def complete_order_view(order_guid: UUID):
+    """
+    Completes an order. The user must be a buyer.
+    :param order_guid: The guid of the order to complete.
+    :return: A redirect to the home view.
+    """
+
     buyer_order = get_buyer_order_by_guid(order_guid, current_user.buyers[0].id)
     if not buyer_order:
         abort(404)
@@ -99,13 +121,28 @@ def complete_order_view(order_guid: UUID):
 @login_required
 @buyer_required
 def order_details_view(order_guid: UUID):
-    buyer_order = get_buyer_order_by_guid(order_guid)
+    """
+    Shows the details of an order. The user must be a buyer.
+    :param order_guid: The guid of the order.
+    :return: The order details view.
+    """
+
+    buyer_order = get_buyer_order_by_guid(order_guid, current_user.buyers[0].id)
     if not buyer_order:
         abort(404)
+
+    def map_history(history):
+        for h in history:
+            h.created_at = h.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            h.status = h.status.value
+        return history
+
+    shipment_history = {so.seller: map_history(so.shipment.history) for so in buyer_order.seller_orders if so.shipment}
 
     return render_template(
         'orders/buyer_order_info.html',
         order=buyer_order,
+        shipment_history=shipment_history,
     )
 
 
@@ -113,6 +150,12 @@ def order_details_view(order_guid: UUID):
 @login_required
 @seller_required
 def seller_order_details_view(seller_order_guid: UUID):
+    """
+    Shows the details of a seller order. The user must be a seller.
+    :param seller_order_guid: The guid of the seller order.
+    :return: The seller order details view.
+    """
+
     seller_order = get_seller_order_by_guid(seller_order_guid, current_user.sellers[0].id)
     if not seller_order:
         abort(404)
@@ -121,3 +164,21 @@ def seller_order_details_view(seller_order_guid: UUID):
         'orders/seller_order_info.html',
         order=seller_order,
     )
+
+
+@orders.route('/incoming/complete', methods=['POST'])
+@login_required
+@seller_required
+def complete_seller_order_view():
+    """
+    Completes a seller order. The user must be a seller.
+    :return: A redirect to the seller orders view.
+    """
+
+    order_guids = request.json['order_guids']
+    seller_order = complete_seller_orders(order_guids, current_user.sellers[0].id)
+    if not seller_order:
+        flash("Some orders are not valid", "danger")
+        return redirect(url_for('orders.seller_orders_view'))
+
+    return redirect(url_for('orders.seller_orders_view'))

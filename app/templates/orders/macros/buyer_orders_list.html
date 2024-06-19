@@ -1,3 +1,5 @@
+{% from 'shipments/macros/shipment_status_chip.html' import shipment_status_chip %}
+
 {% macro order_card(order, current_user) -%}
     {% set reservations = order.cart.reservations|selectattr('deleted_at', 'none')|list %}
     {# TODO: account for currency differences between reservations #}
