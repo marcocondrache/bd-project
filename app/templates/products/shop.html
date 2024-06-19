@@ -31,13 +31,25 @@
                      class="absolute top-12 end-0 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-xl w-80"
                      x-show="open"
                      @click.outside="open = false">
-                    <form class="max-w-sm mx-auto p-3" method="get" action="{{ url_for('products.shop_products') }}">
-                        <input type="hidden" name="search" value="{{ search.search.data or '' }}" />
+                    <form class="max-w-sm mx-auto p-3" method="get" action="{{ url_for('products.shop_products') }}"
+                          x-data="{ min: 0, max: 0 }">
+                        <input type="hidden" name="search" value="{{ search.search.data or '' }}"/>
 
                         {{ search.category.label(class="block mb-2 text-sm font-medium text-gray-900") }}
                         {{ search.category(class="block w-full p-2 mb-6 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500") }}
                         {{ search.brands.label(class="block mb-2 text-sm font-medium text-gray-900") }}
-                        {{ search.brands(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+                        {{ search.brands(class="bg-gray-50 mb-6 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5") }}
+
+                        <div class="flex flex-row gap-3">
+                            <div>
+                                {{ search.price_min.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                                {{ search.price_min(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{"x-model": "min"}) }}
+                            </div>
+                            <div>
+                                {{ search.price_max.label(class="block mb-2 text-sm font-medium text-gray-900") }}
+                                {{ search.price_max(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{":min": "min"}) }}
+                            </div>
+                        </div>
 
                         <button type="submit"
                                 class="text-white mt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
