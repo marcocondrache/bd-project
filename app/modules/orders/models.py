@@ -12,10 +12,12 @@ if TYPE_CHECKING:
     from app.modules.carts.models import Cart
     from app.modules.products.models import Product
     from app.modules.sellers.models import Seller
+    from app.modules.reviews.models import ProductReview
 else:
     Cart = "Cart"
     Product = "Product"
     Seller = "Seller"
+    ProductReview = "ProductReview"
 
 
 class BuyersOrderStatus(Enum):
@@ -84,6 +86,7 @@ class SellerOrder(db.Model):
     ordered_products: Mapped[List["OrderedProduct"]] = db.relationship(
         "OrderedProduct", back_populates="seller_order"
     )
+    reviews: Mapped[List[ProductReview]] = db.relationship("ProductReview", back_populates="seller_order")
 
     def __repr__(self):
         return (f"<SellerOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "

@@ -11,6 +11,7 @@ import uuid
 from extensions import Base
 
 if TYPE_CHECKING:
+    from app.modules.reviews.models import ProductReview
     from app.modules.sellers.models import Seller
     from app.modules.carts.models import ProductReservation
     from app.modules.orders.models import OrderedProduct
@@ -18,6 +19,7 @@ else:
     Seller = "Seller"
     ProductReservation = "ProductReservation"
     OrderedProduct = "OrderedProduct"
+    ProductReview = "ProductReview"
 
 products_categories_association_table = Table(
     "products_categories_association",
@@ -132,6 +134,7 @@ class Product(db.Model):
     ordered_products: Mapped[List[OrderedProduct]] = db.relationship(
         "OrderedProduct", back_populates="product"
     )
+    reviews: Mapped[List[ProductReview]] = db.relationship("ProductReview", back_populates="product")
 
     def __repr__(self):
         return (f"<Product guid={self.guid} owner_seller_id={self.owner_seller_id} name={self.name} "
