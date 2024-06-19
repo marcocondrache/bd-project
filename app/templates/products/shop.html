@@ -43,11 +43,11 @@
                         <div class="flex flex-row gap-3">
                             <div>
                                 {{ search.price_min.label(class="block mb-2 text-sm font-medium text-gray-900") }}
-                                {{ search.price_min(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{"x-model": "min"}) }}
+                                {{ search.price_min(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{"x-model": "min", ":max": "max"}) }}
                             </div>
                             <div>
                                 {{ search.price_max.label(class="block mb-2 text-sm font-medium text-gray-900") }}
-                                {{ search.price_max(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{":min": "min"}) }}
+                                {{ search.price_max(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5", **{"x-model": "max", ":min": "min"}) }}
                             </div>
                         </div>
 
