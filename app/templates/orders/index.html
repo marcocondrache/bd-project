@@ -17,7 +17,7 @@
             </div>
         {% else %}
             {{ orders_list(paginated_orders.items, current_user) }}
-            {{ pagination(paginated_orders) }}
+            {{ pagination(paginated_orders, "orders.index_view") }}
         {% endif %}
     </div>
 {% endblock %}

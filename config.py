@@ -23,7 +23,7 @@ class Prod(object):
         "isolation_level": "REPEATABLE READ"
     }
 
-    BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts", "orders"]
+    BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts", "orders", "shipments"]
     EXTENSIONS = [
         'extensions.db',
         'extensions.login_manager',

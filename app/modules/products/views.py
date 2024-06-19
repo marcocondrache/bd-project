@@ -1,4 +1,3 @@
-import logging
 from uuid import UUID
 
 from flask import request, render_template, url_for, redirect, abort, flash, current_app
@@ -10,7 +9,7 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_filtered, get_all_products, get_all_product_brands
+    get_product_by_guid, get_all_products
 )
 from app.modules.products.models import Product
 from app.modules.shared.handlers import clean_expired_orders
@@ -179,18 +178,19 @@ def shop_products():
 
     filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
+    page_num = request.args.get('page', 1, type=int)
     if search.validate():
         query_key = search.search.data
 
         # TODO: Add filters on category and brands
 
-        page = get_all_products(filters=filters)
+        page = get_all_products(filters=filters, page=page_num)
         return render_template(
             'products/shop.html',
             page=page,
         )
 
-    page = get_all_products(filters=filters)
+    page = get_all_products(filters=filters, page=page_num)
     return render_template(
         'products/shop.html',
         page=page,

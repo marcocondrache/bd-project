@@ -9,6 +9,7 @@ from factory.app import Base
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
+
 def register_processor(app):
     @app.context_processor
     def injectors():

@@ -34,6 +34,24 @@
 {%- endmacro %}
 
 {% macro orders_list(orders, current_user) -%}
+    <script>
+    function shipOrders(orderGuids) {
+        console.log(orderGuids);
+        fetch('/orders/incoming/complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ order_guids: orderGuids })
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        })
+    }
+    </script>
+
     <div class="overflow-auto flex-grow p-4"
          x-data="{ selected: [], allSelected: false }"
     >
@@ -45,7 +63,7 @@
             >
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-slate-300"
                         x-bind:disabled="selected.length === 0"
-                        x-on:click="console.log(selected);">
+                        x-on:click="shipOrders(selected)">
                     Ship orders
                 </button>
                 <div x-show="tooltip && selected.length === 0" class="absolute bg-white border border-gray-200 rounded-lg p-2 shadow-lg transform -translate-y-0 translate-x-32">
