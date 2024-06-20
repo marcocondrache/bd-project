@@ -60,8 +60,8 @@
                 {% for filter in search.filters_name() %}
                     {% set data = search.data[filter] %}
                     {% if data is list %}
-                        {% for d in data %}
-                            <input type="hidden" value="{{ d }}" name="{{ filter }}">
+                        {% for item in data %}
+                            <input type="hidden" value="{{ item }}" name="{{ filter }}">
                         {% endfor %}
                     {% else %}
                         <input type="hidden" value="{{ search.data[filter] }}" name="{{ filter }}">
