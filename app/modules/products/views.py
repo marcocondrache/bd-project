@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from flask import request, render_template, url_for, redirect, abort, flash, current_app
+from flask import request, render_template, url_for, redirect, abort, flash, current_app, g
 from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_reservation_by_product
@@ -11,8 +11,9 @@ from app.modules.products.handlers import (
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_all_products
 )
-from app.modules.products.models import Product
+from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.shared.handlers import clean_expired_orders
+from app.modules.shared.proxy import current_search
 from app.modules.shared.utils import seller_required
 
 
@@ -168,30 +169,42 @@ def create_view():
 @products.route('/shop', methods=['GET'])
 @login_required
 def shop_products():
-    search = SearchForm(request.args)
-
-    current_app.logger.info(search.data)
-
-    seller_id = None
-    if current_user.sellers:
-        seller_id = current_user.sellers[0].id
-
-    filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
-
-    page_num = request.args.get('page', 1, type=int)
-    if search.validate():
-        query_key = search.search.data
-
-        # TODO: Add filters on category and brands
-
-        page = get_all_products(filters=filters, page=page_num)
+    def render(page):
         return render_template(
             'products/shop.html',
             page=page,
         )
 
-    page = get_all_products(filters=filters, page=page_num)
-    return render_template(
-        'products/shop.html',
-        page=page,
-    )
+    sellers = [seller.id for seller in current_user.sellers]
+    filters = [~Product.owner_seller_id.in_(sellers),
+               Product.deleted_at.is_(None)]
+
+    page_num = current_search.page.data
+    if current_search.validate():
+        current_app.logger.info('correct validation')
+
+        query_key = current_search.search.data
+        category = current_search.category.data
+        brands = [b for b in current_search.brands.data or [] if b]
+        price_min = current_search.price_min.data if current_search.price_min.data is not None else -1
+        price_max = current_search.price_max.data if current_search.price_max.data is not None else -1
+
+        query = Product.query
+
+        if query_key:
+            query = query.join(Product.keywords).filter(Keyword.key.ilike(query_key))
+
+        if category and category != 'all':
+            query = query.join(Product.categories).filter(ProductCategory.guid == category)
+
+        if brands:
+            query = query.filter(Product.brand.in_(brands))
+
+        if price_min >= 0 and price_max <= current_search.price_max.widget.max:
+            query = query.filter(Product.price.between(price_min, price_max))
+
+        return render(query.filter(*filters).paginate(page=page_num))
+    else:
+        current_app.logger.warn(current_search.errors)
+
+    return render(get_all_products(filters=filters, page=page_num))

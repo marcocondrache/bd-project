@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from flask_sqlalchemy.pagination import QueryPagination
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.sellers.models import Seller
@@ -10,6 +10,14 @@ from app.modules.shared.handlers import clean_expired_orders
 from extensions import db
 
 separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
+
+
+def get_price_max():
+    return db.session.query(func.max(Product.price)).scalar()
+
+
+def get_stock_max():
+    return db.session.query(func.max(Product.stock)).scalar()
 
 
 def get_all_product_brands():
