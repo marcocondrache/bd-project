@@ -20,10 +20,10 @@ class SearchForm(FlaskForm):
     category = SelectField(u'Category', validators=[validators.Optional()], choices=[('all', "All categories")])
     brands = SelectMultipleField(u'Brands', validators=[validators.Optional()], choices=[])
 
-    price_max = IntegerField(u'To', validators=[validators.Optional()])
+    price_max = IntegerField(u'To', validators=[validators.Optional()], widget=widgets.NumberInput())
     price_min = IntegerField(u'From', validators=[validators.Optional()], widget=widgets.NumberInput(min=0))
 
-    stock_max = IntegerField(u'To', validators=[validators.Optional()])
+    stock_max = IntegerField(u'To', validators=[validators.Optional()], widget=widgets.NumberInput())
     stock_min = IntegerField(u'From', validators=[validators.Optional()], widget=widgets.NumberInput(min=0))
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +37,6 @@ class SearchForm(FlaskForm):
         self.category.choices.extend([(c.guid, c.name) for c in categories])
         self.brands.choices.extend([(b[0], b[0]) for b in brands])
 
-        # FIXME: Max is overwritten by something
         self.price_max.widget.max = price_max
         self.stock_max.widget.max = stock_max
 
