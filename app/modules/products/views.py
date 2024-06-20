@@ -1,4 +1,3 @@
-import logging
 from uuid import UUID
 
 from flask import request, render_template, url_for, redirect, abort, flash, current_app, g
@@ -10,7 +9,7 @@ from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
-    get_product_by_guid, get_products_filtered, get_all_products, get_all_product_brands
+    get_product_by_guid, get_all_products
 )
 from app.modules.products.models import Product, ProductCategory
 from app.modules.shared.handlers import clean_expired_orders
@@ -178,6 +177,7 @@ def shop_products():
 
     filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
+    page_num = request.args.get('page', 1, type=int)
     if current_search.validate():
         current_app.logger.info('correct validation')
 
@@ -200,7 +200,7 @@ def shop_products():
         if price_min is not None and price_max is not None:
             query = query.filter(Product.price.between(price_min, price_max))
 
-        page = query.filter(*filters).paginate()
+        page = query.filter(*filters).paginate(page=page_num)
         return render_template(
             'products/shop.html',
             page=page,
@@ -208,7 +208,7 @@ def shop_products():
     else:
         current_app.logger.warn(current_search.errors)
 
-    page = get_all_products(filters=filters)
+    page = get_all_products(filters=filters, page=page_num)
     return render_template(
         'products/shop.html',
         page=page,

@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% from 'macros/pagination.html' import pagination %}
 {% from 'macros/error_message.html' import error_message %}
+{% from 'orders/macros/buyer_order_shipment_stepper.html' import buyer_order_shipment_stepper %}
 
 {% block title %}Kepler Shop{% endblock %}
 
@@ -43,7 +44,7 @@
                     <div class="flex flex-col gap-2">
                         <span>Order code: <span class="font-semibold">{{ order.guid }}</span></span>
                         <span>Order status: <span class="font-semibold">{{ order.status }}</span></span>
-                        <span>Order date: <span class="font-semibold">{{ order.created_at.strftime('%Y %m %d %H:%M') }}</span></span>
+                        <span>Order date: <span class="font-semibold">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</span></span>
                     </div>
                 </div>
             </div>
@@ -58,6 +59,9 @@
                         <tr>
                             <th scope="col" class="px-6 py-3">
                                 Name
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Seller
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 Quantity
@@ -77,6 +81,9 @@
                                     {{ reservation.product.name }}
                                 </th>
                                 <td class="px-6 py-4">
+                                    {{ reservation.product.seller.user.given_name }} {{ reservation.product.seller.user.family_name }}
+                                </td>
+                                <td class="px-6 py-4">
                                     {{ reservation.quantity }}
                                 </td>
                                 <td class="px-6 py-4">
@@ -91,5 +98,33 @@
                 </table>
             </div>
         </div>
+
+        <span class="text-lg font-semibold ml-4 my-2">Shipments</span>
+        {% if shipment_history|length > 0 %}
+            <div class="overflow-auto flex-grow p-4 shadow-inner">
+                <div class="flex flex-wrap gap-4">
+                    {% for seller, history in shipment_history|items %}
+                        <div class="p-4 m-4 flex flex-col items-start bg-white border border-gray-200 rounded-lg w-80 h-96">
+                            <div class="flex flex-col gap-2">
+                                <span class="text-base font-semibold">By {{ seller.user.given_name }} {{ seller.user.family_name }}</span>
+                            </div>
+                            {% if history != None and history|length > 0 %}
+                                {{ buyer_order_shipment_stepper(history) }}
+                            {% else %}
+                                <div class="flex flex-col justify-center items-center h-full w-full gap-2 w-80 h-96">
+                                    <box-icon name="package" size="lg" color="grey"></box-icon>
+                                    <span>The order has not been accepted yet</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="flex flex-col justify-center items-center h-full w-full gap-2">
+                <box-icon name="package" size="lg" color="grey"></box-icon>
+                <span>The order has not been accepted yet</span>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
