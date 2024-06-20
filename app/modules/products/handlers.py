@@ -15,6 +15,11 @@ separators = "|".join([' ', '.', ',', ';', ':', '-', '!', '?', '\t', '\n'])
 def get_price_max():
     return db.session.query(func.max(Product.price)).scalar()
 
+
+def get_stock_max():
+    return db.session.query(func.max(Product.stock)).scalar()
+
+
 def get_all_product_brands():
     return db.session.query(Product.brand).distinct().all()
 

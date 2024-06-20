@@ -11,7 +11,7 @@ from app.modules.products.handlers import (
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_all_products
 )
-from app.modules.products.models import Product, ProductCategory
+from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.shared.handlers import clean_expired_orders
 from app.modules.shared.proxy import current_search
 from app.modules.shared.utils import seller_required
@@ -169,6 +169,12 @@ def create_view():
 @products.route('/shop', methods=['GET'])
 @login_required
 def shop_products():
+    def render(page):
+        return render_template(
+            'products/shop.html',
+            page=page,
+        )
+
     current_app.logger.info(current_search.data)
 
     seller_id = None
@@ -177,7 +183,7 @@ def shop_products():
 
     filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
 
-    page_num = request.args.get('page', 1, type=int)
+    page_num = current_search.page.data
     if current_search.validate():
         current_app.logger.info('correct validation')
 
@@ -189,9 +195,10 @@ def shop_products():
 
         query = Product.query
 
-        # TODO: Add query by key
+        if query_key:
+            query = query.join(Product.keywords).filter(Keyword.key.ilike(query_key))
 
-        if category is not None and category != 'all':
+        if category and category != 'all':
             query = query.join(Product.categories).filter(ProductCategory.guid == category)
 
         if brands is not None and brands != []:
@@ -200,16 +207,8 @@ def shop_products():
         if price_min is not None and price_max is not None:
             query = query.filter(Product.price.between(price_min, price_max))
 
-        page = query.filter(*filters).paginate(page=page_num)
-        return render_template(
-            'products/shop.html',
-            page=page,
-        )
+        return render(query.filter(*filters).paginate(page=page_num))
     else:
         current_app.logger.warn(current_search.errors)
 
-    page = get_all_products(filters=filters, page=page_num)
-    return render_template(
-        'products/shop.html',
-        page=page,
-    )
+    return render(get_all_products(filters=filters, page=page_num))

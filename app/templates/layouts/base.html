@@ -57,7 +57,10 @@
 
 
             <form class="flex items-center w-1/2 mx-auto" method="get" action="{{ url_for('products.shop_products') }}">
-                <input name="category" type="hidden" value="{{ search.category.data or '' }}"/>
+                {% for filter in search.filters_name() %}
+                    {# FIXME: Inject values #}
+                    <input type="hidden" value="" name="{{ filter }}">
+                {% endfor %}
 
                 {# FIXME: brands data split strings in single chars #}
 
@@ -127,7 +130,7 @@
                 {% if current_user.sellers %}
                     {{ row("Your products", url_for("products.index_view"), "collection", "P") }}
                     {{ row("Incoming orders", url_for("orders.seller_orders_view"), "spreadsheet", "I") }}
-                    {{ row("Shipments", url_for("shipments.index_view"), "package", "T")}}
+                    {{ row("Shipments", url_for("shipments.index_view"), "package", "T") }}
                 {% endif %}
 
                 {% if current_user.buyers %}
