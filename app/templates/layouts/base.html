@@ -58,11 +58,15 @@
 
             <form class="flex items-center w-1/2 mx-auto" method="get" action="{{ url_for('products.shop_products') }}">
                 {% for filter in search.filters_name() %}
-                    {# FIXME: Inject values #}
-                    <input type="hidden" value="" name="{{ filter }}">
+                    {% set data = search.data[filter] %}
+                    {% if data is list %}
+                        {% for d in data %}
+                            <input type="hidden" value="{{ d }}" name="{{ filter }}">
+                        {% endfor %}
+                    {% else %}
+                        <input type="hidden" value="{{ search.data[filter] }}" name="{{ filter }}">
+                    {% endif %}
                 {% endfor %}
-
-                {# FIXME: brands data split strings in single chars #}
 
                 {{ search.search.label(class="sr-only") }}
                 <div class="relative w-full">

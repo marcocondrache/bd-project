@@ -12,7 +12,11 @@ from factory.app import Base
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-def register_processor(app):
+def register_processors(app):
+    @app.template_test("list")
+    def is_list(obj):
+        return isinstance(obj, list)
+
     @app.context_processor
     def injectors():
         pagination = PaginationForm(data=request.args)
@@ -33,6 +37,6 @@ def build(name, config_path, base_path=PROJECT_PATH):
     app.configure(config)
     app.setup()
 
-    register_processor(app)
+    register_processors(app)
 
     return app

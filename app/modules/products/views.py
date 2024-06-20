@@ -177,11 +177,9 @@ def shop_products():
 
     current_app.logger.info(current_search.data)
 
-    seller_id = None
-    if current_user.sellers:
-        seller_id = current_user.sellers[0].id
-
-    filters = [Product.owner_seller_id != seller_id, Product.deleted_at.is_(None)]
+    sellers = [seller.id for seller in current_user.sellers]
+    filters = [~Product.owner_seller_id.in_(sellers),
+               Product.deleted_at.is_(None)]
 
     page_num = current_search.page.data
     if current_search.validate():
@@ -189,9 +187,9 @@ def shop_products():
 
         query_key = current_search.search.data
         category = current_search.category.data
-        brands = current_search.brands.data
-        price_min = current_search.price_min.data
-        price_max = current_search.price_max.data
+        brands = [b for b in current_search.brands.data or [] if b]
+        price_min = current_search.price_min.data if current_search.price_min.data is not None else -1
+        price_max = current_search.price_max.data if current_search.price_max.data is not None else -1
 
         query = Product.query
 
@@ -201,11 +199,13 @@ def shop_products():
         if category and category != 'all':
             query = query.join(Product.categories).filter(ProductCategory.guid == category)
 
-        if brands is not None and brands != []:
+        if brands:
             query = query.filter(Product.brand.in_(brands))
 
-        if price_min is not None and price_max is not None:
+        if price_min >= 0 and price_max <= current_search.price_max.widget.max:
             query = query.filter(Product.price.between(price_min, price_max))
+
+        current_app.logger.info(query.statement)
 
         return render(query.filter(*filters).paginate(page=page_num))
     else:
