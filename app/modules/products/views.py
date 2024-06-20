@@ -175,8 +175,6 @@ def shop_products():
             page=page,
         )
 
-    current_app.logger.info(current_search.data)
-
     sellers = [seller.id for seller in current_user.sellers]
     filters = [~Product.owner_seller_id.in_(sellers),
                Product.deleted_at.is_(None)]
@@ -204,8 +202,6 @@ def shop_products():
 
         if price_min >= 0 and price_max <= current_search.price_max.widget.max:
             query = query.filter(Product.price.between(price_min, price_max))
-
-        current_app.logger.info(query.statement)
 
         return render(query.filter(*filters).paginate(page=page_num))
     else:
