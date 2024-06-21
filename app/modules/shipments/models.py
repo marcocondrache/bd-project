@@ -60,6 +60,13 @@ class Shipment(db.Model):
     history: Mapped[List["ShipmentHistory"]] = db.relationship("ShipmentHistory", back_populates="shipment")
     seller: Mapped["Seller"] = db.relationship("Seller", back_populates="shipments")
 
+    def is_delivered(self):
+        """
+        Check if the shipment is delivered.
+        :return:
+        """
+        return self.current_status == ShipmentStatus.DELIVERED
+
     def __repr__(self):
         return f"<Shipment guid={self.guid} current_status={self.current_status}>"
 

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, List
 from sqlalchemy import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.modules.buyers.models import Buyer
 from extensions import db
 
 if TYPE_CHECKING:
@@ -61,6 +62,7 @@ class BuyerOrder(db.Model):
 
     cart: Mapped[Cart] = db.relationship("Cart", back_populates="buyer_orders")
     seller_orders: Mapped[List["SellerOrder"]] = db.relationship("SellerOrder", back_populates="buyer_order")
+    order_reports: Mapped[List["OrderReport"]] = db.relationship("OrderReport", back_populates="buyer_order")
 
     def __repr__(self):
         return (f"<BuyerOrder guid={self.guid} status={self.status} cart_id={self.cart_id} "
@@ -108,9 +110,10 @@ class SellerOrder(db.Model):
     ordered_products: Mapped[List["OrderedProduct"]] = db.relationship(
         "OrderedProduct", back_populates="seller_order"
     )
-    reviews: Mapped[List[ProductReview]] = db.relationship("ProductReview", back_populates="seller_order")
 
     shipment: Mapped["Shipment"] = db.relationship("Shipment", back_populates="orders")
+
+    order_reports: Mapped[List["OrderReport"]] = db.relationship("OrderReport", back_populates="seller_order")
 
     def total_price(self):
         """
@@ -122,6 +125,33 @@ class SellerOrder(db.Model):
     def __repr__(self):
         return (f"<SellerOrder guid={self.guid} status={self.status} buyer_order_id={self.buyer_order_id} "
                 f"created_at={self.created_at} updated_at={self.updated_at}>")
+
+
+class OrderReport(db.Model):
+    """
+    Represents a helper denormalized table to store the orders report.
+    """
+
+    __tablename__ = "orders_report"
+
+    buyer_order_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("buyers_orders.id"), index=True, nullable=False)
+    buyer_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("buyers.id"), index=True, nullable=False)
+    seller_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("sellers.id"), index=True, nullable=False)
+    seller_order_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("sellers_orders.id"), index=True, nullable=False)
+
+    seller_order: Mapped[SellerOrder] = db.relationship("SellerOrder", back_populates="order_reports")
+    buyer_order: Mapped[BuyerOrder] = db.relationship("BuyerOrder", back_populates="order_reports")
+    buyer: Mapped[Buyer] = db.relationship("Buyer", back_populates="order_reports")
+    seller: Mapped[Seller] = db.relationship("Seller", back_populates="order_reports")
+
+    __table_args__ = (
+        db.PrimaryKeyConstraint(
+            buyer_order_id, buyer_id, seller_order_id, seller_id
+        ),
+    )
+
+    def __repr__(self):
+        return f"<OrderReport buyer_order_id={self.buyer_order_id} seller_order_id={self.seller_order_id}>"
 
 
 class OrderedProduct(db.Model):

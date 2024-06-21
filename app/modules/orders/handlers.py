@@ -7,7 +7,7 @@ import pytz
 from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.carts.models import Cart, ProductReservation, CartStatus
-from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct
+from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct, OrderReport
 from app.modules.shared.consts import created_orders_ttl, page_size
 from app.modules.shipments.handlers import create_shipment
 from app.modules.shipments.models import Shipment
@@ -164,6 +164,8 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
 
     # create seller orders
     seller_orders = []
+    order_reports = []
+
     for r in reservations:
         ordered_product = OrderedProduct(product=r.product, quantity=r.quantity)
 
@@ -181,6 +183,13 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
 
         seller_order.ordered_products.append(ordered_product)
 
+    db.session.commit()
+    # create order reports
+    for so in seller_orders:
+        order_report = OrderReport(buyer_order=buyer_order, buyer=buyer_order.cart.buyer,
+                                   seller=so.seller, seller_order=so)
+        db.session.add(order_report)
+        order_reports.append(order_report)
     db.session.commit()
     return buyer_order, seller_orders
 

@@ -6,9 +6,13 @@ from extensions import db
 if TYPE_CHECKING:
     from app.modules.users.models import User
     from app.modules.carts.models import Cart
+    from app.modules.products.models import ProductReview
+    from app.modules.orders.models import OrderReport
 else:
     User = "User"
     Cart = "Cart"
+    ProductReview = "ProductReview"
+    OrderReport = "OrderReport"
 
 
 class Buyer(db.Model):
@@ -21,6 +25,9 @@ class Buyer(db.Model):
 
     user: Mapped[User] = db.relationship("User", back_populates="buyers")
     carts: Mapped[List[Cart]] = db.relationship("Cart", back_populates="buyer")
+
+    reviews: Mapped[List[ProductReview]] = db.relationship("ProductReview", back_populates="buyer")
+    order_reports: Mapped[List[OrderReport]] = db.relationship("OrderReport", back_populates="buyer")
 
     def __repr__(self):
         return (f"<Buyer user={self.user.email} destination_address={self.destination_address} "

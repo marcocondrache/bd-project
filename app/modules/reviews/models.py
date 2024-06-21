@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 from typing import TYPE_CHECKING
@@ -30,6 +32,11 @@ class ProductReviewHistory(db.Model):
 
     created_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now())
 
+    product_review: Mapped[ProductReview] = db.relationship("ProductReview", back_populates="history")
+
+    def __repr__(self):
+        return f"<ProductReviewHistory {self.id}>"
+
 
 class ProductReview(db.Model):
     """
@@ -41,7 +48,6 @@ class ProductReview(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
     guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
     product_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("products.id"), nullable=False)
-    seller_order_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("seller_orders.id"), nullable=False)
     buyer_id: Mapped[int] = mapped_column(db.Integer, db.ForeignKey("buyers.id"), nullable=False)
 
     current_rating: Mapped[int] = mapped_column(db.Integer, nullable=False)
@@ -51,7 +57,9 @@ class ProductReview(db.Model):
     updated_at: Mapped[str] = mapped_column(db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now())
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
-    product: Mapped[Product] = db.relationship("Product", back_populates="reviews")
-    seller_order: Mapped[SellerOrder] = db.relationship("SellerOrder", back_populates="reviews")
-    buyer: Mapped[Buyer] = db.relationship("Buyer", back_populates="reviews")
-    history: Mapped[ProductReviewHistory] = db.relationship("ProductReviewHistory", back_populates="product_review")
+    product: Mapped[Product] = db.relationship(Product, back_populates="reviews")
+    buyer: Mapped[Buyer] = db.relationship(Buyer, back_populates="reviews")
+    history: Mapped[ProductReviewHistory] = db.relationship(ProductReviewHistory, back_populates="product_review")
+
+    def __repr__(self):
+        return f"<ProductReview {self.id}>"

@@ -9,23 +9,28 @@ from werkzeug.security import generate_password_hash
 
 from app.modules.buyers.models import Buyer
 from app.modules.products.models import ProductCategory, Product
+from app.modules.reviews.models import ProductReview
 from app.modules.sellers.models import Seller
 from app.modules.users.models import User
 
 
 def create_seller(faker, user: User):
     return Seller(iban=faker.iban(), show_soldout_products=faker.boolean(),
-                  user_id=user.id)
+                  user=user)
 
 
 def create_user(faker: Faker):
-    return User(id=random.randint(100, 99999999), email=faker.safe_email(), given_name=faker.first_name(),
+    email = faker.safe_email()
+    password = faker.password(length=8, special_chars=False)
+    print(f"Email: {email}, Password: {password}")
+
+    return User(email=email, given_name=faker.first_name(),
                 family_name=faker.last_name(),
-                password=generate_password_hash(faker.password(length=8, special_chars=False)))
+                password=generate_password_hash(password))
 
 
 def create_buyer(faker, user):
-    return Buyer(destination_address=faker.address(), card_number=faker.credit_card_number(),
+    return Buyer(destination_address=faker.address(), card_number=str(faker.credit_card_number()),
                  user=user)
 
 

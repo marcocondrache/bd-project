@@ -1,5 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% from 'macros/error_message.html' import error_message %}
+{% from 'reviews/review_details.html' import review_details_card %}
+{% from 'reviews/review_creation.html' import review_creation_form %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -16,7 +18,6 @@
                 price: {{ product.price }},
                 currency: "{{ product.currency }}",
                 stock: {{ product.stock }},
-
                 confirmDelete: false,
 
                 showWarning: false,
@@ -25,7 +26,7 @@
             }));
         });
     </script>
-    <div x-data='product_view' class="bg-gray-100 text-gray-900 flex flex-col">
+    <div class="bg-gray-100 text-gray-900 flex flex-col">
         {{ error_message() }}
         <div class="container mx-auto p-4">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:flex relative">
@@ -40,35 +41,39 @@
                 </div>
 
                 <div class="p-4 flex flex-col w-full">
-                    <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
-                    <div class="flex gap-2 mb-4" x-show="categories.length > 0">
-                        <template x-for="category in categories">
+                    <h2 class="text-xl font-semibold mb-2">{{ product.name }}</h2>
+                {% if product.categories|length > 0 %}
+                    <div class="flex gap-2 mb-4">
+                        {% for category in product.categories %}
                             <span
-                                x-text="category"
                                 class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full shadow-md"
-                            ></span>
-                        </template>
+                            >
+                                {{ category.name }}
+                            </span>
+                        {% endfor %}
                     </div>
-                    <p class="mb-2" x-text="description"></p>
-                    <p class="mb-2">Brand: <span class="font-semibold" x-text="brand"></span></p>
-                    <p class="mb-4">Stock: <span class="font-semibold" x-text="stock"></span></p>
+                {% endif %}
+                    <p class="mb-2"> {{ product.description }}</p>
+                    <p class="mb-2">Brand: <span class="font-semibold"> {{ product.brand }}</span></p>
+                    <p class="mb-4">Stock: <span class="font-semibold"> {{ product.stock }}</span></p>
                     <div class="flex items-center gap-4 mb-8">
                         <div>
-                            <span class="text-3xl font-bold" x-text="price"></span>
-                            <span class="text font-medium" x-text="currency"></span>
+                            <span class="text-3xl font-bold">{{ product.price }}</span>
+                            <span class="text font-medium">{{ product.currency }}</span>
                         </div>
+                        {% if product.is_second_hand %}
+                            <span
+                                class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
+                            >
+                                New
+                            </span>
+                        {% else %}
                         <span
-                            x-show="isSecondHand"
-                            class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
-                        >
-                            New
-                        </span>
-                        <span
-                            x-show="!isSecondHand"
                             class="my-4 text-sm font-medium bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
                         >
                             Second hand
                         </span>
+                        {% endif %}
                     </div>
 
                     {% if product.deleted_at is not none %}
@@ -163,6 +168,31 @@
                     {% endif %}
                 </div>
             </div>
+            <!-- Reviews section -> get latest 5 reviews -->
+            {%  if product.reviews|length == 0 %}
+                <div class="mt-4">
+                    <h3 class="text-xl font-semibold mb-2">Reviews</h3>
+                    <div class="bg-white rounded-lg shadow-lg p-4">
+                        <p>No reviews yet</p>
+                    </div>
+                </div>
+            {% else %}
+
+                <div class="mt-4">
+                    <h3 class="text-xl font-semibold mb-2">Reviews</h3>
+                    <div class="flex flex-col gap-4">
+                        {% for review in product.reviews[:5] %}
+                            {{ review_details_card(review.buyer.user, review) }}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if can_review or review %}
+                <div class="mt-4">
+                    <h3 class="text-xl font-semibold mb-2">Your review</h3>
+                    {{ review_creation_form(product, review) }}
+                </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
