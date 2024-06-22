@@ -16,7 +16,7 @@ db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 csrf = CSRFProtect()
 cors = CORS()
 

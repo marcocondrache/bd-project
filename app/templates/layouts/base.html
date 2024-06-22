@@ -183,11 +183,11 @@
                 editUser,
                 profile: {
                     destination_address: "{{ current_user.buyers[0].destination_address }}",
-                    card_number: "{{ current_user.buyers[0].card_number }}",
+                    card_number: "{{ current_user.buyers[0].card_number|string }}",
 
                     {% if current_user.sellers %}
                         iban: "{{ current_user.sellers[0].iban }}",
-                        show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                        show_soldout: "{{ current_user.sellers[0].show_soldout_products|string }}" === "True",
                     {% endif %}
                 },
                 originalProfile: {
@@ -196,9 +196,9 @@
 
                     {% if current_user.sellers %}
                         iban: "{{ current_user.sellers[0].iban }}",
-                        show_soldout: "{{ current_user.sellers[0].show_soldout_products }}" === "True",
+                        show_soldout: "{{ current_user.sellers[0].show_soldout_products|string }}" === "True",
                     {% endif %}
-                }
+                },
             }));
         });
     </script>

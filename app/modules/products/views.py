@@ -5,16 +5,16 @@ from flask_login import login_required, current_user
 
 from app.modules.carts.handlers import get_reservation_by_product
 from app.modules.products import products
-from app.modules.products.forms import SearchForm
 from app.modules.products.handlers import (
     create_product, get_seller_products,
     get_all_product_categories, update_product, delete_product,
     get_product_by_guid, get_all_products
 )
+from app.modules.reviews.handlers import can_be_reviewed, get_product_review
 from app.modules.products.models import Product, ProductCategory, Keyword
 from app.modules.shared.handlers import clean_expired_orders
 from app.modules.shared.proxy import current_search
-from app.modules.shared.utils import seller_required
+from app.modules.shared.utils import seller_required, buyer_required
 
 
 def validate_product(product_guid: str, allow_write=False) -> Product | None:
@@ -62,12 +62,17 @@ def index_view():
 
 @products.route('/<product_guid>', methods=['GET'])
 @login_required
+@buyer_required
 def product_view(product_guid: str):
     product = validate_product(product_guid)
     if not product:
         return redirect(url_for('products.index_view'))
 
     product_reservation, sequence_failed = get_reservation_by_product(current_user.buyers[0].id, product)
+    can_review = can_be_reviewed(product, current_user.buyers[0])
+    review = get_product_review(product, current_user.buyers[0])
+    assessment = sum([r.current_rating for r in product.reviews]) / len(product.reviews) if product.reviews else 0
+
     return render_template(
         'products/[guid].html',
         product=product,
@@ -75,7 +80,10 @@ def product_view(product_guid: str):
         categories=[c.name for c in get_all_product_categories()],
         product_reservation=product_reservation,
         sequence_failed=sequence_failed,
-        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id
+        is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
+        can_review=can_review,
+        review=review,
+        assessment=assessment
     )
 
 

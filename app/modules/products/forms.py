@@ -1,4 +1,3 @@
-from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import validators, widgets
 from wtforms.fields.choices import SelectField, SelectMultipleField
@@ -10,6 +9,9 @@ from app.modules.products.handlers import get_all_product_categories, get_all_pr
 
 
 class SearchForm(FlaskForm):
+    """
+    Represents the search form. Used in the top bar.
+    """
     class Meta:
         csrf = False
 

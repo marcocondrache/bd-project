@@ -17,11 +17,17 @@ else:
 
 
 class CartStatus(Enum):
+    """
+    The CartStatus enum. It represents the status of a cart.
+    """
     ACTIVE = "active"
     FINALIZED = "finalized"
 
 
 class ProductReservation(db.Model):
+    """
+    The ProductReservation model. It represents a reservation of a product in a cart.
+    """
     __tablename__ = "product_reservations"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
@@ -49,6 +55,9 @@ class ProductReservation(db.Model):
 
 
 class ProductReservationHistory(db.Model):
+    """
+    The ProductReservationHistory model. It represents the history of a reservation of a product in a cart.
+    """
     __tablename__ = "product_reservation_history"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
@@ -67,6 +76,9 @@ class ProductReservationHistory(db.Model):
 
 
 class Cart(db.Model):
+    """
+    The Cart model. It represents a cart of a buyer.
+    """
     __tablename__ = "carts"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)

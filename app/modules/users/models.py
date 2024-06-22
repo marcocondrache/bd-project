@@ -15,6 +15,9 @@ else:
 
 
 class User(UserMixin, db.Model):
+    """
+    Represents a user. A user can be a buyer or a seller. A user in order to be a seller must be a buyer first.
+    """
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)
@@ -29,13 +32,19 @@ class User(UserMixin, db.Model):
     )
     deleted_at: Mapped[str] = mapped_column(db.DateTime, nullable=True)
 
-    # TODO: uselist=False, glhf w/ that
-    #  https://docs.sqlalchemy.org/en/20/orm/relationship_api.html#sqlalchemy.orm.relationship.params.uselist
     buyers: Mapped[List[Buyer]] = db.relationship("Buyer", back_populates="user")
     sellers: Mapped[List[Seller]] = db.relationship("Seller", back_populates="user")
 
     def get_id(self):
+        """
+        Get the user guid. Utility function in order to work with Flask-Login.
+        :return: the user guid
+        """
         return str(self.guid)
 
     def __repr__(self):
+        """
+        Get the string representation of the user.
+        :return: the string representation of the user
+        """
         return f"<User guid={self.guid} email={self.email} given_name={self.given_name} family_name={self.family_name}>"

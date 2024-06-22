@@ -13,6 +13,11 @@ from app.modules.shared.utils import buyer_required
 
 
 def validate_product(product_guid: str) -> Product:
+    """
+    Utility function to validate a product by its guid.
+    :param product_guid: the guid of the product
+    :return: the product if it exists, otherwise abort with a 404 error
+    """
     try:
         product_guid = UUID(product_guid)
         product = get_product_by_guid(product_guid)
@@ -27,8 +32,13 @@ def validate_product(product_guid: str) -> Product:
 @login_required
 @buyer_required
 def index_view():
+    """
+    Cart view.
+    :return: The cart view.
+    """
     buyer_id = current_user.buyers[0].id
 
+    # handling form submission
     if request.method == 'POST':
         product_guid = request.form.get('product_guid')
         quantity = int(request.form.get('quantity'))
@@ -48,6 +58,8 @@ def index_view():
     page = request.args.get('page', 1, type=int)
 
     cart = get_cart_by_buyer(buyer_id)
+
+    # get the reservations of the cart
     reservations = get_reservation_by_cart(cart, page)
     return render_template(
         'carts/index.html',

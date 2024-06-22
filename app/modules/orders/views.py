@@ -1,4 +1,3 @@
-from typing import List
 from uuid import UUID
 
 from flask import render_template, url_for, redirect, abort, flash, request

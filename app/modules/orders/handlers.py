@@ -7,14 +7,14 @@ import pytz
 from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.carts.models import Cart, ProductReservation, CartStatus
-from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct
-from app.modules.shared.consts import created_orders_ttl, page_size
+from app.modules.orders.models import BuyerOrder, BuyersOrderStatus, SellerOrder, OrderedProduct, OrderReport
+from app.modules.shared.consts import DEFAULT_CREATED_ORDERS_TTL, DEFAULT_PAGE_SIZE
 from app.modules.shipments.handlers import create_shipment
 from app.modules.shipments.models import Shipment
 from extensions import db
 
 
-def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+def get_buyer_orders_by_buyer(buyer_id: int, page: int = 1, per_page: int = DEFAULT_PAGE_SIZE) -> QueryPagination:
     """
     Get buyer orders by buyer id.
     :param buyer_id: the id of the buyer
@@ -52,7 +52,7 @@ def get_seller_order_by_guid(guid: UUID, seller_id: int) -> SellerOrder | None:
     return SellerOrder.query.filter_by(guid=guid, seller_id=seller_id).first()
 
 
-def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = DEFAULT_PAGE_SIZE) -> QueryPagination:
     """
     Get seller orders by seller id.
     :param seller_id: the id of the seller
@@ -67,7 +67,7 @@ def get_seller_orders_by_seller(seller_id: int, page: int = 1, per_page: int = p
             .paginate(page=page, per_page=per_page))
 
 
-def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+def get_ordered_products_by_product(product_id: int, page: int = 1, per_page: int = DEFAULT_PAGE_SIZE) -> QueryPagination:
     """
     Get ordered products by product id.
     :param product_id: the id of the product
@@ -146,7 +146,7 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
     :return: the buyer order and the seller orders
     """
 
-    if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=created_orders_ttl):
+    if buyer_order.created_at.replace(tzinfo=pytz.UTC) < datetime.now(pytz.UTC) - timedelta(seconds=DEFAULT_CREATED_ORDERS_TTL):
         for r in buyer_order.cart.reservations:
             r.product.locked_stock -= r.quantity
         buyer_order.deleted_at = db.func.now()
@@ -166,6 +166,8 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
 
     # create seller orders
     seller_orders = []
+    order_reports = []
+
     for r in reservations:
         ordered_product = OrderedProduct(product=r.product, quantity=r.quantity)
 
@@ -183,6 +185,13 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
 
         seller_order.ordered_products.append(ordered_product)
 
+    db.session.commit()
+    # create order reports
+    for so in seller_orders:
+        order_report = OrderReport(buyer_order=buyer_order, buyer=buyer_order.cart.buyer,
+                                   seller=so.seller, seller_order=so)
+        db.session.add(order_report)
+        order_reports.append(order_report)
     db.session.commit()
     return buyer_order, seller_orders
 

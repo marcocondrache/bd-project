@@ -10,6 +10,11 @@ from extensions import csrf
 @login_required
 @csrf.exempt
 def register_view():
+    """
+    Register a seller. The user must not be a seller.
+    :return:
+    """
+    # handling form submission
     if request.method == 'POST':
         iban = request.form.get('iban')
         show_sold_products = request.form.get('show_sold_products') == 'on'
