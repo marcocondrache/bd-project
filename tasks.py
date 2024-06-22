@@ -13,6 +13,28 @@ def generate_styles(c):
     print("styles generated")
 
 
+def generate_secret():
+    secret_entry = "SECRET_KEY="
+    env_path = ".env"
+
+    if not os.path.exists(env_path):  # .env file does not exist, create it
+        with open(env_path, "w") as env_file:
+            env_file.write(f"{secret_entry}{os.urandom(32)}\n")
+            print(f"generated .env file with secret key")
+    else:
+        with open(env_path, "r") as env_file:
+            lines = env_file.readlines()
+
+        for line in lines:  # check if secret key already exists
+            if line.startswith(secret_entry):
+                print("secret key already exists in .env file, skipping...")
+                return
+
+        with open(env_path, "a") as env_file:  # append secret key to .env file
+            env_file.write(f"{secret_entry}{os.urandom(32)}\n")
+            print("appended secret key to .env file")
+
+
 @task
 def populate(c):
     migrate(c)
@@ -33,10 +55,7 @@ def setup(c):
     c.run("npm install")
 
     generate_styles(c)
-
-    # Generate secret and other env variables
-    env = open('.env', 'w+')
-    env.write("SECRET_KEY={secret}".format(secret=os.urandom(32)))
+    generate_secret()
 
 
 @task

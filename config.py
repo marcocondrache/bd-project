@@ -13,14 +13,18 @@ class Prod(object):
 
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24))
 
-    DB_USER = os.getenv('DB_USER', 'db_admin')
-    DB_PASS = os.getenv('DB_PASS', 'password')
-    DB_HOST = os.getenv('DB_HOST', '0.0.0.0')
-    DB_NAME = os.getenv('DB_NAME', 'kepler_db')
+    DB_USER = os.getenv('DB_USER')
+    DB_PASS = os.getenv('DB_PASS')
+    DB_HOST = os.getenv('DB_HOST')
+    DB_NAME = os.getenv('DB_NAME')
+
+    if not DB_USER or not DB_PASS or not DB_HOST or not DB_NAME:
+        raise ValueError("Missing database configuration: add DB_USER, DB_PASS, DB_HOST, DB_NAME to the .env file")
 
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "isolation_level": "REPEATABLE READ"
+        "isolation_level": "REPEATABLE READ",
+        "echo": True,
     }
 
     BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts", "orders", "shipments"]
