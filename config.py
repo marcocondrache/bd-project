@@ -38,8 +38,8 @@ class Prod(object):
 
 class Dev(Prod):
     SQLALCHEMY_ENGINE_OPTIONS = {
-        **super().SQLALCHEMY_ENGINE_OPTIONS,
+        **Prod.SQLALCHEMY_ENGINE_OPTIONS,
         "echo": True,
     }
-    
+
     DEBUG = True
