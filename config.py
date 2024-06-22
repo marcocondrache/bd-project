@@ -24,7 +24,6 @@ class Prod(object):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
     SQLALCHEMY_ENGINE_OPTIONS = {
         "isolation_level": "REPEATABLE READ",
-        "echo": True,
     }
 
     BLUEPRINTS = ["home", "auth", "users", "buyers", "sellers", "products", "carts", "orders", "shipments"]
@@ -38,4 +37,9 @@ class Prod(object):
 
 
 class Dev(Prod):
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        **super().SQLALCHEMY_ENGINE_OPTIONS,
+        "echo": True,
+    }
+    
     DEBUG = True
