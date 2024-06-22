@@ -1,6 +1,14 @@
 # Kepler Shop
 
-This project uses conda as an environment, pip for python packages and invoke to run tasks
+This project uses conda as an environment, pip for python packages and invoke to
+run tasks
+
+## Requirements
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+- [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (nvm
+  is recommended)
 
 ## Boot up
 
@@ -26,9 +34,10 @@ DB_HOST=localhost:5432
 DB_NAME=kepler_db
 DB_USER=[username]
 DB_PASS=[password]
-
-SECRET_KEY=[secret_key]
 ```
+
+**The username and password needs to match the one defined in
+the `docker-compose.yaml` file**
 
 Run the server:
 
@@ -36,8 +45,12 @@ Run the server:
 $ invoke setup dev
 ```
 
-## Migrations
-If you have made changes to the models, you need to generate the migrations and apply them to the database. To do this, run the following commands:
+## Contributing
+
+### Migrations
+
+If you have made changes to the models, you need to generate the migrations and
+apply them to the database. To do this, run the following commands:
 
 ```sh
 flask db migrate -m "<migration message>"
@@ -46,5 +59,5 @@ invoke migrate
 
 The first command generates the migration file,
 and the second applies the migration to the database.
-To apply the migration to the database, 
+To apply the migration to the database,
 you need to have the database running and the database env variables set.
