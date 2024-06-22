@@ -128,7 +128,6 @@
                    x-transition:leave-start="translate-x-0"
                    x-transition:leave-end="-translate-x-full"
             >
-                {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
                 {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
 
                 {% if current_user.sellers %}

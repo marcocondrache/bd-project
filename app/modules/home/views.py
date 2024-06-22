@@ -13,4 +13,4 @@ def unauthorized():
 @home.route('/')
 @login_required
 def index_view():
-    return render_template('index.html')
+    return redirect(url_for('products.shop_products'))
