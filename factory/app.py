@@ -36,7 +36,7 @@ class Base(Flask):
         @self.errorhandler(403)
         def forbidden(e):
             self.logger.error(e.description)
-            return render_template("index.html"), 403
+            return render_template("http/403.html", reason=e.description), 403
 
         @self.errorhandler(CSRFError)
         def handle_csrf_error(e):
