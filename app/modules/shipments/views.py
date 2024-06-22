@@ -5,7 +5,6 @@ from flask_wtf import FlaskForm
 from app.modules.shared.utils import seller_required
 from app.modules.shipments import shipments
 from app.modules.shipments.handlers import get_shipments_by_seller, get_shipment_by_uuid, update_shipment_status
-from app.modules.shipments.models import ShipmentStatus
 
 
 @shipments.route("", methods=['GET'])

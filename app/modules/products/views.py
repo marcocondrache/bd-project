@@ -71,6 +71,7 @@ def product_view(product_guid: str):
     product_reservation, sequence_failed = get_reservation_by_product(current_user.buyers[0].id, product)
     can_review = can_be_reviewed(product, current_user.buyers[0])
     review = get_product_review(product, current_user.buyers[0])
+    assessment = sum([r.current_rating for r in product.reviews]) / len(product.reviews) if product.reviews else 0
 
     return render_template(
         'products/[guid].html',
@@ -81,7 +82,8 @@ def product_view(product_guid: str):
         sequence_failed=sequence_failed,
         is_seller_product=current_user.sellers and product.owner_seller_id == current_user.sellers[0].id,
         can_review=can_review,
-        review=review
+        review=review,
+        assessment=assessment
     )
 
 

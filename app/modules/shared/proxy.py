@@ -6,6 +6,10 @@ from app.modules.products.forms import SearchForm
 
 
 def _get_search():
+    """
+    Utility function to get the search form. If the user is authenticated and the search form is not in the context,
+    :return: the search form
+    """
     if has_request_context() and current_user.is_authenticated:
         if "_search" not in g:
             return SearchForm(request.args)

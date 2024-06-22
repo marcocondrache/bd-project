@@ -56,6 +56,11 @@
                     <p class="mb-2"> {{ product.description }}</p>
                     <p class="mb-2">Brand: <span class="font-semibold"> {{ product.brand }}</span></p>
                     <p class="mb-4">Stock: <span class="font-semibold"> {{ product.stock }}</span></p>
+                    {% if product.reviews|length > 0 %}
+                        <p class="mb-4">Average assessment: <span class="font-semibold"> {{ assessment }}</span></p>
+                    {% else %}
+                        <p class="mb-4">No reviews yet</p>
+                    {% endif %}
                     <div class="flex items-center gap-4 mb-8">
                         <div>
                             <span class="text-3xl font-bold">{{ product.price }}</span>
@@ -168,10 +173,9 @@
                     {% endif %}
                 </div>
             </div>
-            <!-- Reviews section -> get latest 5 reviews -->
             {%  if product.reviews|length == 0 %}
                 <div class="mt-4">
-                    <h3 class="text-xl font-semibold mb-2">Reviews</h3>
+                    <h3 class="text-xl font-semibold mb-2">Latest Reviews</h3>
                     <div class="bg-white rounded-lg shadow-lg p-4">
                         <p>No reviews yet</p>
                     </div>
@@ -180,7 +184,7 @@
 
                 <div class="mt-4">
                     <h3 class="text-xl font-semibold mb-2">Reviews</h3>
-                    <div class="flex flex-col gap-4">
+                    <div class="flex flex-col">
                         {% for review in product.reviews[:5] %}
                             {{ review_details_card(review.buyer.user, review) }}
                         {% endfor %}

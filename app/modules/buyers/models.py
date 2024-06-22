@@ -16,6 +16,9 @@ else:
 
 
 class Buyer(db.Model):
+    """
+    The Buyer model. A buyer is a user that can buy products.
+    """
     __tablename__ = "buyers"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)

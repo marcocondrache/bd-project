@@ -17,6 +17,9 @@ else:
 
 
 class Seller(db.Model):
+    """
+    Represents a seller. A seller is a user that sells products.
+    """
     __tablename__ = "sellers"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, nullable=False, index=True)

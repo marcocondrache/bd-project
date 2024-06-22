@@ -12,7 +12,7 @@ from extensions import db
 from uuid import UUID
 
 
-def create_product_review(product_guid: str, rating: int, message: str, buyer: Buyer):
+def create_or_update_product_review(product_guid: str, rating: int, message: str, buyer: Buyer):
     """
     Create a product review for a product.
     :param product_guid: The product guid.
@@ -26,6 +26,12 @@ def create_product_review(product_guid: str, rating: int, message: str, buyer: B
     if not product:
         raise ValueError("Product not found")
 
+    # if the review already exists, update it
+    review = get_product_review(product, buyer)
+    if review:
+        return update_product_review(review, rating, message)
+
+    # check whether the product can be reviewed
     if not can_be_reviewed(product, buyer):
         raise ValueError("Product can't be reviewed")
 
@@ -36,6 +42,20 @@ def create_product_review(product_guid: str, rating: int, message: str, buyer: B
         buyer=buyer,
     )
     db.session.add(product_review)
+    db.session.commit()
+    return product_review
+
+
+def update_product_review(product_review: ProductReview, rating: int, message: str):
+    """
+    Update a product review.
+    :param product_review: The product review.
+    :param rating: The rating.
+    :param message: The message.
+    :return: The updated product review.
+    """
+    product_review.current_rating = rating
+    product_review.current_message = message
     db.session.commit()
     return product_review
 
@@ -57,7 +77,19 @@ def can_be_reviewed(product: Product, buyer: Buyer) -> bool:
     :param buyer: the buyer
     :return: True if the product can be reviewed, False otherwise
     """
-    filtered_order_reports: List[OrderReport] = OrderReport.query.filter_by(buyer_id=buyer.id, seller_id=product.seller.id).all()
-    return any(order_report.seller_order.shipment.is_delivered()
-               for order_report in filtered_order_reports if order_report.seller_order.shipment is not None) and \
-        not get_product_review(product, buyer)
+
+    # get all the order reports of the buyer for the product seller
+    filtered_order_reports: List[OrderReport] = OrderReport.query.filter_by(
+        buyer_id=buyer.id,
+        seller_id=product.seller.id
+    ).all()
+
+    # get the order reports that have a shipment and are delivered
+    remaining_order_reports: List[OrderReport] = [order_report
+                                                  for order_report in filtered_order_reports if
+                                                  order_report.seller_order.shipment is not None and \
+                                                  not get_product_review(product,
+                                                                         buyer) and order_report.seller_order.shipment.is_delivered()]
+
+    # check if the product is in any of the remaining order reports
+    return any([orp for orp in remaining_order_reports if any(filter(lambda op: op.product == product, orp.seller_order.ordered_products))])

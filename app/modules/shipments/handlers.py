@@ -3,7 +3,7 @@ from typing import List
 from flask_sqlalchemy.pagination import QueryPagination
 
 from app.modules.orders.models import SellerOrder, SellerOrderStatus
-from app.modules.shared.consts import page_size
+from app.modules.shared.consts import DEFAULT_PAGE_SIZE
 from app.modules.shipments.models import Shipment, ShipmentStatus
 from extensions import db
 
@@ -60,7 +60,7 @@ def update_shipment_status(shipment: Shipment) -> Shipment:
     return shipment
 
 
-def get_shipments_by_seller(seller_id: int, page: int = 1, per_page: int = page_size) -> QueryPagination:
+def get_shipments_by_seller(seller_id: int, page: int = 1, per_page: int = DEFAULT_PAGE_SIZE) -> QueryPagination:
     """
     Get shipments by seller id.
     :param seller_id: the id of the seller
