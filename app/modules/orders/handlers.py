@@ -115,6 +115,7 @@ def create_buyer_order(cart: Cart) -> (
         for r in invalid_reservations:
             r.deleted_at = db.func.now()
             # TODO: should create a new reservation?
+        db.session.commit()
         return None, invalid_reservations, OrderCreationErrorReason.INVALID_PRODUCTS
 
     # check locked products
@@ -161,6 +162,7 @@ def complete_buyer_order(buyer_order: BuyerOrder) -> (BuyerOrder | None, List[Se
     for r in reservations:
         r.product.locked_stock -= r.quantity
         r.product.stock -= r.quantity
+        r.product.sequence += 1
 
     # create seller orders
     seller_orders = []

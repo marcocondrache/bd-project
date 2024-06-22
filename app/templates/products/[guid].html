@@ -11,13 +11,14 @@
             Alpine.data('product_view', () => ({
                 categories: {{ product_categories|tojson }},
 
-                name: "{{ product.name }}",
-                description: "{{ product.description|default('No description available') }}",
-                brand: "{{ product.brand }}",
-                isSecondHand: "{{ product.is_second_hand }}",
-                price: {{ product.price }},
-                currency: "{{ product.currency }}",
-                stock: {{ product.stock }},
+                name: {{ product.name|tojson }},
+                description: {{ product.description|default('No description available')|tojson }},
+                brand: {{ product.brand|tojson }},
+                isSecondHand: {{ product.is_second_hand|tojson }},
+                price: {{ product.price|tojson }},
+                currency: {{ product.currency|tojson }},
+                stock: {{ product.stock|tojson }},
+
                 confirmDelete: false,
 
                 showWarning: false,
@@ -26,7 +27,7 @@
             }));
         });
     </script>
-    <div class="bg-gray-100 text-gray-900 flex flex-col">
+    <div x-data='product_view' class="bg-gray-100 text-gray-900 flex flex-col">
         {{ error_message() }}
         <div class="container mx-auto p-4">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden lg:flex relative">
@@ -34,51 +35,42 @@
                     {% if product.image %}
                         <img class="lg:w-64 w-full h-64 lg:h-full" src="{{ product.image }}" alt="{{ product.name }}">
                     {% else %}
-                        <div class="lg:w-64 w-full h-64 lg:h-full flex items-center justify-center">
+                        <div class="lg:w-64 min-w-20 h-64 lg:h-full flex items-center justify-center">
                             <box-icon name="image-alt" size="lg"></box-icon>
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="p-4 flex flex-col w-full">
-                    <h2 class="text-xl font-semibold mb-2">{{ product.name }}</h2>
-                {% if product.categories|length > 0 %}
-                    <div class="flex gap-2 mb-4">
-                        {% for category in product.categories %}
+                    <h2 class="text-xl font-semibold mb-2" x-text="name"></h2>
+                    <div class="flex gap-2 mb-4" x-show="categories.length > 0">
+                        <template x-for="category in categories">
                             <span
-                                class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full shadow-md"
-                            >
-                                {{ category.name }}
-                            </span>
-                        {% endfor %}
+                                    x-text="category"
+                                    class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full shadow-md"
+                            ></span>
+                        </template>
                     </div>
-                {% endif %}
-                    <p class="mb-2"> {{ product.description }}</p>
-                    <p class="mb-2">Brand: <span class="font-semibold"> {{ product.brand }}</span></p>
-                    <p class="mb-4">Stock: <span class="font-semibold"> {{ product.stock }}</span></p>
-                    {% if product.reviews|length > 0 %}
-                        <p class="mb-4">Average assessment: <span class="font-semibold"> {{ assessment }}</span></p>
-                    {% else %}
-                        <p class="mb-4">No reviews yet</p>
-                    {% endif %}
+                    <p class="mb-2" x-text="description"></p>
+                    <p class="mb-2">Brand: <span class="font-semibold" x-text="brand"></span></p>
+                    <p class="mb-4">Stock: <span class="font-semibold" x-text="stock"></span></p>
                     <div class="flex items-center gap-4 mb-8">
                         <div>
-                            <span class="text-3xl font-bold">{{ product.price }}</span>
-                            <span class="text font-medium">{{ product.currency }}</span>
+                            <span class="text-3xl font-bold" x-text="price"></span>
+                            <span class="text font-medium" x-text="currency"></span>
                         </div>
-                        {% if product.is_second_hand %}
-                            <span
-                                class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
-                            >
-                                New
-                            </span>
-                        {% else %}
                         <span
-                            class="my-4 text-sm font-medium bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
+                                x-show="isSecondHand"
+                                class="text-sm font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full shadow-md"
+                        >
+                            New
+                        </span>
+                        <span
+                                x-show="!isSecondHand"
+                                class="my-4 text-sm font-medium bg-orange-100 text-orange-800 px-2 py-1 rounded-full"
                         >
                             Second hand
                         </span>
-                        {% endif %}
                     </div>
 
                     {% if product.deleted_at is not none %}

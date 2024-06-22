@@ -61,10 +61,10 @@
                     {% set data = search.data[filter] %}
                     {% if data is list %}
                         {% for item in data %}
-                            <input type="hidden" value="{{ item }}" name="{{ filter }}">
+                            <input type="hidden" value="{{ item or '' }}" name="{{ filter }}">
                         {% endfor %}
                     {% else %}
-                        <input type="hidden" value="{{ search.data[filter] }}" name="{{ filter }}">
+                        <input type="hidden" value="{{ search.data[filter] or '' }}" name="{{ filter }}">
                     {% endif %}
                 {% endfor %}
 
@@ -128,7 +128,6 @@
                    x-transition:leave-start="translate-x-0"
                    x-transition:leave-end="-translate-x-full"
             >
-                {{ row("Dashboard", url_for("home.index_view"), "home", "D") }}
                 {{ row("Shop", url_for("products.shop_products"), "store", "S") }}
 
                 {% if current_user.sellers %}
