@@ -33,7 +33,7 @@
                     {% if product.image %}
                         <img class="lg:w-64 w-full h-64 lg:h-full" src="{{ product.image }}" alt="{{ product.name }}">
                     {% else %}
-                        <div class="lg:w-64 w-full h-64 lg:h-full flex items-center justify-center">
+                        <div class="lg:w-64 min-w-20 h-64 lg:h-full flex items-center justify-center">
                             <box-icon name="image-alt" size="lg"></box-icon>
                         </div>
                     {% endif %}
