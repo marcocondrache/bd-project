@@ -1,5 +1,6 @@
 import random
 from concurrent.futures import ThreadPoolExecutor
+from typing import List
 
 import faker_commerce
 from faker import Faker
@@ -8,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 
 from app.modules.buyers.models import Buyer
-from app.modules.products.models import ProductCategory, Product
+from app.modules.products.models import ProductCategory, Product, Keyword
 from app.modules.reviews.models import ProductReview
 from app.modules.sellers.models import Seller
 from app.modules.users.models import User
@@ -32,6 +33,23 @@ def create_user(faker: Faker):
 def create_buyer(faker, user):
     return Buyer(destination_address=faker.address(), card_number=str(faker.credit_card_number()),
                  user=user)
+
+
+def create_keywords(products: List[Product]) -> List[Keyword]:
+    # create a mapping of keywords to products, the keywords are the product name split by spaces
+    keywords = {}
+    for product in products:
+        # include the brand in the keywords and the name of the product itself
+        for word in set(product.name.split() + product.brand.split() + [product.name]):
+            if word not in keywords:
+                keywords[word] = []
+            keywords[word].append(product)
+
+    # create the keywords
+    for word, products in keywords.items():
+        keyword = Keyword(key=word, reference_count=len(products))
+        keyword.products = products
+        yield keyword
 
 
 def create_product(faker, seller):
@@ -88,11 +106,15 @@ class Populate(object):
     def __populate_products(self):
         categories = self.session.query(ProductCategory).all()
         sellers = self.session.query(Seller).all()
+        products = []
 
         for seller in sellers:
             for _ in range(20):
                 product = create_product(self.faker, seller)
                 product.categories = random.choices(categories, k=3)
                 self.session.add(product)
+                products.append(product)
 
+        keywords = list(create_keywords(products))
+        self.session.add_all(keywords)
         self.session.commit()
