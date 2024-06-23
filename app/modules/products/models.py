@@ -88,6 +88,7 @@ class ProductHistory(db.Model):
     price: Mapped[float] = mapped_column("price", db.Float, nullable=False)
     currency: Mapped[str] = mapped_column("currency", db.String(3), nullable=False)
     stock: Mapped[int] = mapped_column("stock", db.Integer, nullable=False)
+    locked_stock: Mapped[int] = mapped_column("locked_stock", db.Integer, nullable=False, default=0)
 
     product = db.relationship("Product", back_populates="history")
 

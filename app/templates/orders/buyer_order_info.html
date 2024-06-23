@@ -75,10 +75,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for reservation in order.cart.reservations %}
+                    <!-- exclude reservations with deleted_at not null -->
+                        {% for reservation in order.cart.reservations if reservation.deleted_at == None %}
                             <tr class="bg-white border-b bg-gray-100">
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {{ reservation.product.name }}
+                                    <a href="{{ url_for('products.product_view', product_guid=reservation.product.guid) }}">
+                                        {{ reservation.product.name }}
+                                    </a>
                                 </th>
                                 <td class="px-6 py-4">
                                     {{ reservation.product.seller.user.given_name }} {{ reservation.product.seller.user.family_name }}

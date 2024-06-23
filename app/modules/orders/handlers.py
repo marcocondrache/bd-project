@@ -114,7 +114,6 @@ def create_buyer_order(cart: Cart) -> (
     if invalid_reservations:
         for r in invalid_reservations:
             r.deleted_at = db.func.now()
-            # TODO: should create a new reservation?
         db.session.commit()
         return None, invalid_reservations, OrderCreationErrorReason.INVALID_PRODUCTS
 

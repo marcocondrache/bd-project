@@ -2,7 +2,6 @@
 
 {% macro order_card(order, current_user) -%}
     {% set reservations = order.cart.reservations|selectattr('deleted_at', 'none')|list %}
-    {# TODO: account for currency differences between reservations #}
     {% set ns = namespace(total=0) %}
     {% for reservation in reservations %}
         {% set ns.total = ns.total + (reservation.quantity * reservation.product.price) %}
