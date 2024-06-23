@@ -95,7 +95,6 @@ def update_cart(buyer_id: int, product: Product, quantity: int) -> (Cart | None,
     # if the product sequence is different from the reservation sequence, delete the reservation and return None, product
     if product.sequence != product_reservation.product_sequence:
         product_reservation.deleted_at = db.func.now()
-        # TODO should create a new reservation?
         db.session.commit()
         return None, product
 

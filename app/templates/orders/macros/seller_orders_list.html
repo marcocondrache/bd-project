@@ -1,5 +1,4 @@
 {% macro order_card(order, current_user) -%}
-    {# TODO: account for currency differences between reservations #}
     {% set ns = namespace(total=0) %}
     {% for product in order.ordered_products %}
         {% set ns.total = ns.total + (product.quantity * product.product.price) %}

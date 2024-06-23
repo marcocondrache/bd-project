@@ -168,7 +168,7 @@
                 this.originalProfile = this.profile;
                 this.profileEditMode = false;
             } else {
-                alert("Failed to update user"); // TODO find the will to do
+                alert("Failed to update user");
             }
         }
 
@@ -182,21 +182,21 @@
                 profileEditMode: false,
                 editUser,
                 profile: {
-                    destination_address: "{{ current_user.buyers[0].destination_address }}",
-                    card_number: "{{ current_user.buyers[0].card_number|string }}",
+                    destination_address: {{ current_user.buyers[0].destination_address|tojson }},
+                    card_number: {{ current_user.buyers[0].card_number|tojson }},
 
                     {% if current_user.sellers %}
-                        iban: "{{ current_user.sellers[0].iban }}",
-                        show_soldout: "{{ current_user.sellers[0].show_soldout_products|string }}" === "True",
+                        iban: {{ current_user.sellers[0].iban|tojson }},
+                        show_soldout: {{ current_user.sellers[0].show_soldout_products|tojson }},
                     {% endif %}
                 },
                 originalProfile: {
-                    destination_address: "{{ current_user.buyers[0].destination_address }}",
-                    card_number: "{{ current_user.buyers[0].card_number }}",
+                    destination_address: {{ current_user.buyers[0].destination_address|tojson }},
+                    card_number: {{ current_user.buyers[0].card_number|tojson }},
 
                     {% if current_user.sellers %}
-                        iban: "{{ current_user.sellers[0].iban }}",
-                        show_soldout: "{{ current_user.sellers[0].show_soldout_products|string }}" === "True",
+                        iban: {{ current_user.sellers[0].iban|tojson }},
+                        show_soldout: {{ current_user.sellers[0].show_soldout_products|tojson }},
                     {% endif %}
                 },
             }));
